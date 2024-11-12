@@ -4,8 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-fe": "npm run --prefix ./frontend start"
+    "start:fe": "npm run --prefix ./frontend start",
+    "start:mw": "npm run --prefix ./middleware start",
+    "start": "concurrently \"npm run start:fe\" \"npm run start:mw\""
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
 }
