@@ -1,20 +1,20 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import TestPage from './pages/TestPage';
 
 function App() {
   return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/test">
-            <TestPage />
-          </Route>
-          {/* Add more routes as needed */}
-          <Route path="/">
-            {/* TODO: remove this sample code for when developing your app */}
+    <div>
+      <Routes>
+        {/* Define the /test route */}
+        <Route path="/test" element={<TestPage />} />
+
+        {/* Define the root route */}
+        <Route
+          path="/"
+          element={
             <div className="App">
               <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
@@ -31,10 +31,10 @@ function App() {
                 </a>
               </header>
             </div>
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+          }
+        />
+      </Routes>
+    </div>
   );
 }
 
