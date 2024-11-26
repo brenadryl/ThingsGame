@@ -25,8 +25,23 @@ const buildTestResponse = (response) => {
 const testResolvers = {
   Query: {
     test: async () => {
-      const response = await TestDataSource.test();
-      return buildTestResponse(response);
+      try {
+        const data = await TestDataSource.test();
+        console.log('Resolver data:', data);
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        return {
+          message: 'FE integrated successfully with Middleware!',
+          data: data.data || [],
+        };
+      } catch (error) {
+        console.error('Error in test resolver:', error);
+        return {
+          message: 'Error integrating FE with Middleware',
+          data: [],
+        };
+      }
     },
   },
 };
