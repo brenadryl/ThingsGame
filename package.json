@@ -18,7 +18,7 @@
     "@graphql-codegen/typescript-operations": "^4.4.0",
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@types/react-router-dom": "^5.3.3",
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.2"
   },
   "dependencies": {
     "@apollo/client": "^3.11.10",

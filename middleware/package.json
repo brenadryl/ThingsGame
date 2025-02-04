@@ -12,12 +12,12 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
-    "@vercel/node": "^3.2.24",
+    "@vercel/node": "^3.2.29",
     "apollo-server-express": "^3.13.0",
-    "axios": "^1.7.8",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "graphql": "^16.9.0",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6"
   }
 }
