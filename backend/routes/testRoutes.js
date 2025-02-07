@@ -4,7 +4,7 @@ const getPrompts = async (req, res) => {
   try {
     let db = await connectToDb();
     const collection = db.collection(process.env.DB_COLLECTION);
-    const data = await collection.find({}).toArray();
+    const data = await collection.find({}).sort({promptId: 1}).toArray();
     res.send({
       message: 'And the Backend too!',
       data
