@@ -21,10 +21,12 @@ export const lightTheme = createTheme({
       },
       typography: {
         fontFamily: "'Poppins', sans-serif",
-        h1: { fontSize: '2.5rem', fontWeight: 700, color: '#333333' },
-        h2: { fontSize: '2rem', fontWeight: 600, color: '#333333' },
-        body1: { fontSize: '1rem', fontWeight: 400, color: '#333333' },
-        button: { textTransform: 'none', fontWeight: 600 },
+        h1: { fontSize: '2.5rem', fontWeight: 1000, color: '#333333' },
+        h2: { fontSize: '2rem', fontWeight: 900, color: '#333333' },
+        h3: { fontSize: '1.5rem', fontWeight: 800, color: '#333333' },
+        h4: { fontSize: '1.4rem', fontWeight: 800, color: '#333333' },
+        body1: { fontSize: '1rem', fontWeight: 800, color: '#333333' },
+        button: { textTransform: 'none', fontWeight: 800 },
       },
       components: {
         MuiButton: {
@@ -39,7 +41,7 @@ export const lightTheme = createTheme({
         MuiAppBar: {
           styleOverrides: {
             root: {
-              backgroundColor: '#005F73', // Deep Blue for Navigation
+              backgroundColor: '#00C9A7', // Deep Blue for Navigation
             },
           },
         },
@@ -66,10 +68,12 @@ export const darkTheme = createTheme({
       },
       typography: {
         fontFamily: "'Poppins', sans-serif",
-        h1: { fontSize: '2.5rem', fontWeight: 700, color: '#FFFFFF' },
-        h2: { fontSize: '2rem', fontWeight: 600, color: '#FFFFFF' },
-        body1: { fontSize: '1rem', fontWeight: 400, color: '#FFFFFF' },
-        button: { textTransform: 'none', fontWeight: 600 },
+        h1: { fontSize: '2.5rem', fontWeight: 1000, color: '#FFFFFF' },
+        h2: { fontSize: '2rem', fontWeight: 900, color: '#FFFFFF' },
+        h3: { fontSize: '1.5rem', fontWeight: 800, color: '#FFFFFF' },
+        h4: { fontSize: '1.4rem', fontWeight: 800, color: '#FFFFFF' },
+        body1: { fontSize: '1rem', fontWeight: 800, color: '#FFFFFF' },
+        button: { textTransform: 'none', fontWeight: 800 },
       },
       components: {
         MuiButton: {
@@ -84,7 +88,7 @@ export const darkTheme = createTheme({
         MuiAppBar: {
           styleOverrides: {
             root: {
-              backgroundColor: '#005F73', // Deep Blue for Navigation
+              backgroundColor: '#00C9A7', // Deep Blue for Navigation
             },
           },
         },

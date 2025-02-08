@@ -1,27 +1,75 @@
 import mongoose from 'mongoose';
-import express from 'express'; // Import express
+import cors from 'cors';
+import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import { PubSub } from 'graphql-subscriptions';
+import { createServer } from 'http';
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/use/ws';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import typeDefs from './typeDefs.js';
 import resolvers from './resolvers.js';
 
-const pubsub = new PubSub();
+const allowedOrigins = ["http://localhost:3000", "https://things-game-ten.vercel.app/"];
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+
 async function startServer() {
+ try { // Connect to MongoDB
   await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+  // Create an Express application
   const app = express();
 
-  const server = new ApolloServer({ typeDefs, resolvers });
+  // Configure CORS
+  app.use(cors({ credentials: true, origin: '*' }));
+  // app.use(cors({ credentials: true, origin: allowedOrigins }));
 
+  // Create an HTTP server
+  const httpServer = createServer(app);
+
+  // Create the schema
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+  // Set up WebSocket server for subscriptions
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql',
+  });
+
+  const serverCleanup = useServer({ schema }, wsServer);
+
+  // Set up Apollo Server
+  const server = new ApolloServer({ 
+    schema,
+    plugins: [
+      {
+        async serverWillStart() {
+          return {
+            async drainServer () {
+              await serverCleanup.dispose();
+            }
+          }
+        }
+      }
+    ]
+  });
+
+  // Start Apollo Server
   await server.start();
 
+  // Apply Apollo middleware to Express app
   server.applyMiddleware({ app });
 
-  app.listen({ port: 5500 }, () => {
-    console.log(`Server ready at http://localhost:5500${server.graphqlPath}`);
+  // Start the HTTP server
+  const PORT = process.env.PORT || 5500;
+  httpServer.listen(PORT, () => {
+    console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
   });
+ } catch (error) {
+  console.error("Error starting server", error)
+  process.exit(1);
+ }
+
 }
 
 startServer();

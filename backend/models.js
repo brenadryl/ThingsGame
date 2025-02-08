@@ -10,16 +10,16 @@ const gagSchema = new mongoose.Schema({
     text: { type: String, required: true },
     votes: { type: Number, default: 0},
     createdAt: { type: Date, default: Date.now },
-    playerId: {
+    player: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Player'
     },
-    guesserId: {
+    guesser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player'
     },
-    roundId: {
+    round: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Round'
@@ -31,7 +31,7 @@ const roundSchema = new mongoose.Schema({
     stage: { type: Number, max: 2, default: 1 },
     promptText: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    gameId: {
+    game: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Game'
     },
@@ -43,19 +43,21 @@ const playerSchema = new mongoose.Schema({
     active: { type: Boolean, default: true },
     name: { type: String, required: true },
     color: { type: String},
-    icon: { type: String},
+    icon: { type: Number},
+    turn: { type: Number, required: true},
     createdAt: { type: Date, default: Date.now },
-    gameId: {
+    game: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Game'
     },
 });
 
 const gameSchema = new mongoose.Schema({
-    active: { type: Boolean, default: false },
-    code: { type: String, required: true },
+    active: { type: Boolean, default: true },
+    gameCode: { type: String, required: true },
+    stage: { type: Number, max: 3, default: 1 },
     createdAt: { type: Date, default: Date.now },
-    currentRoundId: {
+    currentRound: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Round'
     },
@@ -64,15 +66,15 @@ const gameSchema = new mongoose.Schema({
 const guessSchema = new mongoose.Schema({
     isCorrect: { type: Boolean, required: true },
     createdAt: { type: Date, default: Date.now },
-    guesserId: {
+    guesser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player'
     },
-    guessedId: {
+    guessed: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Player'
     },
-    gagId: {
+    gag: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gag'
     },

@@ -10,6 +10,8 @@ import { lightTheme, darkTheme } from "./themes/theme";
 import GradientButton from './Components/GradientButton';
 import { Container } from '@mui/system';
 import JoinPage from './pages/JoinPage';
+import HostPage from './pages/HostPage';
+import WaitingRoom from './pages/WaitingRoom';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -20,15 +22,15 @@ function App() {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
-          <Typography variant="h5" color="background" component="div" sx={{ flexGrow: 1 }}>
-            Oaks Things
+          <Typography variant="h2" color="primary.contrastText" component="div" sx={{ flexGrow: 1 }}>
+            JOAKS ON YOU
           </Typography>
           <GradientButton
             onClick={() => setDarkMode(!darkMode)}
             firstColor={darkMode ? darkTheme.palette.primary.main : lightTheme.palette.primary.main}
             secondColor={darkMode ? darkTheme.palette.secondary.main : lightTheme.palette.secondary.main}
-            startIcon={darkMode ? <WbSunnyIcon/> : undefined}
-            endIcon={darkMode ? undefined : <BedtimeIcon/>}
+            startIcon={darkMode ? <BedtimeIcon/> : undefined}
+            endIcon={darkMode ? undefined : <WbSunnyIcon/>}
           />
           </Toolbar>
         </AppBar>
@@ -41,8 +43,18 @@ function App() {
               }
             />
             <Route
+              path="/host"
+              element={ <HostPage/>
+              }
+            />
+            <Route
               path="/join"
               element={ <JoinPage/>
+              }
+            />
+            <Route
+              path="/waiting-room/:gameId/:playerId"
+              element={ <WaitingRoom/>
               }
             />
           </Routes>

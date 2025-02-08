@@ -15,10 +15,10 @@ const HomePage: React.FC = () => {
             firstColor={theme.palette.primary.main}
             secondColor={theme.palette.secondary.main}
           >
-                <Typography variant="h5">JOIN GAME</Typography>
+                <Typography variant="h3" color='primary.contrastText'>JOIN GAME</Typography>
         </GradientButton>
         <Box marginTop="24px">
-            <Button variant="contained" color="info"> HOST GAME</Button>
+            <Button variant="contained" color="info" onClick={()=> navigate('/host')}> HOST GAME</Button>
         </Box>
     </Box>
   )

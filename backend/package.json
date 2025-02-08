@@ -19,8 +19,10 @@
     "express": "^4.21.2",
     "graphql-subscriptions": "^3.0.0",
     "graphql-tag": "^2.12.6",
+    "graphql-ws": "^6.0.3",
     "graphql-yoga": "^5.10.11",
     "mongodb": "^6.13.0",
-    "mongoose": "^8.9.7"
+    "mongoose": "^8.9.7",
+    "subscriptions-transport-ws": "^0.11.0"
   }
 }

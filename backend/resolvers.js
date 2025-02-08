@@ -1,9 +1,11 @@
 import { Gag, Game, Guess, Player, Round, Prompt } from './models.js';
 import { withFilter } from 'graphql-subscriptions';
+import pubsub from './pubsub.js';
+import { FUN_COLORS } from './constants.js';
 
 function generateRandomString(length) {
   let result = '';
-  const characters = 'abcdefghijklmnopqrstuvwxyz';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const charactersLength = characters.length;
 
   for (let i = 0; i < length; i++) {
@@ -26,44 +28,92 @@ const resolvers = {
         const prompts = await Prompt.aggregate([{ $sample: { size: 3 } }]);
         return prompts;
       },
+      getPlayers: async (_, { gameId }) => {
+        try {
+          const players = await Player.find({game: gameId});
+          const playersWithDetails = await Promise.all(
+            players.map(async (player) => {
+              const guessesMade = await Guess.find({guesser: player._id})
+              const guessesReceived = await Guess.find({guessed: player._id})
+              const gags = await Gag.find({player: player._id})
+              return {
+                ...player.toObject(),
+                guessesMade,
+                guessesReceived,
+                gags,
+              }
+            })
+          );
+          return playersWithDetails;
+        } catch (error) {
+          console.error("Error fetching players.", error)
+          throw new Error("Failed to fetch players")
+        }
+      },
+      getPlayer: async (_, { id }) => {
+        try {
+          const player = await Player.findById(id);
+          if (!player) {
+            throw new Error("Player not found");
+          }
+          const guessesMade = await Guess.find({guesser: player._id})
+          const guessesReceived = await Guess.find({guessed: player._id})
+          const gags = await Gag.find({player: player._id})
+
+          return {
+            ...player.toObject(),
+            guessesMade,
+            guessesReceived,
+            gags,
+          }
+        } catch (error) {
+          console.error("Error fetching player", error)
+          throw new Error("Failed to fetch player")
+        }
+      },
+      getGame: async (_, { id }) => {
+        try {
+          const game = await Game.findById(id).populate("currentRound");
+          if (!game) {
+            throw new Error("Game not found");
+          }
+          const players = await Player.find({game: game._id})
+          const rounds = await Round.find({game: game._id})
+
+          return {
+            ...game.toObject(),
+            players,
+            rounds,
+          }
+        } catch (error) {
+          console.error("Error fetching game", error)
+          throw new Error("Failed to fetch game")
+        }
+      },
       rounds: () => Round.find(),
-      players: () => Player.find(),
-      game: () => Game.find(),
       guesses: () => Guess.find(),
-      getGags: async (_, { id, roundId, guesserId, playerId, guessed }) => {
-        let filter = {};
-        if (id){
-          filter._id = id;
-        }
-        if (roundId){
-          filter.roundId = roundId;
-        }
-        if (guesserId){
-          filter.guesserId = roundId;
-        }
-        if (playerId){
-          filter.playerId = roundId;
-        }
-        if (guessed !== undefined){
-          filter.guessed = guessed;
-        }
-        const gags = await Gag.find(filter);
-        return gags;
-      }
-      
     },
     Mutation: {
-      createPlayer: async (_, { name, gameCode, color, icon }) => {
+      createPlayer: async (_, { name, gameCode }) => {
         const existingGame = await Game.findOne({ gameCode: gameCode });
-        if (existingGame) {
-          const existingPlayer = await Player.findOne({ gameId: existingGame._id, name: name });
+        if (existingGame && existingGame.active && existingGame.stage === 1) {
+          const existingPlayer = await Player.findOne({ game: existingGame._id, name: name });
           if (existingPlayer) {
             throw new UserInputError("A player with this name already exists in this game.");
           }
+          const players = await Player.find({game: existingGame._id})
+          if (players.length > 19) {
+            throw new UserInputError("This game is full.");
+          }
+
           const createdAt = Math.floor(Date.now() / 1000);
-          const player = new Player({ name, gameId: existingGame._id, color, icon, createdAt });
+          const uniqueNum = (parseInt(gameCode, 36) + players.length)%20;
+          const player = new Player({ name, game: existingGame._id, color: FUN_COLORS[uniqueNum], icon: uniqueNum, createdAt, turn: players.length });
           await player.save();
-          pubsub.publish("newPlayer", { newPlayer: { ...player._doc, gameId: player.gameId } });
+          await player.populate('game');
+          console.log("player created", player)
+          pubsub.publish("newPlayer", { newPlayer: { ...player.toObject(), gameId: existingGame._id } });
+          console.log("pubsub called with", { newPlayer: { ...player.toObject(), gameId: existingGame._id } })
           return player;
         } 
         
@@ -76,7 +126,13 @@ const resolvers = {
           { name, points, color, icon },
           { new: true }
         );
-        pubsub.publish("playerChange", { playerChange: { ...player._doc, gameId: player.gameId } });
+        if (!player) {
+          throw new Error(`Player with id ${id} not found.`);
+        }
+        if (!player.game) {
+          throw new Error(`Player with id ${id} is not associated with any game.`);
+        }
+        pubsub.publish("playerChange", { playerChange: { ...player.toObject(), gameId: player.game } });
         return player;
       },
 
@@ -93,13 +149,13 @@ const resolvers = {
         return game;
       },
   
-      updateGame: async (_, { id, active }) => {
-        const game = await Game.findOneAndUpdate(
-          { _id: id },
-          { active },
+      updateGame: async (_, { id, active, stage }) => {
+        const game = await Game.findByIdAndUpdate(
+          id,
+          { active, stage },
           { new: true }
         );
-        pubsub.publish("gameChange", { gameChange: { ...game._doc, _id: id } });
+        pubsub.publish("gameChange", { gameChange: { ...game.toObject(), _id: id } });
         return game;
       },
   
@@ -131,14 +187,14 @@ const resolvers = {
 
       createRound: async (_, { gameId, roundNumber, promptText, turn }) => {
         const createdAt = Math.floor(Date.now() / 1000);
-        const round = new Round({ gameId, roundNumber, promptText, turn, createdAt });
+        const round = new Round({ game: gameId, roundNumber, promptText, turn, createdAt });
         await round.save();
         await Game.findOneAndUpdate(
           { _id: id },
-          { currentRoundId: round._id },
+          { currentRound: round._id },
           { new: true }
         );
-        pubsub.publish("newRound", { newRound: { ...round._doc, gameId: round.gameId } });
+        pubsub.publish("newRound", { newRound: { ...round.toObject(), gameId: round.game } });
         return round;
       },
   
@@ -148,25 +204,25 @@ const resolvers = {
           { turn, stage },
           { new: true }
         );
-        pubsub.publish("roundChange", { roundChange: { ...round._doc, gameId: round.gameId } });
+        pubsub.publish("roundChange", { roundChange: { ...round.toObject(), gameId: round.game } });
         return round;
       },
 
       createGag: async (_, { roundId, playerId, text }) => {
         const createdAt = Math.floor(Date.now() / 1000);
-        const gag = new Gag({ roundId, playerId, text, createdAt });
+        const gag = new Gag({ round: roundId, player: playerId, text, createdAt });
         await gag.save();
-        pubsub.publish("newGag", { newGag: { ...gag._doc, roundId: gag.roundId } });
+        pubsub.publish("newGag", { newGag: { ...gag.toObject(), round: gag.round } });
         return gag;
       },
   
       updateGag: async (_, { id, guesserId, guessed }) => {
         const gag = await Gag.findByIdAndUpdate(
           id,
-          { guesserId, guessed },
+          { guesser: guesserId, guessed },
           { new: true }
         );
-        pubsub.publish("gagChange", { gagUpdate: { ...gag._doc, roundId: gag.roundId } });
+        pubsub.publish("gagChange", { gagUpdate: { ...gag.toObject(), roundId: gag.round } });
         return gag;
       },
 
@@ -179,25 +235,25 @@ const resolvers = {
         if (!gag){
           throw new Error("Gag not found");
         }
-        pubsub.publish("voteChange", { voteChange: { ...gag._doc, roundId: gag.roundId } });
+        pubsub.publish("voteChange", { voteChange: { ...gag.toObject(), roundId: gag.round } });
         return gag;
       },
 
       createGuess: async (_, { guesserId, guessedId, gagId }) => {
         const existingGag = await Gag.findById(gagId);
         if (existingGag) {
-          const isCorrect = guessedId === existingGag.playerId;
+          const isCorrect = guessedId === existingGag.player;
           const createdAt = Math.floor(Date.now() / 1000);
-          const guess = new Guess({ guesserId, guessedId, gagId, isCorrect, createdAt });
+          const guess = new Guess({ guesser: guesserId, guessed: guessedId, gag: gagId, isCorrect, createdAt });
           await guess.save();
           if (isCorrect) {
-            const gag = await Gag.findByIdAndUpdate(
+            await Gag.findByIdAndUpdate(
               gagId,
               { guessed: true },
               { new: true }
             );
           }
-          pubsub.publish("newGuess", { newGuess: { ...guess._doc, roundId: existingGag.roundId } });
+          pubsub.publish("newGuess", { newGuess: { ...guess.toObject(), roundId: existingGag.round } });
           return guess;
         }
 
@@ -214,11 +270,37 @@ const resolvers = {
     Subscription: {
       newPlayer: {
         subscribe: withFilter(
-          () => pubsub.asyncIterator('newPlayer'),
-          (payload, variables) => {
-            return payload.newPlayer.gameId === variables.gameId;
+          () => {
+            console.log("subscription started for new player")
+            return pubsub.asyncIterableIterator('newPlayer')
+          },
+          (payload, variables) => { 
+            console.log("Subscription triggered with payload:", payload);
+            return payload.newPlayer.gameId.toString() === variables.gameId.toString();
           }
-        )
+        ),
+        resolve: async (payload) => {
+          try {
+            const players = await Player.find({game: payload.newPlayer.gameId}).sort({createdAt: 1});
+            const playersWithDetails = await Promise.all(
+              players.map(async (player) => {
+                const guessesMade = await Guess.find({guesser: player._id})
+                const guessesReceived = await Guess.find({guessed: player._id})
+                const gags = await Gag.find({player: player._id})
+                return {
+                  ...player.toObject(),
+                  guessesMade,
+                  guessesReceived,
+                  gags,
+                }
+              })
+            );
+            return playersWithDetails;
+          } catch (error) {
+            console.error("Error fetching players for subscription")
+            throw new Error("Failed to fetch players for subscription")
+          }
+        }
       },
       playerChange: {
         subscribe: withFilter(

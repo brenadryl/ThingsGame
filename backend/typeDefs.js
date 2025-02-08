@@ -2,10 +2,11 @@ const typeDefs = `
   type Query {
     prompts: [Prompt]
     getRandomPrompts: [Prompt]
+    getPlayers(gameId: ID!): [Player]
+    getPlayer(id: ID!): Player
+    getGame(id: ID!): Game
     getGags(id: ID, roundId: ID, guesserId: ID, playerId: ID, guessed: Boolean): [Gag],
     rounds: [Round]
-    players: [Player]
-    game(gameCode: String): Game
     guesses: [Guess]
     getPromptsByColors(colors: [String!]!): [Prompt]
   }
@@ -47,8 +48,10 @@ const typeDefs = `
     active: Boolean!
     color: String
     createdAt: Float!
-    icon: String
+    icon: Int
+    turn: Int!
     game: Game
+    gags: [Gag]
     guessesMade: [Guess]
     guessesReceived: [Guess]
   }
@@ -56,13 +59,12 @@ const typeDefs = `
   type Game {
     _id: ID!
     stage: Int!
-    finished: Boolean!
+    gameCode: String!
+    active: Boolean!
     createdAt: Float!
     currentRound: Round
-    host: Player
     rounds: [Round]
     players: [Player]
-    guesses: [Guess]
   }
 
   type Guess {
@@ -83,7 +85,7 @@ const typeDefs = `
   }
 
   type Mutation {
-    createPlayer(name: String!, gameCode: String!, color: String, icon: String): Player!
+    createPlayer(name: String!, gameCode: String!): Player!
     updatePlayer(id: ID!, name: String, points: Int, color: String, icon: String): Player!
     createGame: Game!
     updateGame(id: ID!, active: Boolean): Game!
@@ -98,7 +100,7 @@ const typeDefs = `
   }
 
   type Subscription {
-    newPlayer(gameId: ID!): Player
+    newPlayer(gameId: ID!): [Player]
     playerChange(gameId: ID!): Player
     newGuess(gameId: ID!): Guess
     newGag(roundId: ID!): Gag
