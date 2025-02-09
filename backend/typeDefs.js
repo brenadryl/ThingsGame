@@ -88,7 +88,7 @@ const typeDefs = `
     createPlayer(name: String!, gameCode: String!): Player!
     updatePlayer(id: ID!, name: String, points: Int, color: String, icon: String): Player!
     createGame: Game!
-    updateGame(id: ID!, active: Boolean): Game!
+    updateGameStage(id: ID!, active: Boolean, stage: Int): Game!
     deleteOld: DeleteResponse
     createRound(gameId: ID!, roundNumber: Int!, promptText: String!, turn: Int!): Round!
     updateRound(id: ID!, turn: Int, stage: Int): Round!
@@ -108,7 +108,7 @@ const typeDefs = `
     voteChange(roundId: ID!): Gag
     newRound(gameId: ID!): Round
     roundChange(gameId: ID!): Round
-    gameChange(gameId: ID!): Game
+    gameStageChange(gameId: ID!): Game
   }
 `;
 

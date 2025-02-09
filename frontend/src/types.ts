@@ -107,5 +107,5 @@ export interface Prompt {
     voteChange: (args: { roundId: string }) => AsyncIterator<Gag>;
     newRound: (args: { gameId: string }) => AsyncIterator<Round>;
     roundChange: (args: { gameId: string }) => AsyncIterator<Round>;
-    gameChange: (args: { gameId: string }) => AsyncIterator<Game>;
+    gameStageChange: (args: { gameId: string }) => AsyncIterator<Game>;
   }

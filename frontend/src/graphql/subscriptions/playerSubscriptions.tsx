@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSubscription, gql } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 export const NEW_PLAYER_SUBSCRIPTION = gql`
   subscription OnNewPlayer($gameId: ID!) {

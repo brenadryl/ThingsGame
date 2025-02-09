@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GET_PROMPTS, GET_RANDOM_PROMPTS, GetRandomPromptsData } from '../graphql/queries/promptQueries';
 import { Prompt } from '../types';
-import { ADD_PLAYER } from '../graphql/mutations/addPlayer';
+import { ADD_PLAYER } from '../graphql/mutations/playerMutations';
 
 const JoinPage: React.FC = () => {
     const { loading: loadingRandom, error: errorRandom, data: randomData } = useQuery<GetRandomPromptsData>(GET_RANDOM_PROMPTS);

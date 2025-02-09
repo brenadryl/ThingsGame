@@ -149,14 +149,22 @@ const resolvers = {
         return game;
       },
   
-      updateGame: async (_, { id, active, stage }) => {
-        const game = await Game.findByIdAndUpdate(
-          id,
-          { active, stage },
-          { new: true }
-        );
-        pubsub.publish("gameChange", { gameChange: { ...game.toObject(), _id: id } });
-        return game;
+      updateGameStage: async (_, { id, active, stage }) => {
+        try {
+          const game = await Game.findByIdAndUpdate(
+            id,
+            { active, stage },
+            { new: true }
+          );
+          if (!game) {
+            throw new Error("Game not found.")
+          }
+          pubsub.publish("gameStageChange", { gameStageChange: game });
+          return game;
+        } catch (error) {
+          console.error("Error updating game stage:", error)
+          throw new Error("Failed to update game stage.")
+        }
       },
   
       deleteOld: async () => {
@@ -358,11 +366,11 @@ const resolvers = {
           }
         )
       },
-      gameChange: {
+      gameStageChange: {
         subscribe: withFilter(
-          () => pubsub.asyncIterator('gameChange'),
+          () => pubsub.asyncIterableIterator('gameStageChange'),
           (payload, variables) => {
-            return payload.gameChange.gameId === variables.gameId;
+            return payload.gameStageChange._id.toString() === variables.gameId.toString();
           }
         )
       },

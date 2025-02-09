@@ -12,6 +12,7 @@ import { Container } from '@mui/system';
 import JoinPage from './pages/JoinPage';
 import HostPage from './pages/HostPage';
 import WaitingRoom from './pages/WaitingRoom';
+import PlayRoom from './pages/PlayRoom';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -55,6 +56,11 @@ function App() {
             <Route
               path="/waiting-room/:gameId/:playerId"
               element={ <WaitingRoom/>
+              }
+            />
+            <Route
+              path="/play-room/:gameId/:playerId"
+              element={ <PlayRoom/>
               }
             />
           </Routes>

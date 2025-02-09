@@ -2,8 +2,8 @@ import { useMutation } from '@apollo/client';
 import { Alert, Box, Button, TextField} from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CREATE_GAME } from '../graphql/mutations/createGame';
-import { ADD_PLAYER } from '../graphql/mutations/addPlayer';
+import { CREATE_GAME } from '../graphql/mutations/gameMutations';
+import { ADD_PLAYER } from '../graphql/mutations/playerMutations';
 
 const HostPage: React.FC = () => {
     const navigate = useNavigate();
