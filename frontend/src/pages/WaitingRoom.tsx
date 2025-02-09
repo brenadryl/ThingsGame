@@ -3,13 +3,12 @@ import { Alert, Box, Button, CircularProgress, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Game, Player } from '../types';
-import PlayerCard from '../Components/PlayerCards';
 import { useSubscription } from '@apollo/client';
 import { NEW_PLAYER_SUBSCRIPTION } from '../graphql/subscriptions/playerSubscriptions';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
-import { FUN_ICONS } from '../themes/constants';
 import { CHANGE_GAME_MUTATION } from '../graphql/mutations/gameMutations';
 import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscriptions';
+import PlayerList from '../Components/PlayerList';
 
 
 const WaitingRoom: React.FC = () => {  
@@ -26,19 +25,13 @@ const WaitingRoom: React.FC = () => {
 
   const { error: errorSubscription } = useSubscription(NEW_PLAYER_SUBSCRIPTION, {
     variables: { gameId },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onSubscriptionData: ({subscriptionData}) => {
+      console.log("subscriptionData",subscriptionData )
       try {
         if (subscriptionData?.data?.newPlayer) {
-          console.log("Subscription received new player data:", subscriptionData.data.newPlayer);
-          setPlayerList((prevPlayerList) => {
-            const updatedPlayers = subscriptionData.data.newPlayer;
-            if (Array.isArray(updatedPlayers)) {
-              return [... updatedPlayers];
-            } else {
-              console.warn("Subscription returned unexpected data format");
-              return prevPlayerList;
-            }
-          })
+          console.log("Subscription received new player data:", subscriptionData.data?.newPlayer);
+          const updatedPlayers = subscriptionData.data?.newPlayer;
+          setPlayerList(updatedPlayers)
         } else {
           console.warn("Subscription did not return expected data.");
         }
@@ -46,6 +39,7 @@ const WaitingRoom: React.FC = () => {
         console.error("Error processing subscription data:", err);
         setErrorMessage("Error processing player updates.");
       }
+      console.log("Playerlist: ", playerList)
     }
   });
   useSubscription(GAME_STAGE_SUBSCRIPTION, {
@@ -63,7 +57,9 @@ const WaitingRoom: React.FC = () => {
     console.log(gameData)
     if(gameData?.getGame) {
       setGame(gameData.getGame)
-      setPlayerList(gameData.getGame.players || [])
+      if (playerList.length < 1) {
+        setPlayerList(gameData.getGame.players)
+      }
       const currentPlayer = gameData.getGame.players.find(p => p._id === playerId) || null;
       if(!currentPlayer) {
         setErrorMessage("You are not a part of this game")
@@ -111,9 +107,7 @@ const WaitingRoom: React.FC = () => {
         <Typography color="text.secondary">Game Code:</Typography>
         <Typography color="info" variant="h3">{game?.gameCode}</Typography>
       </Box>
-      {playerList.map((currPlayer) => (
-        <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} icon={FUN_ICONS[currPlayer.icon || 0]} color={currPlayer.color || ''}/>
-      ))}
+      <PlayerList playerList={playerList}/>
       {game?.players?.[0]?._id === playerId && (
         <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginTop: '24px'}}>
           {startLoading ? <CircularProgress size={24}/> : "Start Game"}

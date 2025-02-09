@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Alert, Box, Button, CircularProgress, Typography} from '@mui/material';
+import { Alert, Box, CircularProgress, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Game, Player } from '../types';
@@ -14,10 +14,18 @@ const PlayRoom: React.FC = () => {
   const [game, setGame] = useState<Game | null>(null)
   const [playerList, setPlayerList] = useState<Player[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { loading: loadingGame, error: errorGame, data: gameData } = useQuery<GetGameData>(GET_GAME, {
+  const { loading: loadingGame, error: errorGame, data: gameData, refetch } = useQuery<GetGameData>(GET_GAME, {
     variables: {id: gameId},
     skip: !gameId,
+    fetchPolicy: "network-only",
   });
+
+  useEffect(() => {
+    if (gameId) {
+      console.log("Refetching game data...");
+      refetch();
+    }
+  })
 
   useEffect(() => {
     console.log(gameData)
@@ -52,11 +60,13 @@ const PlayRoom: React.FC = () => {
     return <CircularProgress />
   }
 
+  const currentTurnPlayer = playerList[(game?.rounds?.length || 0 % playerList.length)];
+
   return (
     <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-      <Box textAlign="center" alignItems="center"  marginBottom="32px" display="flex" flexDirection="row">
-        <Typography color="text.secondary">Game Code:</Typography>
-        <Typography color="info" variant="h3">{game?.gameCode}</Typography>
+      <Typography color="info" variant="h3">{`Round ${game?.rounds.length || 0 + 1}`}</Typography>
+      <Box textAlign="center" alignItems="center"  marginY="16px" >
+        <Typography color="text.secondary">{currentTurnPlayer?.name + " is choosing a prompt"}</Typography>
       </Box>
       {playerList.map((currPlayer) => (
         <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} icon={FUN_ICONS[currPlayer.icon || 0]} color={currPlayer.color || ''}/>

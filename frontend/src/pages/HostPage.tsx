@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CREATE_GAME } from '../graphql/mutations/gameMutations';
 import { ADD_PLAYER } from '../graphql/mutations/playerMutations';
+import { DELETE_OLD } from '../graphql/mutations/otherMutations';
 
 const HostPage: React.FC = () => {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ const HostPage: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [createGame] = useMutation(CREATE_GAME);
+    const [deleteOld] = useMutation(DELETE_OLD);
     const [createPlayer] = useMutation(ADD_PLAYER);
     const regex = /^[A-Za-z]+$/;
 
@@ -38,6 +40,8 @@ const HostPage: React.FC = () => {
         }
     
         try {
+          const { data: deletionData } = await deleteOld();
+          console.log("deleted", deletionData)
           const { data: gameData } = await createGame();
     
           if (gameData?.createGame) {
