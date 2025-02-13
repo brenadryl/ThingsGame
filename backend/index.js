@@ -11,7 +11,7 @@ import resolvers from './resolvers.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const allowedOrigins = ["http://localhost:3000", "https://things-game-ten.vercel.app/"];
+const allowedOrigins = ["http://localhost:3000", "https://things-game-ten.vercel.app/", "https://joaksonyou.com"];
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
@@ -23,8 +23,8 @@ async function startServer() {
   const app = express();
 
   // Configure CORS
-  app.use(cors({ credentials: true, origin: '*' }));
-  // app.use(cors({ credentials: true, origin: allowedOrigins }));
+  // app.use(cors({ credentials: true, origin: '*' }));
+  app.use(cors({ credentials: true, origin: allowedOrigins }));
 
   // Create an HTTP server
   const httpServer = createServer(app);
