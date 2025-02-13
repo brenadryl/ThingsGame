@@ -5,7 +5,7 @@ export const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: { main: '#FFD700', contrastText: '#FFFFFF' }, // Electric Yellow (Primary Accent)
-        secondary: { main: '#FF6B35'}, // Bright Orange (Interactive Elements)
+        secondary: { main: '#FF6B35', contrastText: '#FFFFFF'}, // Bright Orange (Interactive Elements)
         error: { main: '#FF3F34' }, // Sunset Red (Error & Alerts)
         warning: { main: '#A7D129' }, // Lime Green (Success & Highlights)
         info: { main: '#00C9A7', contrastText: '#FFFFFF'}, // Aqua Blue (Secondary UI)
@@ -52,7 +52,7 @@ export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
         primary: { main: '#FFD700', contrastText: '#2A2A2A' }, // Electric Yellow (Primary Accent)
-        secondary: { main: '#FF6B35' }, // Bright Orange (Interactive Elements)
+        secondary: { main: '#FF6B35', contrastText: '#2A2A2A' }, // Bright Orange (Interactive Elements)
         error: { main: '#FF3F34' }, // Sunset Red (Error & Alerts)
         warning: { main: '#A7D129' }, // Lime Green (Success & Highlights)
         info: { main: '#00C9A7', contrastText: '#2A2A2A' }, // Aqua Blue (Secondary UI)

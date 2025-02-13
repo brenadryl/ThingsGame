@@ -27,7 +27,6 @@ const gagSchema = new mongoose.Schema({
 });
 
 const roundSchema = new mongoose.Schema({
-    roundNumber: { type: Number, required: true },
     stage: { type: Number, max: 2, default: 1 },
     promptText: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },

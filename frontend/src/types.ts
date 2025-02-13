@@ -18,9 +18,7 @@ export interface Prompt {
   
   export interface Round {
     _id: string;
-    roundNumber: number;
     stage: number;
-    finished: boolean;
     promptText: string;
     createdAt: number;
     game: Game;
@@ -89,7 +87,7 @@ export interface Prompt {
     createGame: () => Promise<Game>;
     updateGame: (args: { id: string; active?: boolean }) => Promise<Game>;
     deleteOld: () => Promise<DeleteResponse>;
-    createRound: (args: { gameId: string; roundNumber: number; promptText: string; turn: number }) => Promise<Round>;
+    createRound: (args: { gameId: string; promptText: string; turn: number }) => Promise<Round>;
     updateRound: (args: { id: string; turn?: number; stage?: number }) => Promise<Round>;
     createGag: (args: { roundId: string; playerId: string; text: string }) => Promise<Gag>;
     updateGag: (args: { id: string; guesserId?: string; guessed?: boolean }) => Promise<Gag>;

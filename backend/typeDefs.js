@@ -5,10 +5,7 @@ const typeDefs = `
     getPlayers(gameId: ID!): [Player]
     getPlayer(id: ID!): Player
     getGame(id: ID!): Game
-    getGags(id: ID, roundId: ID, guesserId: ID, playerId: ID, guessed: Boolean): [Gag],
-    rounds: [Round]
-    guesses: [Guess]
-    getPromptsByColors(colors: [String!]!): [Prompt]
+    getCurrentRound(id: ID!, gameId: ID!): Round
   }
 
   type Prompt {
@@ -31,9 +28,7 @@ const typeDefs = `
 
   type Round {
     _id: ID!
-    roundNumber: Int!
     stage: Int!
-    finished: Boolean!
     promptText: String!
     createdAt: Float!
     game: Game
@@ -90,7 +85,7 @@ const typeDefs = `
     createGame: Game!
     updateGameStage(id: ID!, active: Boolean, stage: Int): Game!
     deleteOld: DeleteResponse
-    createRound(gameId: ID!, roundNumber: Int!, promptText: String!, turn: Int!): Round!
+    createRound(gameId: ID!, promptText: String!, turn: Int!): Round!
     updateRound(id: ID!, turn: Int, stage: Int): Round!
     createGag(roundId: ID!, playerId: ID!, text: String!): Gag!
     updateGag(id: ID!, guesserId: ID!, guessed: Boolean): Gag!

@@ -57,9 +57,6 @@ const WaitingRoom: React.FC = () => {
     console.log(gameData)
     if(gameData?.getGame) {
       setGame(gameData.getGame)
-      if (playerList.length < 1) {
-        setPlayerList(gameData.getGame.players)
-      }
       const currentPlayer = gameData.getGame.players.find(p => p._id === playerId) || null;
       if(!currentPlayer) {
         setErrorMessage("You are not a part of this game")
@@ -107,10 +104,10 @@ const WaitingRoom: React.FC = () => {
         <Typography color="text.secondary">Game Code:</Typography>
         <Typography color="info" variant="h3">{game?.gameCode}</Typography>
       </Box>
-      <PlayerList playerList={playerList}/>
+      <PlayerList playerList={playerList.length > (game?.players?.length || 0) ? playerList : (game?.players || [])}/>
       {game?.players?.[0]?._id === playerId && (
         <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginTop: '24px'}}>
-          {startLoading ? <CircularProgress size={24}/> : "Start Game"}
+          {startLoading ? <CircularProgress size={24}/> : "START GAME"}
         </Button>
       )}
       {startError && <Alert severity="error">Error starting game: {startError.message}</Alert>}

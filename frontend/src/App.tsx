@@ -13,6 +13,7 @@ import JoinPage from './pages/JoinPage';
 import HostPage from './pages/HostPage';
 import WaitingRoom from './pages/WaitingRoom';
 import PlayRoom from './pages/PlayRoom';
+import WritingRoom from './pages/WritingRoom';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -61,6 +62,11 @@ function App() {
             <Route
               path="/play-room/:gameId/:playerId"
               element={ <PlayRoom/>
+              }
+            />
+            <Route
+              path="/writing-room/:gameId/:playerId/:roundId"
+              element={ <WritingRoom/>
               }
             />
           </Routes>

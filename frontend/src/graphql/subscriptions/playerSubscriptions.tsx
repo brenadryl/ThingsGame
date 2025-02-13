@@ -35,7 +35,6 @@ export const NEW_PLAYER_SUBSCRIPTION = gql`
           votes
           round {
             _id
-            roundNumber
             promptText
           }
         }

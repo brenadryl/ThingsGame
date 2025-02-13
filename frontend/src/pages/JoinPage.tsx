@@ -7,8 +7,6 @@ import { Prompt } from '../types';
 import { ADD_PLAYER } from '../graphql/mutations/playerMutations';
 
 const JoinPage: React.FC = () => {
-    const { loading: loadingRandom, error: errorRandom, data: randomData } = useQuery<GetRandomPromptsData>(GET_RANDOM_PROMPTS);
-    const { loading: loadingAll, error: errorAll, data: allData } = useQuery<GetRandomPromptsData>(GET_PROMPTS);
     const [createPlayer, {loading: creatingPlayer}] = useMutation(ADD_PLAYER);
     const [name, setName] = useState('');
     const [gameCode, setGameCode] = useState('');
@@ -89,30 +87,7 @@ const JoinPage: React.FC = () => {
                 </Button>
             </Box>
         </form>
-        <div>
-      <h1>GraphQL Prompts</h1>
-
-      {/* Random Prompts Section */}
-      <h2>Random Prompts</h2>
-      {loadingRandom && <p>Loading...</p>}
-      {errorRandom && <p>Error: {errorRandom.message}</p>}
-      <ul>
-        {randomData?.getRandomPrompts.map((prompt: Prompt) => (
-          <li key={prompt._id}>{prompt.text}</li>
-        ))}
-      </ul>
-
-      {/* All Prompts Section */}
-      <h2>All Prompts</h2>
-      {loadingAll && <p>Loading...</p>}
-      {errorAll && <p>Error: {errorAll.message}</p>}
-      <ul>
-        {allData?.prompts.map((prompt: Prompt) => (
-          <li key={prompt._id}>{prompt.text}</li>
-        ))}
-      </ul>
-    </div>
-        </>
+      </>
   )
 }
 export default JoinPage;

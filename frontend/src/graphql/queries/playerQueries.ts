@@ -35,7 +35,6 @@ export const GET_PLAYERS = gql`
             votes
             round {
                 _id
-                roundNumber
                 promptText
             }
         }
@@ -76,7 +75,6 @@ export const GET_PLAYER = gql`
             text
             round {
                 _id
-                roundNumber
                 promptText
             }
         }

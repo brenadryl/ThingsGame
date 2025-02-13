@@ -28,6 +28,23 @@ const resolvers = {
         const prompts = await Prompt.aggregate([{ $sample: { size: 3 } }]);
         return prompts;
       },
+      getCurrentRound: async (_, { id, gameId }) => {
+        const round = await Round.findById(id);
+        const game = await Game.findById(gameId)
+        console.log("Game: ", game)
+        console.log("Gameid: ", gameId)
+        if (id.toString() === game?.currentRound?._id.toString() && round.stage < 3) {
+          const gags = await Gag.find({round: round._id}).populate("player")
+
+          return {
+            ...round.toObject(),
+            gags,
+            game,
+          }
+        } else {
+          throw new Error("Round no longer active")
+        }
+      },
       getPlayers: async (_, { gameId }) => {
         try {
           const players = await Player.find({game: gameId});
@@ -90,8 +107,6 @@ const resolvers = {
           throw new Error("Failed to fetch game")
         }
       },
-      rounds: () => Round.find(),
-      guesses: () => Guess.find(),
     },
     Mutation: {
       createPlayer: async (_, { name, gameCode }) => {
@@ -111,9 +126,7 @@ const resolvers = {
           const player = new Player({ name, game: existingGame._id, color: FUN_COLORS[uniqueNum], icon: uniqueNum, createdAt, turn: players.length });
           await player.save();
           await player.populate('game');
-          console.log("player created", player)
           pubsub.publish("newPlayer", { newPlayer: { ...player.toObject(), gameId: existingGame._id } });
-          console.log("pubsub called with", { newPlayer: { ...player.toObject(), gameId: existingGame._id } })
           return player;
         } 
         
@@ -193,16 +206,20 @@ const resolvers = {
         };
       },
 
-      createRound: async (_, { gameId, roundNumber, promptText, turn }) => {
+      createRound: async (_, { gameId, promptText, turn }) => {
+        const game = Game.findById(gameId)
+        if (game.currentRound && !game.currentRound.stage != 3) {
+          throw new Error("Current round not yet over");
+        }
         const createdAt = Math.floor(Date.now() / 1000);
-        const round = new Round({ game: gameId, roundNumber, promptText, turn, createdAt });
+        const round = new Round({ game: gameId, promptText, turn, createdAt });
         await round.save();
         await Game.findOneAndUpdate(
-          { _id: id },
+          { _id: gameId },
           { currentRound: round._id },
           { new: true }
         );
-        pubsub.publish("newRound", { newRound: { ...round.toObject(), gameId: round.game } });
+        pubsub.publish("newRound", { newRound: { ...round.toObject(), gameId: gameId } });
         return round;
       },
   
@@ -217,10 +234,25 @@ const resolvers = {
       },
 
       createGag: async (_, { roundId, playerId, text }) => {
+        const round = await Round.findById(roundId)
+        if (!round || round.stage !== 1) {
+          throw new Error("Round is no longer accepting submissions");
+        }
+        const player = await Player.findById(playerId)
+        if (round.game._id.toString() !== player.game._id.toString()) {
+          console.log("Round game: ", round.game)
+          console.log("player game: ", player.game)
+          console.log("round.game !== player.game: ", round.game !== player.game)
+          throw new Error("Player is not in Game");
+        }
+        const existingGag = await Gag.findOne({ player: player._id.toString(), round: round._id.toString() });
+        if (existingGag) {
+          throw new Error("A response has already been submitted to this round from this player.");
+        }
         const createdAt = Math.floor(Date.now() / 1000);
         const gag = new Gag({ round: roundId, player: playerId, text, createdAt });
         await gag.save();
-        pubsub.publish("newGag", { newGag: { ...gag.toObject(), round: gag.round } });
+        pubsub.publish("newGag", { newGag: { ...gag.toObject(), roundId: roundId } });
         return gag;
       },
   
@@ -310,6 +342,30 @@ const resolvers = {
           }
         }
       },
+      gameStageChange: {
+        subscribe: withFilter(
+          () => pubsub.asyncIterableIterator('gameStageChange'),
+          (payload, variables) => {
+            return payload.gameStageChange._id.toString() === variables.gameId.toString();
+          }
+        )
+      },
+      newRound: {
+        subscribe: withFilter(
+          () => pubsub.asyncIterableIterator('newRound'),
+          (payload, variables) => {
+            return payload.newRound.gameId.toString() === variables.gameId.toString();
+          }
+        )
+      },
+      newGag: {
+        subscribe: withFilter(
+          () => pubsub.asyncIterableIterator('newGag'),
+          (payload, variables) => {
+            return payload.newGag.roundId.toString() === variables.roundId.toString();
+          }
+        )
+      },
       playerChange: {
         subscribe: withFilter(
           () => pubsub.asyncIterator('playerChange'),
@@ -323,14 +379,6 @@ const resolvers = {
           () => pubsub.asyncIterator('newGuess'),
           (payload, variables) => {
             return payload.newGuess.gameId === variables.gameId;
-          }
-        )
-      },
-      newGag: {
-        subscribe: withFilter(
-          () => pubsub.asyncIterator('newGag'),
-          (payload, variables) => {
-            return payload.newGag.roundId === variables.roundId;
           }
         )
       },
@@ -350,27 +398,11 @@ const resolvers = {
           }
         )
       },
-      newRound: {
-        subscribe: withFilter(
-          () => pubsub.asyncIterator('newRound'),
-          (payload, variables) => {
-            return payload.newRound.gameId === variables.gameId;
-          }
-        )
-      },
       roundChange: {
         subscribe: withFilter(
           () => pubsub.asyncIterator('roundChange'),
           (payload, variables) => {
             return payload.roundChange.gameId === variables.gameId;
-          }
-        )
-      },
-      gameStageChange: {
-        subscribe: withFilter(
-          () => pubsub.asyncIterableIterator('gameStageChange'),
-          (payload, variables) => {
-            return payload.gameStageChange._id.toString() === variables.gameId.toString();
           }
         )
       },

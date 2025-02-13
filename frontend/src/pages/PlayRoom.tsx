@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery, useSubscription } from '@apollo/client';
 import { Alert, Box, CircularProgress, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -6,6 +6,8 @@ import { Game, Player } from '../types';
 import PlayerCard from '../Components/PlayerCards';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import { FUN_ICONS } from '../themes/constants';
+import PromptSelection from '../Components/PromptSelection';
+import { NEW_ROUND_SUBSCRIPTION } from '../graphql/subscriptions/roundSubscriptions';
 
 
 const PlayRoom: React.FC = () => {  
@@ -19,6 +21,16 @@ const PlayRoom: React.FC = () => {
     skip: !gameId,
     fetchPolicy: "network-only",
   });
+  useSubscription(NEW_ROUND_SUBSCRIPTION, {
+      variables: {gameId},
+      onSubscriptionData: ({subscriptionData}) => {
+        const round = subscriptionData?.data?.newRound;
+        if (round?._id) {
+          console.log("Round started! Navigating to Writing Room...")
+          navigate(`/writing-room/${gameId}/${playerId}/${round._id}`)
+        }
+      }
+    })
 
   useEffect(() => {
     if (gameId) {
@@ -38,8 +50,8 @@ const PlayRoom: React.FC = () => {
         console.log("You are not a part of this game")
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
       }
-      if (gameData.getGame.stage !== 1) {
-        navigate(`/play-room/${gameData.getGame._id}/${playerId}`)
+      if (gameData.getGame.currentRound && gameData.getGame.currentRound.stage !== 3) {
+        navigate(`/writing-room/${gameData.getGame._id}/${playerId}/${gameData.getGame.currentRound._id}`)
       }
     }
   }, [gameData, playerId, navigate])
@@ -60,11 +72,20 @@ const PlayRoom: React.FC = () => {
     return <CircularProgress />
   }
 
-  const currentTurnPlayer = playerList[(game?.rounds?.length || 0 % playerList.length)];
+  const currentTurn = ((game?.rounds?.length || 0) % (playerList.length));
+  console.log("game?.rounds?.length", game?.rounds?.length)
+  console.log("playerList.length", playerList.length)
+  console.log("currentTurn", currentTurn)
+  const currentTurnPlayer = playerList[currentTurn];
+  const currentRound = game?.rounds.length || 0 + 1;
+
+  if (currentTurnPlayer?._id === playerId) {
+    return <PromptSelection gameId={gameId || ''} turn={currentTurn}/>
+  }
 
   return (
     <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-      <Typography color="info" variant="h3">{`Round ${game?.rounds.length || 0 + 1}`}</Typography>
+      <Typography color="info" variant="h3">{`Round ${currentRound}`}</Typography>
       <Box textAlign="center" alignItems="center"  marginY="16px" >
         <Typography color="text.secondary">{currentTurnPlayer?.name + " is choosing a prompt"}</Typography>
       </Box>

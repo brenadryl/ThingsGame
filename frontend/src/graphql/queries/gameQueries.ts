@@ -40,15 +40,13 @@ export const GET_GAME = gql`
           votes
           round {
             _id
-            roundNumber
             promptText
           }
         }
       }
       rounds {
         _id
-        roundNumber
-        finished
+        stage
         promptText
         turn
         gags {
@@ -62,7 +60,7 @@ export const GET_GAME = gql`
       }
       currentRound {
         _id
-        roundNumber
+        stage
         promptText
         turn
       }
