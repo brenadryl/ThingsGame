@@ -99,9 +99,12 @@ const resolvers = {
           const players = await Player.find({game: game._id})
           const rounds = await Round.find({game: game._id})
           const currentGags = await Gag.find({round: game.currentRound})
-          const gagIds = currentGags.map((gag) => gag._id)
-          const currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: 1});
-          const currentRound = {...game.currentRound.toObject(), gags: currentGags, guesses: currentGuesses}
+          let currentGuesses = []; 
+          if (currentGags && currentGags.length > 0) {
+            const gagIds = currentGags.map((gag) => gag._id)
+            currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: 1});
+          }
+          const currentRound = game.currentRound ? {...game.currentRound.toObject(), gags: currentGags, guesses: currentGuesses} : undefined;
 
           return {
             ...game.toObject(),
