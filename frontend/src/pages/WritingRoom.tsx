@@ -54,9 +54,9 @@ const WritingRoom: React.FC = () => {
             if (gagData?.createGag) {
                 navigate(`/round-room/${gameId}/${playerId}`)
             }
-        } catch (error) {
-            console.error("Error submitting gag:", gagError)
-            setErrorMessage("Failed to submit response.");
+        } catch (error: any) {
+            console.error("Error submitting gag:", error)
+            setErrorMessage(error.message || "Failed to submit response.");
         } finally {
             console.log(submitGag)
             setLoading(false)

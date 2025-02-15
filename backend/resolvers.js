@@ -2,6 +2,7 @@ import { Gag, Game, Guess, Player, Round, Prompt } from './models.js';
 import { withFilter } from 'graphql-subscriptions';
 import pubsub from './pubsub.js';
 import { FUN_COLORS } from './constants.js';
+import { UserInputError } from 'apollo-server-express';
 
 function generateRandomString(length) {
   let result = '';
@@ -117,7 +118,7 @@ const resolvers = {
 
           let roundsWithDetails = [];
 
-          if (round && rounds.length > 0) {
+          if (rounds && rounds.length > 0) {
             roundsWithDetails = await Promise.all(
               rounds.map(async (round) => {
                 const gags = await Gag.find({round: round._id}).populate("round")
@@ -280,19 +281,23 @@ const resolvers = {
       createGag: async (_, { roundId, playerId, text }) => {
         const round = await Round.findById(roundId)
         if (!round || round.stage !== 1) {
-          throw new Error("Round is no longer accepting submissions");
+          throw new UserInputError("Round is no longer accepting submissions");
         }
         const game = await Game.findById(round.game).populate("currentRound")
         if (round._id.toString() !== game.currentRound._id.toString()) {
-          throw new Error("Game has moved on to a new round");
+          throw new UserInputError("Game has moved on to a new round");
         }
         const player = await Player.findById(playerId)
         if (round.game._id.toString() !== player.game._id.toString()) {
-          throw new Error("Player is not in Game");
+          throw new UserInputError("Player is not in Game");
+        }
+        const sameResponse = await Gag.findOne({ text, round: round._id.toString() });
+        if (sameResponse) {
+          throw new UserInputError("That response has already been submitted to this round by another player. Try another.");
         }
         const existingGag = await Gag.findOne({ player: player._id.toString(), round: round._id.toString() });
         if (existingGag) {
-          throw new Error("A response has already been submitted to this round from this player.");
+          throw new UserInputError("A response has already been submitted to this round from this player.");
         }
         const createdAt = Math.floor(Date.now() / 1000);
         const gag = new Gag({ round: roundId, player: playerId, text, createdAt });
