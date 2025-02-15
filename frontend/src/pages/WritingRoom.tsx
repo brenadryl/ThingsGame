@@ -4,18 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GET_CURRENT_ROUND, GetCurrentRoundData } from '../graphql/queries/roundQueries';
 import { Round } from '../types';
-import { NEW_GAG } from '../graphql/mutations/gagMutation';
+import { NEW_GAG } from '../graphql/mutations/gagMutations';
 
 const WritingRoom: React.FC = () => {
-    const { gameId, playerId, roundId } = useParams();
+    const { gameId, playerId } = useParams();
     const navigate = useNavigate();
     const [gag, setGag] = useState('');
     const [loading, setLoading] = useState(false);
     const [round, setRound] = useState<Round | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { loading: loadingRound, error: errorRound, data: roundData } = useQuery<GetCurrentRoundData>(GET_CURRENT_ROUND, {
-    variables: {id: roundId, gameId},
-    skip: !roundId,
+    variables: { gameId},
+    skip: !gameId,
     });
     const [submitGag, { error: gagError}] = useMutation(NEW_GAG);
 
@@ -27,14 +27,14 @@ const WritingRoom: React.FC = () => {
         }
         if(roundData?.getCurrentRound) {
             setRound(roundData.getCurrentRound)
-          if (roundData.getCurrentRound.stage !== 1 || roundData.getCurrentRound._id !== roundId) {
+          if (roundData.getCurrentRound.stage !== 1) {
             navigate(`/play-room/${gameId}/${playerId}`)
           } else if (roundData.getCurrentRound.gags && roundData.getCurrentRound.gags.find(g => g.player._id === playerId)) {
             console.log("Player has already submitted a response to this round")
-            navigate(`/submission-room/${gameId}/${playerId}/${roundData.getCurrentRound._id}`)
+            navigate(`/round-room/${gameId}/${playerId}`)
           }
         }
-    }, [roundData, gameId, playerId, navigate, errorRound, roundId])
+    }, [roundData, gameId, playerId, navigate, errorRound])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const inputGag = event.target.value;
@@ -50,9 +50,9 @@ const WritingRoom: React.FC = () => {
             return;
         }
         try {
-            const {data: gagData} = await submitGag({variables: { roundId: roundId, playerId: playerId, text: gag }})
+            const {data: gagData} = await submitGag({variables: { roundId: round?._id, playerId: playerId, text: gag }})
             if (gagData?.createGag) {
-                navigate(`/submission-room/${gameId}/${playerId}/${roundId}`)
+                navigate(`/round-room/${gameId}/${playerId}`)
             }
         } catch (error) {
             console.error("Error submitting gag:", gagError)

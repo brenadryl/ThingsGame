@@ -14,6 +14,7 @@ import HostPage from './pages/HostPage';
 import WaitingRoom from './pages/WaitingRoom';
 import PlayRoom from './pages/PlayRoom';
 import WritingRoom from './pages/WritingRoom';
+import RoundRoom from './pages/RoundRoom';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -65,8 +66,13 @@ function App() {
               }
             />
             <Route
-              path="/writing-room/:gameId/:playerId/:roundId"
+              path="/writing-room/:gameId/:playerId"
               element={ <WritingRoom/>
+              }
+            />
+            <Route
+              path="/round-room/:gameId/:playerId"
+              element={ <RoundRoom/>
               }
             />
           </Routes>

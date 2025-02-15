@@ -2,12 +2,25 @@ import { gql } from "@apollo/client";
 import { Round } from "../../types";
 
 export const GET_CURRENT_ROUND = gql`
-  query GetCurrentRound($id: ID!, $gameId: ID!) {
-    getCurrentRound(id: $id, gameId: $gameId) {
+  query GetCurrentRound( $gameId: ID!) {
+    getCurrentRound(gameId: $gameId) {
         _id
         promptText
         stage
         turn
+        guesses {
+          _id
+          isCorrect
+          guesser {
+            _id
+          }
+          guessed {
+            _id
+          }
+          gag {
+            _id
+          }
+        }
         gags {
             text
             player {

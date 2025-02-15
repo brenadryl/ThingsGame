@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { GET_RANDOM_PROMPTS, GetRandomPromptsData } from '../graphql/queries/promptQueries';
 import { Prompt } from '../types';
 import { Box } from '@mui/system';
-import { NEW_ROUND } from '../graphql/mutations/roundMutation';
+import { NEW_ROUND } from '../graphql/mutations/roundMutations';
 
 interface PromptSelectionProps {
   gameId: string;
@@ -87,7 +87,9 @@ const PromptSelection: React.FC<PromptSelectionProps> = ({ gameId, turn }) => {
                         width: "260px",
                         borderRadius: 1,
                     }}
-                  >{prompt.text.toUpperCase()}</Button>
+                  >
+                    {prompt.text.toUpperCase()}
+                  </Button>
                 </Box>
             ))}
 
@@ -112,16 +114,6 @@ const PromptSelection: React.FC<PromptSelectionProps> = ({ gameId, turn }) => {
         </Box>
 
         </form>
-
-              {/* Random Prompts Section */}
-              <h2>Random Prompts</h2>
-              {loading && <p>Loading...</p>}
-              {error && <p>Error: {error.message}</p>}
-              <ul>
-                {data?.getRandomPrompts.map((prompt: Prompt) => (
-                  <li key={prompt._id}>{prompt.text}</li>
-                ))}
-              </ul>
     </>
   );
 };

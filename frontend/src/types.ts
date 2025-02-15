@@ -24,6 +24,7 @@ export interface Prompt {
     game: Game;
     turn: number;
     gags: Gag[];
+    guesses: Guess[];
   }
   
   export interface Player {

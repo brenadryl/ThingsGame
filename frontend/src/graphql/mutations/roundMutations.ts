@@ -5,6 +5,7 @@ export const NEW_ROUND = gql`
     createRound(gameId: $gameId, promptText: $promptText, turn: $turn) {
       _id
       promptText
+      stage
       game {
         _id
       }

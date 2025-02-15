@@ -63,6 +63,30 @@ export const GET_GAME = gql`
         stage
         promptText
         turn
+        gags {
+          _id
+          guessed
+          text
+          votes
+          player {
+            _id
+          }
+          guesser {
+            _id
+          }
+        }
+        guesses {
+          isCorrect
+          guesser {
+            _id
+          }
+          guessed {
+            _id
+          }
+          gag {
+            _id
+          }
+        }
       }
     }
   }

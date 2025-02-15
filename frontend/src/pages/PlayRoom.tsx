@@ -27,7 +27,7 @@ const PlayRoom: React.FC = () => {
         const round = subscriptionData?.data?.newRound;
         if (round?._id) {
           console.log("Round started! Navigating to Writing Room...")
-          navigate(`/writing-room/${gameId}/${playerId}/${round._id}`)
+          navigate(`/writing-room/${gameId}/${playerId}`)
         }
       }
     })
@@ -51,7 +51,7 @@ const PlayRoom: React.FC = () => {
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
       }
       if (gameData.getGame.currentRound && gameData.getGame.currentRound.stage !== 3) {
-        navigate(`/writing-room/${gameData.getGame._id}/${playerId}/${gameData.getGame.currentRound._id}`)
+        navigate(`/writing-room/${gameData.getGame._id}/${playerId}`)
       }
     }
   }, [gameData, playerId, navigate])
@@ -73,9 +73,6 @@ const PlayRoom: React.FC = () => {
   }
 
   const currentTurn = ((game?.rounds?.length || 0) % (playerList.length));
-  console.log("game?.rounds?.length", game?.rounds?.length)
-  console.log("playerList.length", playerList.length)
-  console.log("currentTurn", currentTurn)
   const currentTurnPlayer = playerList[currentTurn];
   const currentRound = game?.rounds.length || 0 + 1;
 

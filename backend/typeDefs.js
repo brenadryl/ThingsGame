@@ -5,7 +5,7 @@ const typeDefs = `
     getPlayers(gameId: ID!): [Player]
     getPlayer(id: ID!): Player
     getGame(id: ID!): Game
-    getCurrentRound(id: ID!, gameId: ID!): Round
+    getCurrentRound(gameId: ID!): Round
   }
 
   type Prompt {
@@ -34,6 +34,7 @@ const typeDefs = `
     game: Game
     turn: Int!
     gags: [Gag]
+    guesses: [Guess]
   }
 
   type Player {
@@ -90,15 +91,15 @@ const typeDefs = `
     createGag(roundId: ID!, playerId: ID!, text: String!): Gag!
     updateGag(id: ID!, guesserId: ID!, guessed: Boolean): Gag!
     updateVote(id: ID!): Gag!
-    createGuess(guesserId: ID!, guessedId: ID!, gagId: ID!): Guess!
+    createGuess(gagId: ID!, guesserId: ID!, guessedId: ID!): Guess!
     createPrompt(text: String!): Prompt!
   }
 
   type Subscription {
     newPlayer(gameId: ID!): [Player]
     playerChange(gameId: ID!): Player
-    newGuess(gameId: ID!): Guess
-    newGag(roundId: ID!): Gag
+    newGuess(roundId: ID!): Guess
+    gagUpdate(roundId: ID!): [Gag]
     gagChange(roundId: ID!): Gag
     voteChange(roundId: ID!): Gag
     newRound(gameId: ID!): Round

@@ -15,3 +15,12 @@ export const NEW_GAG = gql`
     }
   }
 `;
+
+export const UPDATE_GAG = gql`
+  mutation UpdateGag($id: ID!, $vote: Int) {
+    updateGag(id: $id, vote: $vote) {
+      _id
+      votes
+    }
+  }
+`;
