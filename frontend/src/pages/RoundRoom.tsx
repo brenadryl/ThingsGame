@@ -75,6 +75,9 @@ const RoundRoom: React.FC = () => {
         const currentTurn = ((game?.currentRound?.turn || 0) + (wrongGuesses)) % (game?.players.length || 1);
         setCurrentTurnPlayer(game?.players[currentTurn] || null);
         setMyTurn(game?.players[currentTurn]._id === playerId);
+        if (game?.players[currentTurn]._id !== playerId) {
+          setSelectedGag(null)
+        }
         } else {
           console.warn("Subscription did not return expected data.");
         }
@@ -96,6 +99,9 @@ const RoundRoom: React.FC = () => {
       const currentTurn = ((gameData.getGame?.currentRound?.turn || 0) + (wrongGuesses)) % (gameData.getGame?.players.length || 1);
       setCurrentTurnPlayer(gameData.getGame?.players[currentTurn] || null);
       setMyTurn(gameData.getGame?.players[currentTurn]._id === playerId);
+      if (gameData.getGame?.players[currentTurn]._id !== playerId) {
+        setSelectedGag(null)
+      }
       const currentPlayer = gameData.getGame.players.find(p => p._id === playerId) || null;
       if(!currentPlayer) {
         setErrorMessage("You are not a part of this game")
@@ -182,7 +188,7 @@ const RoundRoom: React.FC = () => {
 
   return (
     <>
-    <GuessAnnouncementModal hasNewGuess={newGuess !== null} newGuess={newGuess} handleClose={handleCloseAnnouncement} guessed={game?.players.find((player) => player._id === newGuess?.guessed._id)} guesser={game?.players.find((player) => player._id === newGuess?.guesser._id)} />
+    <GuessAnnouncementModal hasNewGuess={newGuess !== null} newGuess={newGuess} handleClose={handleCloseAnnouncement} />
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer isDrawerOpen={isDrawerOpen} playerList={game?.players || []} gagList={gagList || []} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
       <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">

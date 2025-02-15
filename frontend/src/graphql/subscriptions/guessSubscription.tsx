@@ -11,9 +11,15 @@ export const NEW_GUESS_SUBSCRIPTION = gql`
         }
         guessed {
             _id
+            icon
+            name
+            color
         }
         guesser {
             _id
+            icon
+            name
+            color
         }
     }
 }

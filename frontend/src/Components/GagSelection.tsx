@@ -18,6 +18,8 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
     if (myTurn) {
         setSelectedGag(gag._id)
         onClick(gag)
+    } else {
+        setSelectedGag('')
     }
   }
   const selectFavorite = (gag: Gag) => {

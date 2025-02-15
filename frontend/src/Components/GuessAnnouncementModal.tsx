@@ -8,14 +8,12 @@ interface GuessAnnouncementModalProps {
   hasNewGuess: boolean;
   newGuess: Guess | null;
   handleClose: () => void;
-  guesser?: Player;
-  guessed?: Player;
 }
 
-const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ hasNewGuess, newGuess, handleClose, guesser, guessed }) => {
+const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ hasNewGuess, newGuess, handleClose }) => {
     console.log("newGuess", newGuess)
-    const guesserList = guesser ? [guesser] : [];
-    const guessedList = guessed ? [guessed] : [];
+    const guesserList = newGuess?.guesser ? [newGuess.guesser] : [];
+    const guessedList = newGuess?.guessed ? [newGuess?.guessed] : [];
     const [delayedAnnouncement, setDelayedAnnouncement] = useState("...")
     useEffect(() => {
         if (hasNewGuess) {
