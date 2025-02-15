@@ -181,7 +181,7 @@ const RoundRoom: React.FC = () => {
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer isDrawerOpen={isDrawerOpen} playerList={game?.players || []} gagList={gagList || []} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
       <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-          <Typography color="text.secondary">{`${currentTurnPlayer?.name} IS GUESSING`}</Typography>
+          <Typography color="text.secondary">{myTurn ? "SELECT A RESPONSE TO GUESS WHO SAID IT" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>
         <Box textAlign="center" alignItems="center"  marginBottom="32px" marginTop="8px">
           <Typography color="info" variant="h3">{game?.currentRound.promptText}</Typography>
         </Box>
