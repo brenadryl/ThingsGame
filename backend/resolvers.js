@@ -36,7 +36,7 @@ const resolvers = {
         if (round._id.toString() === game?.currentRound?._id.toString() && round.stage < 3) {
           const gags = await Gag.find({round: round._id}).populate("player")
           const gagIds = gags.map((gag) => gag._id)
-          const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: 1}).populate("guessed").populate("guesser").populate("gag");
+          const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1}).populate("guessed").populate("guesser").populate("gag");
           return {
             ...round.toObject(),
             gags,
@@ -102,7 +102,7 @@ const resolvers = {
           let currentGuesses = []; 
           if (currentGags && currentGags.length > 0) {
             const gagIds = currentGags.map((gag) => gag._id)
-            currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: 1});
+            currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1});
           }
           const currentRound = game.currentRound ? {...game.currentRound.toObject(), gags: currentGags, guesses: currentGuesses} : undefined;
 
@@ -370,7 +370,7 @@ const resolvers = {
           try {
             const gags = await Gag.find({round: payload.newGuess.roundId});
             const gagIds = gags.map((gag) => gag._id)
-            const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: 1}).populate("guessed").populate("guesser").populate("gag");
+            const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1}).populate("guessed").populate("guesser").populate("gag");
             const returnGuesses = guesses.map((guess) => {return {...guess.toObject()}})
             console.log("return Guesses", returnGuesses)
             return returnGuesses;

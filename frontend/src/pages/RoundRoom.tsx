@@ -62,13 +62,15 @@ const RoundRoom: React.FC = () => {
     variables: { roundId: game?.currentRound._id },
     skip: !game?.currentRound._id,
     onSubscriptionData: ({subscriptionData}) => {
-      console.log("guess subscriptionData",subscriptionData )
       try {
         if (subscriptionData?.data?.newGuess) {
           console.log("Subscription received new guess data:", subscriptionData.data?.newGuess);
           const updatedGuesses = subscriptionData.data?.newGuess;
+          console.log("updatedGuesses, ", updatedGuesses)
+          console.log("guessList, ", guessList)
           if (updatedGuesses.length > guessList.length) {
-            setNewGuess(subscriptionData.data?.newGuess[0])
+            console.log("new guess!!!! ", updatedGuesses)
+            setNewGuess(updatedGuesses[0])
           }
           setGuessList(updatedGuesses)
         const wrongGuesses = updatedGuesses.filter((guess: Guess) => !guess.isCorrect).length || 0;
@@ -85,12 +87,10 @@ const RoundRoom: React.FC = () => {
         console.error("Error processing subscription data:", err);
         setErrorMessage("Error processing player updates.");
       }
-      console.log("guessList: ", guessList)
     }
   });
 
   useEffect(() => {
-    console.log(gameData)
     if(gameData?.getGame) {
       setGame(gameData.getGame)
       setGagList(gameData.getGame.currentRound.gags)
@@ -152,9 +152,7 @@ const RoundRoom: React.FC = () => {
     setDrawerOpen(false)
   }
   const handlePlayerClick = (player: Player) => {
-    console.log("myTurn, ", myTurn)
     if (myTurn) {
-      console.log("player, ", player)
       setSelectedPlayer(player)
       setModalOpen(true)
       setDrawerOpen(false)
@@ -181,10 +179,6 @@ const RoundRoom: React.FC = () => {
   const handleCloseAnnouncement = () => {
     setNewGuess(null);
   }
-
-
-
-  console.log("game", game)
 
   return (
     <>
