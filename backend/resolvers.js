@@ -284,6 +284,8 @@ const resolvers = {
           const createdAt = Math.floor(Date.now() / 1000);
           const guess = new Guess({ guesser: guesserId, guessed: guessedId, gag: gagId, isCorrect, createdAt });
           await guess.save();
+          const savedGuess = await Guess.findById(guess._id).populate("guesser").populate("guessed").populate("gag");
+          if (!savedGuess || !savedGuess._id) throw new Error("Failed to retrieve saved guess")
           if (isCorrect) {
             const gag = await Gag.findByIdAndUpdate(
               gagId,
@@ -292,8 +294,8 @@ const resolvers = {
             );
             pubsub.publish("gagUpdate", { gagUpdate: { ...gag.toObject(), roundId: existingGag.round._id } });
           }
-          pubsub.publish("newGuess", { newGuess: { ...guess.toObject(), roundId: existingGag.round._id } });
-          return guess;
+          pubsub.publish("newGuess", { newGuess: { ...savedGuess.toObject(), roundId: existingGag.round._id } });
+          return savedGuess;
         }
 
         throw new UserInputError("No such gag.");
@@ -369,7 +371,9 @@ const resolvers = {
             const gags = await Gag.find({round: payload.newGuess.roundId});
             const gagIds = gags.map((gag) => gag._id)
             const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: 1}).populate("guessed").populate("guesser").populate("gag");
-            return guesses;
+            const returnGuesses = guesses.map((guess) => {return {...guess.toObject()}})
+            console.log("return Guesses", returnGuesses)
+            return returnGuesses;
           } catch (error) {
             console.error("Error fetching guesses for subscription")
             throw new Error("Failed to fetch guesses for subscription")

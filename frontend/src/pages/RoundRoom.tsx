@@ -22,6 +22,8 @@ const RoundRoom: React.FC = () => {
   const [game, setGame] = useState<Game | null>(null)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isModalOpen, setModalOpen] = useState(false)
+  const [myTurn, setMyTurn] = useState(false)
+  const [currentTurnPlayer, setCurrentTurnPlayer] = useState<Player | null>(null)
   const [newGuess, setNewGuess] = useState<Guess | null>(null)
   const [gagList, setGagList] = useState<Gag[]>([])
   const [guessList, setGuessList] = useState<Guess[]>([])
@@ -32,6 +34,7 @@ const RoundRoom: React.FC = () => {
   const { loading: loadingGame, error: errorGame, data: gameData } = useQuery<GetGameData>(GET_GAME, {
     variables: {id: gameId},
     skip: !gameId,
+    fetchPolicy: "network-only",
   });
   const [createGuess] = useMutation(NEW_GUESS)
   const { error: errorSubscription } = useSubscription(GAG_UPDATE_SUBSCRIPTION, {
@@ -68,6 +71,10 @@ const RoundRoom: React.FC = () => {
             setNewGuess(subscriptionData.data?.newGuess[0])
           }
           setGuessList(updatedGuesses)
+        const wrongGuesses = updatedGuesses.filter((guess: Guess) => !guess.isCorrect).length || 0;
+        const currentTurn = ((game?.currentRound?.turn || 0) + (wrongGuesses)) % (game?.players.length || 1);
+        setCurrentTurnPlayer(game?.players[currentTurn] || null);
+        setMyTurn(game?.players[currentTurn]._id === playerId);
         } else {
           console.warn("Subscription did not return expected data.");
         }
@@ -85,6 +92,10 @@ const RoundRoom: React.FC = () => {
       setGame(gameData.getGame)
       setGagList(gameData.getGame.currentRound.gags)
       setGuessList(gameData.getGame.currentRound.guesses)
+      const wrongGuesses = gameData.getGame.currentRound.guesses.filter((guess) => !guess.isCorrect).length || 0;
+      const currentTurn = ((gameData.getGame?.currentRound?.turn || 0) + (wrongGuesses)) % (gameData.getGame?.players.length || 1);
+      setCurrentTurnPlayer(gameData.getGame?.players[currentTurn] || null);
+      setMyTurn(gameData.getGame?.players[currentTurn]._id === playerId);
       const currentPlayer = gameData.getGame.players.find(p => p._id === playerId) || null;
       if(!currentPlayer) {
         setErrorMessage("You are not a part of this game")
@@ -116,12 +127,6 @@ const RoundRoom: React.FC = () => {
   if(loadingGame) {
     return <CircularProgress />
   }
-
-  const wrongGuesses = game?.currentRound.guesses.filter((guess) => !guess.isCorrect)
-  const currentTurn = (((game?.currentRound?.turn || 0) + (wrongGuesses?.length || 0)) % (game?.players.length || 1));
-  console.log("Game?.currentRound", game?.currentRound)
-  const currentTurnPlayer = game?.players[currentTurn];
-  const myTurn = currentTurnPlayer?._id === playerId;
 
   const handleGagClick = (gag: Gag) => {
     setSelectedGag(gag)
@@ -177,7 +182,7 @@ const RoundRoom: React.FC = () => {
 
   return (
     <>
-    <GuessAnnouncementModal hasNewGuess={newGuess !== null} newGuess={newGuess} handleClose={handleCloseAnnouncement}/>
+    <GuessAnnouncementModal hasNewGuess={newGuess !== null} newGuess={newGuess} handleClose={handleCloseAnnouncement} guessed={game?.players.find((player) => player._id === newGuess?.guessed._id)} guesser={game?.players.find((player) => player._id === newGuess?.guesser._id)} />
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer isDrawerOpen={isDrawerOpen} playerList={game?.players || []} gagList={gagList || []} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
       <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
@@ -185,7 +190,7 @@ const RoundRoom: React.FC = () => {
         <Box textAlign="center" alignItems="center"  marginBottom="32px" marginTop="8px">
           <Typography color="info" variant="h3">{game?.currentRound.promptText}</Typography>
         </Box>
-        {game?.players.length === game?.currentRound.gags.length ? 
+        {(game?.players.length === game?.currentRound.gags.length) || (game?.players.length === gagList.length) ? 
         (<GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite}/>): 
         (<PlayerSelection playerList={game?.players || []} gagList={gagList || []} onClick={() => {}}/>)}
         {/* {game?.players?.[0]?._id === playerId && (

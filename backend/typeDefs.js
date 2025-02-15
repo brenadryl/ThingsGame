@@ -98,7 +98,7 @@ const typeDefs = `
   type Subscription {
     newPlayer(gameId: ID!): [Player]
     playerChange(gameId: ID!): Player
-    newGuess(roundId: ID!): Guess
+    newGuess(roundId: ID!): [Guess]
     gagUpdate(roundId: ID!): [Gag]
     gagChange(roundId: ID!): Gag
     voteChange(roundId: ID!): Gag
