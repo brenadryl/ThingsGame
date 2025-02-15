@@ -115,6 +115,20 @@ const resolvers = {
             );
           }
 
+          let roundsWithDetails = [];
+
+          if (round && rounds.length > 0) {
+            roundsWithDetails = await Promise.all(
+              rounds.map(async (round) => {
+                const gags = await Gag.find({round: round._id}).populate("round")
+                return {
+                  ...round.toObject(),
+                  gags,
+                }
+              })
+            );
+          }
+
 
           if (currentGags && currentGags.length > 0) {
             const gagIds = currentGags.map((gag) => gag._id)
@@ -129,7 +143,7 @@ const resolvers = {
           return {
             ...game.toObject(),
             players: playersWithDetails,
-            rounds,
+            rounds: roundsWithDetails,
             currentRound,
           }
         } catch (error) {
