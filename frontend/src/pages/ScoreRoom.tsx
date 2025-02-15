@@ -97,12 +97,12 @@ const ScoreRoom: React.FC = () => {
     points += favoriteGags.filter((gag) => gag?.player._id === player._id).length || 0;
     return points;
   }
+  console.log("favorite gags", favoriteGags)
 
   return (
     <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
       <Box textAlign="center" alignItems="center"  marginBottom="32px" display="flex" flexDirection="row">
-        <Typography color="text.secondary">Game Code:</Typography>
-        <Typography color="info" variant="h3">{game?.gameCode}</Typography>
+        <Typography color="text.secondary" variant="h3">SCOREBOARD</Typography>
       </Box>
       {game?.players.map((currPlayer) => (
             <PlayerCard 
@@ -113,6 +113,37 @@ const ScoreRoom: React.FC = () => {
                 points={calculatePoints(currPlayer)}
             />
         ))}
+        {favoriteGags.length > 0 && (
+            <Box marginTop="24px">
+                <Typography color="text.secondary" variant='h4'>FAVORITE RESPONSES: </Typography>
+            </Box>
+        )}
+        {favoriteGags.map((gag) => {
+            if (gag) {
+                return (
+                    <Box 
+                        display="flex" 
+                        key={`${gag?._id}-container`} 
+                        marginY="8px"
+                        justifyContent="space-between"
+                        minWidth="320px"
+                        padding="8px" 
+                        sx={{
+                            border: 1,
+                            borderColor: "secondary.main",
+                            borderRadius: 1,
+                        }}
+                    >
+                        <Typography color="secondary" key={`${gag?._id}-gag`}> {gag.text}</Typography>
+                        <Box marginLeft="16px">
+                            <Typography color="secondary" key={`${gag?._id}-votes`}>{gag.votes}</Typography>
+                        </Box>
+                    </Box>
+                )
+            } else {
+                return null;
+            }
+        })}
       {game?.players?.[0]?._id === playerId && (
         <Button onClick={handleUpdateGame} variant='contained' disabled={updateGameLoading} sx={{marginTop: '24px'}}>
           {updateGameLoading ? <CircularProgress size={24}/> : "START NEXT ROUND"}
