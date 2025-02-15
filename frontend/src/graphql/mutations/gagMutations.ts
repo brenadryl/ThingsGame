@@ -17,8 +17,8 @@ export const NEW_GAG = gql`
 `;
 
 export const UPDATE_GAG = gql`
-  mutation UpdateGag($id: ID!, $vote: Int) {
-    updateGag(id: $id, vote: $vote) {
+  mutation UpdateGag($id: ID!, $votes: Int) {
+    updateGag(id: $id, votes: $votes) {
       _id
       votes
     }

@@ -50,7 +50,7 @@ const PlayRoom: React.FC = () => {
         console.log("You are not a part of this game")
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
       }
-      if (gameData.getGame.currentRound && gameData.getGame.currentRound.stage !== 3) {
+      if (gameData.getGame.currentRound && gameData.getGame.currentRound.stage !== 2) {
         navigate(`/writing-room/${gameData.getGame._id}/${playerId}`)
       }
     }

@@ -31,9 +31,7 @@ const resolvers = {
       getCurrentRound: async (_, { gameId }) => {
         const game = await Game.findById(gameId).populate("currentRound")
         const round = await Round.findById(game?.currentRound);
-        console.log("Game: ", game)
-        console.log("Gameid: ", gameId)
-        if (round._id.toString() === game?.currentRound?._id.toString() && round.stage < 3) {
+        if (round._id.toString() === game?.currentRound?._id.toString() && round.stage < 2) {
           const gags = await Gag.find({round: round._id}).populate("player")
           const gagIds = gags.map((gag) => gag._id)
           const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1}).populate("guessed").populate("guesser").populate("gag");
@@ -100,15 +98,37 @@ const resolvers = {
           const rounds = await Round.find({game: game._id})
           const currentGags = await Gag.find({round: game.currentRound})
           let currentGuesses = []; 
+          let playersWithDetails = [];
+          if (players && players.length > 0) {
+            playersWithDetails = await Promise.all(
+              players.map(async (player) => {
+                const guessesMade = await Guess.find({guesser: player._id})
+                const guessesReceived = await Guess.find({guessed: player._id})
+                const gags = await Gag.find({player: player._id}).populate("round")
+                return {
+                  ...player.toObject(),
+                  guessesMade,
+                  guessesReceived,
+                  gags,
+                }
+              })
+            );
+          }
+
+
           if (currentGags && currentGags.length > 0) {
             const gagIds = currentGags.map((gag) => gag._id)
             currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1});
           }
           const currentRound = game.currentRound ? {...game.currentRound.toObject(), gags: currentGags, guesses: currentGuesses} : undefined;
-
+          // console.log("currentRound1: ", currentRound)
+          // console.log("rounds1: ", rounds)
+          // console.log("currentGags1: ", currentGags)
+          // console.log("currentGuesses1: ", currentGuesses)
+          // console.log("players1: ", playersWithDetails)
           return {
             ...game.toObject(),
-            players,
+            players: playersWithDetails,
             rounds,
             currentRound,
           }
@@ -218,7 +238,7 @@ const resolvers = {
 
       createRound: async (_, { gameId, promptText, turn }) => {
         const game = Game.findById(gameId)
-        if (game.currentRound && !game.currentRound.stage != 3) {
+        if (game.currentRound && !game.currentRound.stage != 2) {
           throw new Error("Current round not yet over");
         }
         const createdAt = Math.floor(Date.now() / 1000);
@@ -267,13 +287,21 @@ const resolvers = {
         return gag;
       },
   
-      updateGag: async (_, { id, vote }) => {
+      updateGag: async (_, { id, votes }) => {
         const gag = await Gag.findByIdAndUpdate(
           id,
-          { $inc: { votes: vote } },
+          { $inc: { votes: votes } },
           { new: true }
         ).populate("round");
-        pubsub.publish("gagUpdate", { gagUpdate: { ...gag.toObject(), roundId: gag.round._id } });
+        const game = await Game.findById(gag.round.game)
+        console.log("GAGGGGG ", gag)
+        if(gag.round.stage !== 2) {
+          await Round.findByIdAndUpdate(gag.round._id.toString(), {stage: 2}, {new: true})
+        }
+        if(game.stage !== 3) {
+          await Game.findByIdAndUpdate(game._id.toString(), {stage: 3}, {new: true})
+          pubsub.publish("gameStageChange", { gameStageChange: game._id.toString() });
+        }
         return gag;
       },
 
@@ -316,7 +344,6 @@ const resolvers = {
             return pubsub.asyncIterableIterator('newPlayer')
           },
           (payload, variables) => { 
-            console.log("Subscription triggered with payload:", payload);
             return payload.newPlayer.gameId.toString() === variables.gameId.toString();
           }
         ),
@@ -372,7 +399,6 @@ const resolvers = {
             const gagIds = gags.map((gag) => gag._id)
             const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1}).populate("guessed").populate("guesser").populate("gag");
             const returnGuesses = guesses.map((guess) => {return {...guess.toObject()}})
-            console.log("return Guesses", returnGuesses)
             return returnGuesses;
           } catch (error) {
             console.error("Error fetching guesses for subscription")

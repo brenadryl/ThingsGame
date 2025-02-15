@@ -14,12 +14,13 @@ interface GagSelectionProps {
 const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, setFavorite}) => {
   const [selectedGag, setSelectedGag] = useState('');
   const [favoriteGag, setFavoriteGag] = useState('');
+  if (!myTurn && selectedGag !== '') {
+      setSelectedGag('')
+  }
   const selectGag = (gag: Gag) => {
     if (myTurn) {
         setSelectedGag(gag._id)
         onClick(gag)
-    } else {
-        setSelectedGag('')
     }
   }
   const selectFavorite = (gag: Gag) => {

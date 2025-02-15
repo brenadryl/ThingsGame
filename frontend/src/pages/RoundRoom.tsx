@@ -1,11 +1,10 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Drawer, Typography} from '@mui/material';
+import { Alert, Box, CircularProgress, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Gag, Game, Guess, Player } from '../types';
 import { useSubscription } from '@apollo/client';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
-import PlayerList from '../Components/PlayerList';
 import { GAG_UPDATE_SUBSCRIPTION } from '../graphql/subscriptions/gagSubscriptions';
 import PlayerSelection from '../Components/PlayerSelection';
 import GagSelection from '../Components/GagSelection';
@@ -14,8 +13,31 @@ import { NEW_GUESS_SUBSCRIPTION } from '../graphql/subscriptions/guessSubscripti
 import GuessAnnouncementModal from '../Components/GuessAnnouncementModal';
 import ConfirmGuessModal from '../Components/ConfirmGuessModal';
 import PlayerDrawer from '../Components/PlayerDrawer';
+import { UPDATE_GAG } from '../graphql/mutations/gagMutations';
 
 
+const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess | undefined, turn: number, gagList: Gag[] | undefined) => {
+  if (!playerList) return null;
+  if (!lastWrongGuess) {
+    return playerList ? playerList[turn] : null;
+  }
+  let currentPlayerIndex = playerList?.findIndex((player) => player._id === lastWrongGuess.guesser._id);
+  if (currentPlayerIndex === -1) return playerList ? playerList[turn] : null;
+  let foundPlayer = false;
+  while (!foundPlayer) {
+    currentPlayerIndex += 1;
+    if (currentPlayerIndex >= playerList.length) {
+      currentPlayerIndex = 0;
+    }
+    if (!gagList) {
+      foundPlayer = true;
+    } else {
+      const playerGag = gagList.find((gag) => gag.player._id === playerList[currentPlayerIndex]._id)
+      if (!playerGag?.guessed) foundPlayer = true;
+    }
+  }
+  return playerList[currentPlayerIndex]
+ }
 const RoundRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
   const navigate = useNavigate();
@@ -37,6 +59,7 @@ const RoundRoom: React.FC = () => {
     fetchPolicy: "network-only",
   });
   const [createGuess] = useMutation(NEW_GUESS)
+  const [updateGag] = useMutation(UPDATE_GAG)
   const { error: errorSubscription } = useSubscription(GAG_UPDATE_SUBSCRIPTION, {
     variables: { roundId: game?.currentRound._id },
     skip: !game?.currentRound._id,
@@ -47,6 +70,11 @@ const RoundRoom: React.FC = () => {
           console.log("Subscription received updated Gag data:", subscriptionData.data?.gagUpdate);
           const updatedGags = subscriptionData.data?.gagUpdate;
           setGagList(updatedGags)
+          if (updatedGags.every((gag: Gag) => gag.guessed)) {
+            console.log("END OF ROUND 2 ", updatedGags)
+            handleEndOfRound();
+            return;
+          }
         } else {
           console.warn("Subscription did not return expected data.");
         }
@@ -73,13 +101,11 @@ const RoundRoom: React.FC = () => {
             setNewGuess(updatedGuesses[0])
           }
           setGuessList(updatedGuesses)
-        const wrongGuesses = updatedGuesses.filter((guess: Guess) => !guess.isCorrect).length || 0;
-        const currentTurn = ((game?.currentRound?.turn || 0) + (wrongGuesses)) % (game?.players.length || 1);
-        setCurrentTurnPlayer(game?.players[currentTurn] || null);
-        setMyTurn(game?.players[currentTurn]._id === playerId);
-        if (game?.players[currentTurn]._id !== playerId) {
-          setSelectedGag(null)
-        }
+          console.log("updatedGuesses", updatedGuesses)
+          const lastWrongGuess = updatedGuesses?.filter((guess: Guess) => !guess.isCorrect)[0];
+          const currPlayerTurn = getCurrentTurn(game?.players, lastWrongGuess, game?.currentRound.turn || 0, gagList);
+          setCurrentTurnPlayer(currPlayerTurn);
+          setMyTurn(currPlayerTurn?._id === playerId);
         } else {
           console.warn("Subscription did not return expected data.");
         }
@@ -90,16 +116,56 @@ const RoundRoom: React.FC = () => {
     }
   });
 
+  const handleEndOfRound = async () => {
+    console.log("You shouldn't see me soon")
+    if (favorite !== '') {
+      try {
+        await updateGag({
+          variables: {
+            id: favorite,
+            votes: 1,
+          }
+        })
+      } catch (error) {
+        console.error("Error selecting favorite: ", error)
+        setErrorMessage("Response was not favorited")
+      }
+    } else{
+      try {
+        await updateGag({
+          variables: {
+            id: gagList[0]._id,
+            votes: 0,
+          }
+        })
+      } catch (error) {
+        console.error("Error selecting favorite: ", error)
+        setErrorMessage("Response was not favorited")
+      }
+    }
+    navigate(`/score-room/${gameId}/${playerId}`)
+  }
+
   useEffect(() => {
     if(gameData?.getGame) {
       setGame(gameData.getGame)
-      setGagList(gameData.getGame.currentRound.gags)
+      console.log("GAMEEEEEEE", gameData.getGame)
+      if (gameData.getGame.currentRound.gags.length > gagList.length) {
+        setGagList(gameData.getGame.currentRound.gags)
+        if (gameData.getGame.currentRound.gags.every((gag: Gag) => gag.guessed)) {
+          console.log("END OF ROUND 1 ", gameData.getGame.currentRound.gags)
+          handleEndOfRound();
+          return;
+        }
+      }
       setGuessList(gameData.getGame.currentRound.guesses)
-      const wrongGuesses = gameData.getGame.currentRound.guesses.filter((guess) => !guess.isCorrect).length || 0;
-      const currentTurn = ((gameData.getGame?.currentRound?.turn || 0) + (wrongGuesses)) % (gameData.getGame?.players.length || 1);
-      setCurrentTurnPlayer(gameData.getGame?.players[currentTurn] || null);
-      setMyTurn(gameData.getGame?.players[currentTurn]._id === playerId);
-      if (gameData.getGame?.players[currentTurn]._id !== playerId) {
+      const lastWrongGuess = gameData.getGame.currentRound.guesses.filter((guess: Guess) => !guess.isCorrect)[0];
+      console.log('gameData.getGame.currentRound.guesses', gameData.getGame.currentRound.guesses)
+      console.log('lastWrongGuess', lastWrongGuess)
+      const currPlayerTurn = getCurrentTurn(gameData.getGame?.players, lastWrongGuess, gameData.getGame?.currentRound.turn || 0, gameData.getGame.currentRound.gags);
+      setCurrentTurnPlayer(currPlayerTurn);
+      setMyTurn(currPlayerTurn?._id === playerId);
+      if (currPlayerTurn?._id !== playerId) {
         setSelectedGag(null)
       }
       const currentPlayer = gameData.getGame.players.find(p => p._id === playerId) || null;
@@ -108,8 +174,8 @@ const RoundRoom: React.FC = () => {
         console.log("You are not a part of this game")
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
       }
-      if (gameData.getGame.currentRound.stage === 3) {
-        navigate(`/play-room/${gameData.getGame._id}/${playerId}`)
+      if (gameData.getGame.currentRound.stage === 2) {
+        navigate(`/score-room/${gameData.getGame._id}/${playerId}`)
       }
     }
   }, [gameData, playerId, navigate])
@@ -177,6 +243,8 @@ const RoundRoom: React.FC = () => {
   }
 
   const handleCloseAnnouncement = () => {
+    setSelectedGag(null)
+    setSelectedPlayer(null)
     setNewGuess(null);
   }
 
@@ -186,7 +254,7 @@ const RoundRoom: React.FC = () => {
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer isDrawerOpen={isDrawerOpen} playerList={game?.players || []} gagList={gagList || []} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
       <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-          <Typography color="text.secondary">{myTurn ? "SELECT A RESPONSE TO GUESS WHO SAID IT" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>
+          {newGuess !== null ? <Typography color="text.secondary"> GUESSING</Typography> : <Typography color="text.secondary">{myTurn ? "SELECT A RESPONSE TO GUESS WHO SAID IT" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>}
         <Box textAlign="center" alignItems="center"  marginBottom="32px" marginTop="8px">
           <Typography color="info" variant="h3">{game?.currentRound.promptText}</Typography>
         </Box>

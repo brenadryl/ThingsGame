@@ -89,7 +89,7 @@ const typeDefs = `
     createRound(gameId: ID!, promptText: String!, turn: Int!): Round!
     updateRound(id: ID!, turn: Int, stage: Int): Round!
     createGag(roundId: ID!, playerId: ID!, text: String!): Gag!
-    updateGag(id: ID!, guesserId: ID!, guessed: Boolean): Gag!
+    updateGag(id: ID!, votes: Int): Gag!
     updateVote(id: ID!): Gag!
     createGuess(gagId: ID!, guesserId: ID!, guessedId: ID!): Guess!
     createPrompt(text: String!): Prompt!

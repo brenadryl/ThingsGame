@@ -15,6 +15,7 @@ import WaitingRoom from './pages/WaitingRoom';
 import PlayRoom from './pages/PlayRoom';
 import WritingRoom from './pages/WritingRoom';
 import RoundRoom from './pages/RoundRoom';
+import ScoreRoom from './pages/ScoreRoom';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -73,6 +74,11 @@ function App() {
             <Route
               path="/round-room/:gameId/:playerId"
               element={ <RoundRoom/>
+              }
+            />
+            <Route
+              path="/score-room/:gameId/:playerId"
+              element={ <ScoreRoom/>
               }
             />
           </Routes>
