@@ -307,6 +307,8 @@ const resolvers = {
       },
   
       updateGag: async (_, { id, votes }) => {
+        console.log("update gag id: ", id)
+        console.log("update gag votes: ", votes)
         const gag = await Gag.findByIdAndUpdate(
           id,
           { $inc: { votes: votes } },
@@ -314,18 +316,11 @@ const resolvers = {
         ).populate("round");
         const game = await Game.findById(gag.round.game)
         console.log("GAGGGGG ", gag)
-        if(gag.round.stage !== 2) {
-          await Round.findByIdAndUpdate(gag.round._id.toString(), {stage: 2}, {new: true})
-        }
-        if(game.stage !== 3) {
-          await Game.findByIdAndUpdate(game._id.toString(), {stage: 3}, {new: true})
-          pubsub.publish("gameStageChange", { gameStageChange: game._id.toString() });
-        }
         return gag;
       },
 
       createGuess: async (_, { gagId, guesserId, guessedId }) => {
-        const existingGag = await Gag.findById(gagId).populate("player");
+        const existingGag = await Gag.findById(gagId).populate("player").populate("round");
         if (existingGag) {
           const isCorrect = guessedId.toString() === existingGag.player._id.toString();
           const createdAt = Math.floor(Date.now() / 1000);
@@ -339,6 +334,20 @@ const resolvers = {
               { guessed: true, guesser: guesserId },
               { new: true }
             );
+
+
+            const guessedGags = await Gag.find({round: existingGag.round, guessed: true})
+            const players = await Player.find({game: existingGag.round.game})
+            console.log("gueesedGags", guessedGags)
+            console.log("players", players)
+            if(guessedGags.length === players.length) {
+              const round = await Round.findByIdAndUpdate(existingGag.round._id.toString(), {stage: 2}, {new: true}).populate("game")
+              console.log("Update gag round: ", round);
+              const updatedGame = await Game.findByIdAndUpdate(round.game._id.toString(), {stage: 3}, {new: true})
+              console.log("Update gag game: ", updatedGame);
+              pubsub.publish("gameStageChange", { gameStageChange: round.game._id.toString() });
+            }
+
             pubsub.publish("gagUpdate", { gagUpdate: { ...gag.toObject(), roundId: existingGag.round._id } });
           }
           pubsub.publish("newGuess", { newGuess: { ...savedGuess.toObject(), roundId: existingGag.round._id } });

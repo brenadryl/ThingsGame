@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { Alert, Box, CircularProgress, Typography} from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Gag, Game, Guess, Player } from '../types';
 import { useSubscription } from '@apollo/client';
@@ -23,24 +23,17 @@ const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess 
   }
   let currentPlayerIndex = playerList?.findIndex((player) => player._id === lastWrongGuess.guesser._id);
   if (currentPlayerIndex === -1) return playerList ? playerList[turn] : null;
-  let foundPlayer = false;
-  while (!foundPlayer) {
-    currentPlayerIndex += 1;
-    if (currentPlayerIndex >= playerList.length) {
-      currentPlayerIndex = 0;
-    }
-    if (!gagList) {
-      foundPlayer = true;
-    } else {
-      const playerGag = gagList.find((gag) => gag.player._id === playerList[currentPlayerIndex]._id)
-      if (!playerGag?.guessed) foundPlayer = true;
-    }
+  while (true) {
+    currentPlayerIndex = (currentPlayerIndex + 1) % playerList.length;
+
+    if (! gagList || gagList.find((gag) => gag.player._id === playerList[currentPlayerIndex]._id && !gag.guessed)) return playerList[currentPlayerIndex]
   }
-  return playerList[currentPlayerIndex]
  }
 const RoundRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
   const navigate = useNavigate();
+  const processedGameData = useRef(false);
+  const roundEnded = useRef(false);
   const [game, setGame] = useState<Game | null>(null)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isModalOpen, setModalOpen] = useState(false)
@@ -118,36 +111,30 @@ const RoundRoom: React.FC = () => {
 
   const handleEndOfRound = async () => {
     console.log("You shouldn't see me soon")
-    if (favorite !== '') {
-      try {
-        await updateGag({
-          variables: {
-            id: favorite,
-            votes: 1,
-          }
-        })
-      } catch (error) {
-        console.error("Error selecting favorite: ", error)
-        setErrorMessage("Response was not favorited")
-      }
-    } else{
-      try {
-        await updateGag({
-          variables: {
-            id: gagList[0]._id,
-            votes: 0,
-          }
-        })
-      } catch (error) {
-        console.error("Error selecting favorite: ", error)
-        setErrorMessage("Response was not favorited")
+    if (!roundEnded.current) {
+      roundEnded.current = true;
+
+      if (favorite !== '') {
+        try {
+          await updateGag({
+            variables: {
+              id: favorite,
+              votes: 1,
+            }
+          })
+        } catch (error) {
+          console.error("Error selecting favorite: ", error)
+          setErrorMessage("Response was not favorited")
+        }
       }
     }
     navigate(`/score-room/${gameId}/${playerId}`)
   }
+  console.log("roundEnded", roundEnded)
 
   useEffect(() => {
-    if(gameData?.getGame) {
+    if(gameData?.getGame && !processedGameData.current) {
+      processedGameData.current = true;
       setGame(gameData.getGame)
       console.log("GAMEEEEEEE", gameData.getGame)
       if (gameData.getGame.currentRound.gags.length > gagList.length) {
@@ -261,12 +248,6 @@ const RoundRoom: React.FC = () => {
         {(game?.players.length === game?.currentRound.gags.length) || (game?.players.length === gagList.length) ? 
         (<GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite}/>): 
         (<PlayerSelection playerList={game?.players || []} gagList={gagList || []} onClick={() => {}}/>)}
-        {/* {game?.players?.[0]?._id === playerId && (
-          <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginTop: '24px'}}>
-            {startLoading ? <CircularProgress size={24}/> : "START GAME"}
-          </Button>
-        )} */}
-        {/* {startError && <Alert severity="error">Error starting game: {startError.message}</Alert>} */}
       </Box>
     </>
   )
