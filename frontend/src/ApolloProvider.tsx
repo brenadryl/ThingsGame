@@ -3,7 +3,7 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import { getMainDefinition } from '@apollo/client/utilities';
 
-const GRAPHQL_HTTP_URL = process.env.REACT_APP_GRAPHQL_ENDPOINT || 'http://localhost:5500/graphql';
+const GRAPHQL_HTTP_URL = process.env.REACT_APP_GRAPHQL_ENDPOINT || 'https://api.joaksonyou.com/graphql';
 const GRAPHQL_WS_URL = GRAPHQL_HTTP_URL.replace(/^http/, 'ws'); // Converts http to ws automatically
 
 // HTTP link for queries and mutations
