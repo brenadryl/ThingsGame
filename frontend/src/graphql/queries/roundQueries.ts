@@ -25,6 +25,7 @@ export const GET_CURRENT_ROUND = gql`
             text
             player {
                 _id
+                icon
             }
         }
     }

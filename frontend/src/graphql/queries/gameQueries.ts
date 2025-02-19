@@ -52,6 +52,7 @@ export const GET_GAME = gql`
         gags {
           player {
             _id
+            icon
           }
           votes
           guessed
@@ -70,6 +71,7 @@ export const GET_GAME = gql`
           votes
           player {
             _id
+            icon
           }
           guesser {
             _id

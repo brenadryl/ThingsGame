@@ -13,8 +13,6 @@ interface PlayerCardProps {
 }
 
 const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emotion = "neutral" }) => {
-  console.log(`${name} ${icon}`)
-  console.log(AVATAR_LIST[icon || 0].happy)
   return (
     <Box
       sx={{
@@ -38,12 +36,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emot
           borderRadius: '20%',
         }}
       >
-        { icon !== undefined && (<img src={AVATAR_LIST[icon][emotion]} key={`${name}-img`} alt={name}     style={{ maxWidth: '70px', maxHeight: '70px', width: 'auto', height: 'auto' }} />) }
+        { icon !== undefined && (<img src={AVATAR_LIST[icon][emotion]} key={`${name}-img`} alt={name} style={{ maxWidth: '70px', maxHeight: '70px', width: 'auto', height: 'auto' }} />) }
         
       </Box>
       <Box borderRadius="10px">
         <Typography variant="h4" color={color}>{name}</Typography>
-        <Typography variant="h3" color="primary.contrastText">{points}</Typography>
+        <Typography variant="h3" color={color}>{points}</Typography>
       </Box>
     </Box>
   );

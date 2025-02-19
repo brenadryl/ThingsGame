@@ -35,7 +35,6 @@ const ScoreRoom: React.FC = () => {
   })
 
   useEffect(() => {
-    console.log(gameData)
     if(gameData?.getGame) {
       setGame(gameData.getGame)
       console.log("SCORE GAME  ", gameData.getGame)
@@ -96,21 +95,26 @@ const ScoreRoom: React.FC = () => {
     points += favoriteGags.filter((gag) => gag?.player._id === player._id).length || 0;
     return points;
   }
-  console.log("favorite gags", favoriteGags)
 
   return (
     <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
       <Box textAlign="center" alignItems="center"  marginBottom="32px" display="flex" flexDirection="row">
         <Typography color="text.secondary" variant="h3">SCOREBOARD</Typography>
       </Box>
-      {game?.players.map((currPlayer) => (
-            <PlayerCard 
-                key={currPlayer._id} 
-                name={currPlayer?.name || ''}
-                color={currPlayer.color || ''}
-                points={calculatePoints(currPlayer)}
-            />
-        ))}
+      <Box display="flex" justifyContent="center" flexWrap="wrap">
+        {game?.players.map((currPlayer) => {
+            const points = calculatePoints(currPlayer);
+            return (
+                <PlayerCard 
+                    key={currPlayer._id} 
+                    name={currPlayer?.name || ''}
+                    color={currPlayer.color || ''}
+                    points={points}
+                    icon={currPlayer.icon}
+                    emotion={points === 0 ? "sad" : (points > 10 ? "happy" : "neutral")}
+                />
+            )})}
+        </Box>
         {favoriteGags.length > 0 && (
             <Box marginTop="24px">
                 <Typography color="text.secondary" variant='h4'>FAVORITE RESPONSES: </Typography>
@@ -124,7 +128,8 @@ const ScoreRoom: React.FC = () => {
                         key={`${gag?._id}-container`} 
                         marginY="8px"
                         justifyContent="space-between"
-                        minWidth="320px"
+                        width="320px"
+                        alignItems="center"
                         padding="8px" 
                         sx={{
                             border: 1,
@@ -132,7 +137,7 @@ const ScoreRoom: React.FC = () => {
                             borderRadius: 1,
                         }}
                     >
-                        <Typography color="secondary" key={`${gag?._id}-gag`}> {gag.text}</Typography>
+                        <Typography color="secondary" textAlign="left" key={`${gag?._id}-gag`}> {gag.text}</Typography>
                         <Box marginLeft="16px">
                             <Typography color="secondary" key={`${gag?._id}-votes`}>{gag.votes}</Typography>
                         </Box>

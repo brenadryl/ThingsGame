@@ -7,6 +7,7 @@ export const NEW_GAG = gql`
       text
       player {
         _id
+        icon
       }
       votes
       round {

@@ -1,14 +1,16 @@
 
 export const FUN_COLORS = [
     '#FF5733', // Vibrant Orange
-    '#33FF57', // Bright Green
-    '#3357FF', // Bold Blue
+    '#24D14C', // Bright Green
     '#FF33A1', // Hot Pink
-    '#33FFF5', // Aqua Blue
-    '#FF8C33', // Warm Amber
-    '#8C33FF', // Electric Purple
-    '#FF3333'  // Fiery Red
-  ];
+    '#00CCDD', // Bright Teal
+    '#FF3333', // Fiery Red
+    '#C433FF', // Vivid Violet
+    '#FFB733', // Bright Gold
+    '#33A1FF', // Vivid Cerulean
+    '#FF66CC', // Playful Magenta
+    '#41A36F', // **Sea Green** 
+];
 
 export const AVATAR_LIST = [
     {
