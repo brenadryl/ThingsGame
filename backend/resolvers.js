@@ -94,7 +94,7 @@ const resolvers = {
           if (!game) {
             throw new Error("Game not found");
           }
-          const players = await Player.find({game: game._id})
+          const players = await Player.find({game: game._id}).sort({createdAt: 1})
           const rounds = await Round.find({game: game._id})
           const currentGags = await Gag.find({round: game.currentRound})
           let currentGuesses = []; 

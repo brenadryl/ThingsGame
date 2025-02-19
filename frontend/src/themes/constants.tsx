@@ -10,17 +10,6 @@ export const FUN_COLORS = [
     '#FF3333'  // Fiery Red
   ];
 
-interface Avatar {
-    name: string;
-    neutral: string;
-    happy: string;
-    suspicious: string;
-    nervous: string;
-    sad: string;
-    sad_phrase: string;
-    happy_phrase: string;
-}
-
 export const AVATAR_LIST = [
     {
         name: 'star',

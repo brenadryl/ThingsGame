@@ -241,10 +241,18 @@ const RoundRoom: React.FC = () => {
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer isDrawerOpen={isDrawerOpen} playerList={game?.players || []} gagList={gagList || []} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
       <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-          {newGuess !== null ? <Typography color="text.secondary"> GUESSING</Typography> : <Typography color="text.secondary">{myTurn ? "SELECT A RESPONSE TO GUESS WHO SAID IT" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>}
         <Box textAlign="center" alignItems="center"  marginBottom="32px" marginTop="8px">
           <Typography color="info" variant="h3">{game?.currentRound.promptText}</Typography>
         </Box>
+        <Box bgcolor="background.default" padding="8px" zIndex={1}>
+          {newGuess !== null ? 
+            <Typography color="text.default"> GUESSING</Typography>
+            : <>
+              <Typography color={myTurn ? "warning.main" : "secondary.light"}>{myTurn ? "YOUR TURN" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>
+            </>
+          }
+        </Box>
+
         {(game?.players.length === game?.currentRound.gags.length) || (game?.players.length === gagList.length) ? 
         (<GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite}/>): 
         (<PlayerSelection playerList={game?.players || []} gagList={gagList || []} onClick={() => {}}/>)}

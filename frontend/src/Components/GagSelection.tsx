@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Gag } from '../types';
-import { Button, IconButton } from '@mui/material';
+import { Button, IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
@@ -28,7 +28,21 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
     setFavorite(gag._id)
   }
     return ( 
-    <>
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        flexDirection="column" 
+        paddingX="16px"
+        paddingTop="32px"
+        paddingBottom="16px"
+        margin="-20px"
+        sx={{
+          borderRadius: "16px",
+          border: '2px solid',
+          borderColor: myTurn ? "warning.main" : "secondary.light"
+        }}
+      >
+        {myTurn && <Typography variant="body2" color="warning.main" sx={{paddingBottom: "16px", marginTop: "-16px", zIndex: 1}}>SELECT A RESPONSE TO GUESS</Typography>}
         {gagList.map((currGag) => {
 
             return (
@@ -40,14 +54,16 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
                         variant={selectedGag === currGag._id ? "contained" :"outlined"}
                         color="secondary"
                         key={currGag._id}
-                        disabled={currGag.guessed}
+                        disabled={currGag.guessed || !myTurn}
                         sx={{
                             pointerEvents: myTurn ? "auto" : "none",
                             opacity: myTurn ? 1 : 1,
                             minWidth: '270px', 
                             marginBottom: '8px',
                             borderRadius: .5,
-                            border: '2px solid'
+                            border: '2px solid',
+                            textDecoration: currGag.guessed ? "line-through" : undefined,
+                            textDecorationThickness: '3px',
                         }}
                         onClick={()=>{selectGag(currGag)}}
                     >
@@ -56,7 +72,7 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
                     
                 </Box>
         )})}
-    </>
+    </Box>
   );
 };
 
