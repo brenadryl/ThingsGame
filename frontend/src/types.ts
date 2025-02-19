@@ -108,3 +108,16 @@ export interface Prompt {
     roundChange: (args: { gameId: string }) => AsyncIterator<Round>;
     gameStageChange: (args: { gameId: string }) => AsyncIterator<Game>;
   }
+
+  export interface Avatar {
+      name: string;
+      neutral: string;
+      happy: string;
+      suspicious: string;
+      nervous: string;
+      sad: string;
+      sad_phrase: string;
+      happy_phrase: string;
+  }
+
+  export type Emotion = 'neutral' | 'happy' | 'suspicious' | 'nervous' | 'sad';

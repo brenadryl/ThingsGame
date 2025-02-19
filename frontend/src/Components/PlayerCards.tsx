@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { AVATAR_LIST } from '../themes/constants';
+import { Emotion } from '../types';
 
 interface PlayerCardProps {
   name: string;
@@ -8,9 +9,10 @@ interface PlayerCardProps {
   color: string;
   points?: number;
   happy?: Boolean;
+  emotion?: Emotion;
 }
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color }) => {
+const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emotion = "neutral" }) => {
   console.log(`${name} ${icon}`)
   console.log(AVATAR_LIST[icon || 0].happy)
   return (
@@ -36,7 +38,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color }) =>
           borderRadius: '20%',
         }}
       >
-        { icon !== undefined && (<img src={AVATAR_LIST[icon].neutral} key={`${name}-img`} alt={name}     style={{ maxWidth: '70px', maxHeight: '70px', width: 'auto', height: 'auto' }} />) }
+        { icon !== undefined && (<img src={AVATAR_LIST[icon][emotion]} key={`${name}-img`} alt={name}     style={{ maxWidth: '70px', maxHeight: '70px', width: 'auto', height: 'auto' }} />) }
         
       </Box>
       <Box borderRadius="10px">
