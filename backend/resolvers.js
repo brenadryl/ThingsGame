@@ -1,7 +1,6 @@
 import { Gag, Game, Guess, Player, Round, Prompt } from './models.js';
 import { withFilter } from 'graphql-subscriptions';
 import pubsub from './pubsub.js';
-import { FUN_COLORS } from './constants.js';
 import { UserInputError } from 'apollo-server-express';
 
 function generateRandomString(length) {
@@ -95,7 +94,7 @@ const resolvers = {
           if (!game) {
             throw new Error("Game not found");
           }
-          const players = await Player.find({game: game._id})
+          const players = await Player.find({game: game._id}).sort({createdAt: 1})
           const rounds = await Round.find({game: game._id})
           const currentGags = await Gag.find({round: game.currentRound})
           let currentGuesses = []; 
@@ -155,33 +154,48 @@ const resolvers = {
     },
     Mutation: {
       createPlayer: async (_, { name, gameCode }) => {
-        const existingGame = await Game.findOne({ gameCode: gameCode });
-        if (existingGame && existingGame.active && existingGame.stage === 1) {
-          const existingPlayer = await Player.findOne({ game: existingGame._id, name: name });
-          if (existingPlayer) {
-            throw new UserInputError("A player with this name already exists in this game.");
-          }
-          const players = await Player.find({game: existingGame._id})
-          if (players.length > 19) {
-            throw new UserInputError("This game is full.");
-          }
+        try {
+          const existingGame = await Game.findOne({ gameCode: gameCode });
+          if (existingGame && existingGame.active && existingGame.stage === 1) {
+            const existingPlayer = await Player.findOne({ game: existingGame._id, name: name });
+            if (existingPlayer) {
+              throw new UserInputError("A player with this name already exists in this game.");
+            }
+            const players = await Player.find({game: existingGame._id})
+            if (players.length > 19) {
+              throw new UserInputError("This game is full.");
+            }
+            const TOTAL_ICONS = 34
+            const assignedIcons = players.map(player => player.icon);
+            let availableIcon = -1;
+            let i = TOTAL_ICONS;
+            while (availableIcon === -1) {
+              if (!assignedIcons.includes(i)) { 
+                availableIcon = i;
+              }
+              i--;
+            }
+            if ( availableIcon === -1) {
+              throw new UserInputError("No available Icons")
+            }
 
-          const createdAt = Math.floor(Date.now() / 1000);
-          const uniqueNum = (parseInt(gameCode, 36) + players.length)%20;
-          const player = new Player({ name, game: existingGame._id, color: FUN_COLORS[uniqueNum], icon: uniqueNum, createdAt, turn: players.length });
-          await player.save();
-          await player.populate('game');
-          pubsub.publish("newPlayer", { newPlayer: { ...player.toObject(), gameId: existingGame._id } });
-          return player;
-        } 
-        
-        throw new UserInputError("No such game.");
+            const createdAt = Math.floor(Date.now() / 1000);
+            const player = new Player({ name, game: existingGame._id, createdAt, color: '#FF5733', icon: availableIcon, turn: players.length });
+            await player.save();
+            await player.populate('game');
+            pubsub.publish("newPlayer", { newPlayer: { ...player.toObject(), gameId: existingGame._id } });
+            return player;
+          }
+          throw new UserInputError("No such game.");
+        } catch (error) {
+            throw error;
+        }
       },
   
-      updatePlayer: async (_, { id, name, points, color, icon }) => {
+      updatePlayer: async (_, { id, name, points }) => {
         const player = await Player.findOneAndUpdate(
           { _id: id },
-          { name, points, color, icon },
+          { name, points },
           { new: true }
         );
         if (!player) {
@@ -192,6 +206,33 @@ const resolvers = {
         }
         pubsub.publish("playerChange", { playerChange: { ...player.toObject(), gameId: player.game } });
         return player;
+      },
+
+      updatePlayerIcon: async (_, { gameId, playerId, icon, color }) => {
+        try {
+          const existingPlayer = await Player.findOne({game: gameId, icon: icon})
+          if (existingPlayer) {
+            throw new UserInputError("A player this avatar has already been chosen");
+          }
+          const player = await Player.findOneAndUpdate(
+            { _id: playerId },
+            { color, icon },
+            { new: true }
+          ).populate("game");
+
+          if (!player) {
+            throw new UserInputError(`Player with id ${id} not found.`);
+          }
+          
+          if (!player.game || player.game._id.toString() !== gameId) {
+            throw new UserInputError(`Player with id ${id} is not associated with this game.`);
+          }
+
+          pubsub.publish("avatarSelected", { avatarSelected: { ...player.toObject(), gameId: gameId } });
+          return player;
+        } catch (error) {
+            throw error;
+        }
       },
 
       createGame: async (_, {}) => {
@@ -395,6 +436,39 @@ const resolvers = {
           } catch (error) {
             console.error("Error fetching players for subscription")
             throw new Error("Failed to fetch players for subscription")
+          }
+        }
+      },
+      avatarSelected: {
+        subscribe: withFilter(
+          () => {
+            console.log("subscription started for new avatar")
+            return pubsub.asyncIterableIterator('avatarSelected')
+          },
+          (payload, variables) => {
+            return payload.avatarSelected.gameId.toString() === variables.gameId.toString();
+          }
+        ),
+        resolve: async (payload) => {
+          try {
+            const players = await Player.find({game: payload.avatarSelected.gameId}).sort({createdAt: 1});
+            const playersWithDetails = await Promise.all(
+              players.map(async (player) => {
+                const guessesMade = await Guess.find({guesser: player._id})
+                const guessesReceived = await Guess.find({guessed: player._id})
+                const gags = await Gag.find({player: player._id})
+                return {
+                  ...player.toObject(),
+                  guessesMade,
+                  guessesReceived,
+                  gags,
+                }
+              })
+            );
+            return playersWithDetails;
+          } catch (error) {
+            console.error("Error fetching avatars for subscription")
+            throw new Error("Failed to fetch avatars for subscription")
           }
         }
       },

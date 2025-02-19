@@ -20,7 +20,7 @@ const PlayerDrawer: React.FC<PlayerDrawerProps> = ({ isDrawerOpen, playerList, g
       onClose={handleCloseDrawer}
       PaperProps={{
         sx: {
-          width: 240,
+          width: 300,
           padding: 2
         }
       }}

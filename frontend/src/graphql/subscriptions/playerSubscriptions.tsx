@@ -40,3 +40,14 @@ export const NEW_PLAYER_SUBSCRIPTION = gql`
       }
   }
 `;
+
+export const AVATAR_SELECTION_SUBSCRIPTION = gql`
+  subscription AvatarSelection($gameId: ID!) {
+    avatarSelected(gameId: $gameId) {
+      _id
+      name
+      icon
+      color
+    }
+  }
+`;

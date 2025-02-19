@@ -42,7 +42,7 @@ const playerSchema = new mongoose.Schema({
     active: { type: Boolean, default: true },
     name: { type: String, required: true },
     color: { type: String},
-    icon: { type: Number},
+    icon: { type: Number, required: true },
     turn: { type: Number, required: true},
     createdAt: { type: Date, default: Date.now },
     game: {
@@ -50,6 +50,8 @@ const playerSchema = new mongoose.Schema({
         ref: 'Game'
     },
 });
+
+playerSchema.index({ game: 1, icon: 1 }, { unique: true });
 
 const gameSchema = new mongoose.Schema({
     active: { type: Boolean, default: true },

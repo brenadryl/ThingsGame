@@ -82,7 +82,8 @@ const typeDefs = `
 
   type Mutation {
     createPlayer(name: String!, gameCode: String!): Player!
-    updatePlayer(id: ID!, name: String, points: Int, color: String, icon: String): Player!
+    updatePlayer(id: ID!, name: String, points: Int): Player!
+    updatePlayerIcon(gameId: ID!, playerId: ID!, icon: Int, color: String): Player!
     createGame: Game!
     updateGameStage(id: ID!, active: Boolean, stage: Int): Game!
     deleteOld: DeleteResponse
@@ -97,6 +98,7 @@ const typeDefs = `
 
   type Subscription {
     newPlayer(gameId: ID!): [Player]
+    avatarSelected(gameId: ID!): [Player]
     playerChange(gameId: ID!): Player
     newGuess(roundId: ID!): [Guess]
     gagUpdate(roundId: ID!): [Gag]

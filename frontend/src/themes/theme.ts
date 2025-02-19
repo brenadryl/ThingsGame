@@ -5,7 +5,7 @@ export const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: { main: '#FFD700', contrastText: '#FFFFFF' }, // Electric Yellow (Primary Accent)
-        secondary: { main: '#FF6B35', contrastText: '#FFFFFF'}, // Bright Orange (Interactive Elements)
+        secondary: { main: '#FF6B35', contrastText: '#FFFFFF', light: '#A9A9A9'}, // Bright Orange (Interactive Elements)
         error: { main: '#FF3F34' }, // Sunset Red (Error & Alerts)
         warning: { main: '#A7D129' }, // Lime Green (Success & Highlights)
         info: { main: '#00C9A7', contrastText: '#FFFFFF'}, // Aqua Blue (Secondary UI)
@@ -26,6 +26,7 @@ export const lightTheme = createTheme({
         h3: { fontSize: '1.5rem', fontWeight: 800, color: '#333333' },
         h4: { fontSize: '1.4rem', fontWeight: 800, color: '#333333' },
         body1: { fontSize: '1rem', fontWeight: 800, color: '#333333' },
+        body2: { fontSize: '0.75rem', fontWeight: 800, color: '#333333' },
         button: { textTransform: 'none', fontWeight: 800 },
       },
       components: {
@@ -52,7 +53,7 @@ export const darkTheme = createTheme({
     palette: {
         mode: 'dark',
         primary: { main: '#FFD700', contrastText: '#2A2A2A' }, // Electric Yellow (Primary Accent)
-        secondary: { main: '#FF6B35', contrastText: '#2A2A2A' }, // Bright Orange (Interactive Elements)
+        secondary: { main: '#FF6B35', contrastText: '#2A2A2A', light: '#A9A9A9' }, // Bright Orange (Interactive Elements)
         error: { main: '#FF3F34' }, // Sunset Red (Error & Alerts)
         warning: { main: '#A7D129' }, // Lime Green (Success & Highlights)
         info: { main: '#00C9A7', contrastText: '#2A2A2A' }, // Aqua Blue (Secondary UI)
@@ -73,6 +74,7 @@ export const darkTheme = createTheme({
         h3: { fontSize: '1.5rem', fontWeight: 800, color: '#FFFFFF' },
         h4: { fontSize: '1.4rem', fontWeight: 800, color: '#FFFFFF' },
         body1: { fontSize: '1rem', fontWeight: 800, color: '#FFFFFF' },
+        body2: { fontSize: '0.75rem', fontWeight: 800, color: '#FFFFFF' },
         button: { textTransform: 'none', fontWeight: 800 },
       },
       components: {
