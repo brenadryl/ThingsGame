@@ -5,7 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Game, Player } from '../types';
 import PlayerCard from '../Components/PlayerCards';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
-import { FUN_ICONS } from '../themes/constants';
 import PromptSelection from '../Components/PromptSelection';
 import { NEW_ROUND_SUBSCRIPTION } from '../graphql/subscriptions/roundSubscriptions';
 
@@ -86,9 +85,11 @@ const PlayRoom: React.FC = () => {
       <Box textAlign="center" alignItems="center"  marginY="16px" >
         <Typography color="text.secondary">{currentTurnPlayer?.name + " is choosing a prompt"}</Typography>
       </Box>
-      {playerList.map((currPlayer) => (
-        <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} icon={FUN_ICONS[currPlayer.icon || 0]} color={currPlayer.color || ''}/>
-      ))}
+      <Box display="flex" justifyContent="center" flexWrap="wrap">
+        {playerList.map((currPlayer) => (
+          <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} color={currPlayer.color || ''} icon={currPlayer.icon}/>
+        ))}
+      </Box>
     </Box>
   )
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Player } from '../types';
 import PlayerCard from './PlayerCards';
-import { FUN_ICONS } from '../themes/constants';
+import { Box } from '@mui/system';
 
 interface PlayerListProps {
   playerList: Player[];
@@ -9,11 +9,11 @@ interface PlayerListProps {
 
 const PlayerList: React.FC<PlayerListProps> = ({ playerList }) => {
   return ( 
-    <>
+    <Box display="flex" justifyContent="center" flexWrap="wrap">
         {playerList.map((currPlayer) => (
-            <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} icon={FUN_ICONS[currPlayer.icon || 0]} color={currPlayer.color || ''}/>
+            <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} color={currPlayer.color || ''} icon={currPlayer.icon}/>
         ))}
-    </>
+    </Box>
   );
 };
 

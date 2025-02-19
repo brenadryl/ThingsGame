@@ -8,7 +8,6 @@ import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import { CHANGE_GAME_MUTATION } from '../graphql/mutations/gameMutations';
 import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscriptions';
 import PlayerCard from '../Components/PlayerCards';
-import { FUN_ICONS } from '../themes/constants';
 
 
 const ScoreRoom: React.FC = () => {  
@@ -107,8 +106,7 @@ const ScoreRoom: React.FC = () => {
       {game?.players.map((currPlayer) => (
             <PlayerCard 
                 key={currPlayer._id} 
-                name={currPlayer?.name || ''} 
-                icon={FUN_ICONS[currPlayer.icon || 0]} 
+                name={currPlayer?.name || ''}
                 color={currPlayer.color || ''}
                 points={calculatePoints(currPlayer)}
             />

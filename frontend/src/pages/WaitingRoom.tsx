@@ -9,12 +9,15 @@ import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import { CHANGE_GAME_MUTATION } from '../graphql/mutations/gameMutations';
 import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscriptions';
 import PlayerList from '../Components/PlayerList';
+import AvatarSelection from '../Components/AvatarSelection';
+import { AVATAR_SELECTION_SUBSCRIPTION } from '../graphql/subscriptions/playerSubscriptions';
 
 
 const WaitingRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
   const navigate = useNavigate();
   const [game, setGame] = useState<Game | null>(null)
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
   const [playerList, setPlayerList] = useState<Player[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { loading: loadingGame, error: errorGame, data: gameData } = useQuery<GetGameData>(GET_GAME, {
@@ -23,13 +26,22 @@ const WaitingRoom: React.FC = () => {
   });
   const [startGame, {loading: startLoading, error: startError}] = useMutation(CHANGE_GAME_MUTATION);
 
+  const { error: errorAvatar } = useSubscription(AVATAR_SELECTION_SUBSCRIPTION, {
+    variables: { gameId },
+    onSubscriptionData: ({ subscriptionData }) => {
+      if (subscriptionData?.data?.avatarSelected) {
+        const updatedPlayers = subscriptionData.data.avatarSelected;
+        setPlayerList(updatedPlayers);
+        console.log("updatePlayers", updatedPlayers)
+      }
+    },
+  });
+
   const { error: errorSubscription } = useSubscription(NEW_PLAYER_SUBSCRIPTION, {
     variables: { gameId },
     onSubscriptionData: ({subscriptionData}) => {
-      console.log("subscriptionData",subscriptionData )
       try {
         if (subscriptionData?.data?.newPlayer) {
-          console.log("Subscription received new player data:", subscriptionData.data?.newPlayer);
           const updatedPlayers = subscriptionData.data?.newPlayer;
           setPlayerList(updatedPlayers)
         } else {
@@ -39,7 +51,6 @@ const WaitingRoom: React.FC = () => {
         console.error("Error processing subscription data:", err);
         setErrorMessage("Error processing player updates.");
       }
-      console.log("Playerlist: ", playerList)
     }
   });
   useSubscription(GAME_STAGE_SUBSCRIPTION, {
@@ -57,8 +68,8 @@ const WaitingRoom: React.FC = () => {
     console.log(gameData)
     if(gameData?.getGame) {
       setGame(gameData.getGame)
-      const currentPlayer = gameData.getGame.players.find(p => p._id === playerId) || null;
-      if(!currentPlayer) {
+      setCurrentPlayer(gameData.getGame.players.find(p => p._id === playerId) || null);
+      if(!gameData.getGame.players.find(p => p._id === playerId)) {
         setErrorMessage("You are not a part of this game")
         console.log("You are not a part of this game")
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
@@ -67,7 +78,7 @@ const WaitingRoom: React.FC = () => {
         navigate(`/play-room/${gameData.getGame._id}/${playerId}`)
       }
     }
-  }, [gameData, playerId, navigate])
+  }, [gameData, playerId, navigate, currentPlayer])
 
   useEffect(() => {
     if (!gameId || !playerId) {
@@ -100,17 +111,18 @@ const WaitingRoom: React.FC = () => {
 
   return (
     <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-      <Box textAlign="center" alignItems="center"  marginBottom="32px" display="flex" flexDirection="row">
+      <Box textAlign="center" alignItems="center"  marginBottom="16px" display="flex" flexDirection="row">
         <Typography color="text.secondary">Game Code:</Typography>
         <Typography color="info" variant="h3">{game?.gameCode}</Typography>
       </Box>
-      <PlayerList playerList={playerList.length > (game?.players?.length || 0) ? playerList : (game?.players || [])}/>
       {game?.players?.[0]?._id === playerId && (
-        <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginTop: '24px'}}>
+        <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginBottom: '16px'}}>
           {startLoading ? <CircularProgress size={24}/> : "START GAME"}
         </Button>
       )}
       {startError && <Alert severity="error">Error starting game: {startError.message}</Alert>}
+      <PlayerList playerList={playerList.length > (game?.players?.length || 0) ? playerList : (game?.players || [])}/>
+      {currentPlayer && (<AvatarSelection playerId={playerId || ''} gameId={gameId || ''} currentAvatarIndex={currentPlayer.icon || null} playerList={playerList.length >= (game?.players?.length || 0) ? playerList : (game?.players || [])}/>)}
     </Box>
   )
 }

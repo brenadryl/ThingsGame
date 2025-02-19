@@ -32,7 +32,7 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
         {gagList.map((currGag) => {
 
             return (
-                <Box width="100%" key={`${currGag._id}-container`}>
+                <Box width="100%" key={`${currGag._id}-container`} display="flex" alignItems="center" position="relative">
                     <IconButton key={`${currGag._id}-icon-button`} size="large" color={favoriteGag === currGag._id  ? "error" : undefined} onClick={() => selectFavorite(currGag)}>
                         {favoriteGag === currGag._id ? <FaHeart key={`${currGag._id}-heart`}  size={30}/> : <FaRegHeart key={`${currGag._id}-outline`} size={30}/>}
                     </IconButton>

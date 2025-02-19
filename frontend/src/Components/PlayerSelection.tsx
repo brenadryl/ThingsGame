@@ -1,6 +1,5 @@
 import React from 'react';
 import { Gag, Player } from '../types';
-import { FUN_ICONS } from '../themes/constants';
 import { Button } from '@mui/material';
 
 interface PlayerSelectionProps {
@@ -30,7 +29,6 @@ const PlayerSelection: React.FC<PlayerSelectionProps> = ({ playerList, gagList, 
                     borderRadius: .5,
                 }}
                 onClick={()=>{onClick(currPlayer)}}
-                startIcon={FUN_ICONS[currPlayer.icon || 0]}
             >
                 {currPlayer?.name || ''}
             </Button>
