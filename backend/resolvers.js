@@ -165,7 +165,7 @@ const resolvers = {
             if (players.length > 19) {
               throw new UserInputError("This game is full.");
             }
-            const TOTAL_ICONS = 50
+            const TOTAL_ICONS = 48
             const assignedIcons = players.map(player => player.icon);
             let availableIcon = -1;
             let i = TOTAL_ICONS;

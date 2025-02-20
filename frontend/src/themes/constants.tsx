@@ -254,16 +254,6 @@ export const AVATAR_LIST = [
         happy_phrase: 'Bull-eive it',
     },
     {
-        name: '',
-        neutral: process.env.PUBLIC_URL + '',
-        happy: process.env.PUBLIC_URL + '',
-        suspicious: process.env.PUBLIC_URL + '',
-        nervous: process.env.PUBLIC_URL + '',
-        sad: process.env.PUBLIC_URL + '',
-        sad_phrase: '',
-        happy_phrase: '',
-    },
-    {
         name: 'apple',
         neutral: process.env.PUBLIC_URL + '/data/avatars/apple/IMG_1916.PNG',
         happy: process.env.PUBLIC_URL + '/data/avatars/apple/IMG_1913.PNG',
