@@ -26,9 +26,12 @@ const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess 
   while (true) {
     currentPlayerIndex = (currentPlayerIndex + 1) % playerList.length;
 
+    // eslint-disable-next-line no-loop-func
     if (! gagList || gagList.find((gag) => gag.player._id === playerList[currentPlayerIndex]._id && !gag.guessed)) return playerList[currentPlayerIndex]
   }
  }
+
+ 
 const RoundRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
   const navigate = useNavigate();
@@ -63,11 +66,6 @@ const RoundRoom: React.FC = () => {
           console.log("Subscription received updated Gag data:", subscriptionData.data?.gagUpdate);
           const updatedGags = subscriptionData.data?.gagUpdate;
           setGagList(updatedGags)
-          if (updatedGags.every((gag: Gag) => gag.guessed)) {
-            console.log("END OF ROUND 2 ", updatedGags)
-            handleEndOfRound();
-            return;
-          }
         } else {
           console.warn("Subscription did not return expected data.");
         }
@@ -109,63 +107,63 @@ const RoundRoom: React.FC = () => {
     }
   });
 
-  const handleEndOfRound = async () => {
-    console.log("You shouldn't see me soon")
-    if (!roundEnded.current) {
-      roundEnded.current = true;
-
-      if (favorite !== '') {
-        try {
-          await updateGag({
-            variables: {
-              id: favorite,
-              votes: 1,
-            }
-          })
-        } catch (error) {
-          console.error("Error selecting favorite: ", error)
-          setErrorMessage("Response was not favorited")
+  useEffect(() => {
+    if (gagList.length > 0 && gagList.every((gag: Gag) => gag.guessed)) {
+      console.log("End of round")
+      if (!roundEnded.current) {
+        roundEnded.current = true;
+  
+        if (favorite !== '') {
+          try {
+              updateGag({
+              variables: {
+                id: favorite,
+                votes: 1,
+              }
+            })
+          } catch (error) {
+            console.error("Error selecting favorite: ", error)
+            setErrorMessage("Response was not favorited")
+          } finally {
+            navigate(`/score-room/${gameId}/${playerId}`)
+          }
         }
       }
+      navigate(`/score-room/${gameId}/${playerId}`)
     }
-    navigate(`/score-room/${gameId}/${playerId}`)
-  }
-  console.log("roundEnded", roundEnded)
+  }, [gagList, updateGag, favorite, gameId, navigate, playerId])
 
   useEffect(() => {
     if(gameData?.getGame && !processedGameData.current) {
       processedGameData.current = true;
       setGame(gameData.getGame)
-      console.log("GAMEEEEEEE", gameData.getGame)
       if (gameData.getGame.currentRound.gags.length > gagList.length) {
         setGagList(gameData.getGame.currentRound.gags)
-        if (gameData.getGame.currentRound.gags.every((gag: Gag) => gag.guessed)) {
-          console.log("END OF ROUND 1 ", gameData.getGame.currentRound.gags)
-          handleEndOfRound();
-          return;
-        }
       }
       setGuessList(gameData.getGame.currentRound.guesses)
+
       const lastWrongGuess = gameData.getGame.currentRound.guesses.filter((guess: Guess) => !guess.isCorrect)[0];
-      console.log('gameData.getGame.currentRound.guesses', gameData.getGame.currentRound.guesses)
-      console.log('lastWrongGuess', lastWrongGuess)
       const currPlayerTurn = getCurrentTurn(gameData.getGame?.players, lastWrongGuess, gameData.getGame?.currentRound.turn || 0, gameData.getGame.currentRound.gags);
       setCurrentTurnPlayer(currPlayerTurn);
       setMyTurn(currPlayerTurn?._id === playerId);
+
       if (currPlayerTurn?._id !== playerId) {
         setSelectedGag(null)
       }
+
       const currentPlayer = gameData.getGame.players.find(p => p._id === playerId) || null;
+
       if(!currentPlayer) {
         setErrorMessage("You are not a part of this game")
         console.log("You are not a part of this game")
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
       }
+
       if (gameData.getGame.currentRound.stage === 2) {
         navigate(`/score-room/${gameData.getGame._id}/${playerId}`)
       }
     }
-  }, [gameData, playerId, navigate])
+  }, [gameData, playerId, navigate, gagList.length])
 
   useEffect(() => {
     if (!gameId || !playerId) {

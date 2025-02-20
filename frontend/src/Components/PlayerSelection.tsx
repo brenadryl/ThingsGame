@@ -30,7 +30,7 @@ const PlayerSelection: React.FC<PlayerSelectionProps> = ({ playerList, gagList, 
                     }}
                     onClick={()=>{onClick(currPlayer)}}
                 >
-                    <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} color={currPlayer.color || ''} icon={currPlayer.icon}/>
+                    <PlayerCard key={currPlayer._id} name={currPlayer?.name || ''} color={currPlayer.color || ''} icon={!gag ? undefined : currPlayer.icon} emotion={gag?.guessed ? "sad" : "neutral"}/>
                 </Button>
             )})}
         </Box>

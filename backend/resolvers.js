@@ -52,7 +52,7 @@ const resolvers = {
             players.map(async (player) => {
               const guessesMade = await Guess.find({guesser: player._id})
               const guessesReceived = await Guess.find({guessed: player._id})
-              const gags = await Gag.find({player: player._id})
+              const gags = await Gag.find({player: player._id}).populate("player")
               return {
                 ...player.toObject(),
                 guessesMade,
@@ -75,7 +75,7 @@ const resolvers = {
           }
           const guessesMade = await Guess.find({guesser: player._id})
           const guessesReceived = await Guess.find({guessed: player._id})
-          const gags = await Gag.find({player: player._id})
+          const gags = await Gag.find({player: player._id}).populate("player")
 
           return {
             ...player.toObject(),
@@ -96,7 +96,7 @@ const resolvers = {
           }
           const players = await Player.find({game: game._id}).sort({createdAt: 1})
           const rounds = await Round.find({game: game._id})
-          const currentGags = await Gag.find({round: game.currentRound})
+          const currentGags = await Gag.find({round: game.currentRound}).populate("player")
           let currentGuesses = []; 
           let playersWithDetails = [];
           if (players && players.length > 0) {
@@ -104,7 +104,7 @@ const resolvers = {
               players.map(async (player) => {
                 const guessesMade = await Guess.find({guesser: player._id})
                 const guessesReceived = await Guess.find({guessed: player._id})
-                const gags = await Gag.find({player: player._id}).populate("round")
+                const gags = await Gag.find({player: player._id}).populate("round").populate("player")
                 return {
                   ...player.toObject(),
                   guessesMade,
@@ -120,7 +120,7 @@ const resolvers = {
           if (rounds && rounds.length > 0) {
             roundsWithDetails = await Promise.all(
               rounds.map(async (round) => {
-                const gags = await Gag.find({round: round._id}).populate("round")
+                const gags = await Gag.find({round: round._id}).populate("round").populate("player")
                 return {
                   ...round.toObject(),
                   gags,
@@ -165,7 +165,7 @@ const resolvers = {
             if (players.length > 19) {
               throw new UserInputError("This game is full.");
             }
-            const TOTAL_ICONS = 34
+            const TOTAL_ICONS = 48
             const assignedIcons = players.map(player => player.icon);
             let availableIcon = -1;
             let i = TOTAL_ICONS;
@@ -354,7 +354,7 @@ const resolvers = {
           id,
           { $inc: { votes: votes } },
           { new: true }
-        ).populate("round");
+        ).populate("round").populate("player");
         const game = await Game.findById(gag.round.game)
         console.log("GAGGGGG ", gag)
         return gag;
@@ -377,15 +377,11 @@ const resolvers = {
             );
 
 
-            const guessedGags = await Gag.find({round: existingGag.round, guessed: true})
+            const guessedGags = await Gag.find({round: existingGag.round, guessed: true}).populate("player")
             const players = await Player.find({game: existingGag.round.game})
-            console.log("gueesedGags", guessedGags)
-            console.log("players", players)
             if(guessedGags.length === players.length) {
               const round = await Round.findByIdAndUpdate(existingGag.round._id.toString(), {stage: 2}, {new: true}).populate("game")
-              console.log("Update gag round: ", round);
               const updatedGame = await Game.findByIdAndUpdate(round.game._id.toString(), {stage: 3}, {new: true})
-              console.log("Update gag game: ", updatedGame);
               pubsub.publish("gameStageChange", { gameStageChange: round.game._id.toString() });
             }
 
@@ -423,7 +419,7 @@ const resolvers = {
               players.map(async (player) => {
                 const guessesMade = await Guess.find({guesser: player._id})
                 const guessesReceived = await Guess.find({guessed: player._id})
-                const gags = await Gag.find({player: player._id})
+                const gags = await Gag.find({player: player._id}).populate("player")
                 return {
                   ...player.toObject(),
                   guessesMade,
@@ -456,7 +452,7 @@ const resolvers = {
               players.map(async (player) => {
                 const guessesMade = await Guess.find({guesser: player._id})
                 const guessesReceived = await Guess.find({guessed: player._id})
-                const gags = await Gag.find({player: player._id})
+                const gags = await Gag.find({player: player._id}).populate("player")
                 return {
                   ...player.toObject(),
                   guessesMade,
@@ -497,7 +493,7 @@ const resolvers = {
         ),
         resolve: async (payload) => {
           try {
-            const gags = await Gag.find({round: payload.newGuess.roundId});
+            const gags = await Gag.find({round: payload.newGuess.roundId}).populate("player");
             const gagIds = gags.map((gag) => gag._id)
             const guesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1}).populate("guessed").populate("guesser").populate("gag");
             const returnGuesses = guesses.map((guess) => {return {...guess.toObject()}})

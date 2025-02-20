@@ -9,6 +9,7 @@ export const GAG_UPDATE_SUBSCRIPTION = gql`
         votes
         player {
             _id
+            icon
         }
         guesser {
             _id
