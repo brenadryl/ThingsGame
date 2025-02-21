@@ -40,42 +40,45 @@ const AvatarSelection: React.FC<AvatarSelectionProps> = ({ playerId, gameId, cur
   return (
     <Box display="flex" justifyContent="center" marginY="16px">
         <Box marginY='16px' sx={{ textAlign: 'center' }} maxWidth='300px'>
-            <Typography variant="h3" gutterBottom>
+            <Typography variant="h3" color="text.secondary" gutterBottom>
                 Color
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 2 }} marginTop="16px">
                 {FUN_COLORS.map((color) => (
                 <Button
                     key={color}
                     onClick={() => handleColorClick(color)}
                     sx={{
-                    backgroundColor: color,
-                    width: 60,
-                    height: 60,
-                    minWidth: 60,
-                    borderRadius: '30%',
+                      backgroundColor: color,
+                      width: 60,
+                      height: 60,
+                      minWidth: 60,
+                      borderRadius: '30%',
+                      border: selectedColor === color ? '2px solid' : 'none',
+                      borderColor: "text.primary",
                     }}
                 />
                 ))}
             </Box>
         </Box>
         <Box display="flex" flexDirection="column" alignItems="center" marginY='16px'>
-        <Typography variant="h3">Choose Your Avatar</Typography>
-        <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
+        <Typography variant="h3" color="text.secondary">Choose Your Avatar</Typography>
+        <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center" marginTop="8px">
             {AVATAR_LIST.map((avatar: any, index: number) => {
                 const open = !playerList.find((player) => player.icon === index);
                 const me = playerList.find((player) => player._id === playerId)
                 return (
             <Button
-                key={avatar.name}
-                onClick={() => handleSelectAvatar(index)}
-                disabled={!open}
-                sx={{
-                width: 80,
-                height: 80,
-                opacity: !open && me?.icon !== index ? 0.1 : 1,
-                bgcolor: me?.icon === index ? me?.color || selectedColor : (!open ? 'grey' : "none"),
-                border: selectedAvatarIndex === index ? '2px solid blue' : 'none',
+                  key={avatar.name}
+                  onClick={() => handleSelectAvatar(index)}
+                  disabled={!open}
+                  sx={{
+                  width: 80,
+                  height: 80,
+                  opacity: !open && me?.icon !== index ? 0.1 : 1,
+                  bgcolor: me?.icon === index ? me?.color || selectedColor : (!open ? 'grey' : "none"),
+                  border: selectedAvatarIndex === index ? '2px solid' : 'none',
+                  borderColor: "text.primary",
                 }}
             >
                 <img src={me?.icon === index ? avatar.happy : avatar.neutral} key={`${avatar.name}-img`} alt={avatar.name} width="100%" />

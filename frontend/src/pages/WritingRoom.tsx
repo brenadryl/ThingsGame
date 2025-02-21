@@ -21,6 +21,12 @@ const WritingRoom: React.FC = () => {
     });
     const [submitGag, { error: gagError}] = useMutation(NEW_GAG);
 
+    useEffect (() => {
+        if (gagError) {
+          setErrorMessage(gagError.message)
+        }
+      }, [gagError])
+
     useEffect(() => {
         if (!gameId || !playerId) {
           setErrorMessage("Invalid Game ID or Player ID")

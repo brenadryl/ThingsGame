@@ -39,6 +39,12 @@ const WaitingRoom: React.FC = () => {
     },
   });
 
+  useEffect (() => {
+    if (errorAvatar) {
+      setErrorMessage(errorAvatar.message)
+    }
+  }, [errorAvatar])
+
   const { error: errorSubscription } = useSubscription(NEW_PLAYER_SUBSCRIPTION, {
     variables: { gameId },
     onSubscriptionData: ({subscriptionData}) => {
