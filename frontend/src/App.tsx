@@ -16,6 +16,7 @@ import PlayRoom from './pages/PlayRoom';
 import WritingRoom from './pages/WritingRoom';
 import RoundRoom from './pages/RoundRoom';
 import ScoreRoom from './pages/ScoreRoom';
+import { LOGO } from './themes/constants';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -26,16 +27,16 @@ function App() {
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
-          <Typography variant="h2" color="primary.contrastText" component="div" sx={{ flexGrow: 1 }}>
-            JOAKS ON YOU
-          </Typography>
-          <GradientButton
-            onClick={() => setDarkMode(!darkMode)}
-            firstColor={darkMode ? darkTheme.palette.primary.main : lightTheme.palette.primary.main}
-            secondColor={darkMode ? darkTheme.palette.secondary.main : lightTheme.palette.secondary.main}
-            startIcon={darkMode ? <BedtimeIcon/> : undefined}
-            endIcon={darkMode ? undefined : <WbSunnyIcon/>}
-          />
+            <Box display="flex" alignContent="center" justifyContent="space-between" width="100%" alignItems="center" paddingX="16px" paddingY="8px">
+              <img src={LOGO}  alt="JOAKS ON YOU" style={{ maxHeight: '60px', width: 'auto', height: 'auto' }} />
+              <GradientButton
+                onClick={() => setDarkMode(!darkMode)}
+                firstColor={darkMode ? darkTheme.palette.primary.main : lightTheme.palette.primary.main}
+                secondColor={darkMode ? darkTheme.palette.secondary.main : lightTheme.palette.secondary.main}
+                startIcon={darkMode ? <BedtimeIcon/> : undefined}
+                endIcon={darkMode ? undefined : <WbSunnyIcon/>}
+              />
+            </Box>
           </Toolbar>
         </AppBar>
         <Container maxWidth="sm">

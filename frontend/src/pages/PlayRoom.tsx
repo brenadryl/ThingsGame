@@ -1,5 +1,5 @@
 import { useQuery, useSubscription } from '@apollo/client';
-import { Alert, Box, CircularProgress, Typography} from '@mui/material';
+import { Alert, Box, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Game, Player } from '../types';
@@ -7,6 +7,7 @@ import PlayerCard from '../Components/PlayerCards';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import PromptSelection from '../Components/PromptSelection';
 import { NEW_ROUND_SUBSCRIPTION } from '../graphql/subscriptions/roundSubscriptions';
+import LoadingLogo from '../Components/LoadingLogo';
 
 
 const PlayRoom: React.FC = () => {  
@@ -68,7 +69,7 @@ const PlayRoom: React.FC = () => {
   }
 
   if(loadingGame) {
-    return <CircularProgress />
+    return <LoadingLogo />
   }
 
   const currentTurn = ((game?.rounds?.length || 0) % (playerList.length));

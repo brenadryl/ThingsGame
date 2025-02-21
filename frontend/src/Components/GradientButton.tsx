@@ -22,6 +22,7 @@ const GradientButton = ({ startIcon, endIcon, children, firstColor, secondColor,
             background: `linear-gradient(180deg, ${firstColor} 10%, ${secondColor} 90%)`,
             border: 0,
             color: {textColor},
+            height: "fit-content"
         }}>
             {children}
         </Button>

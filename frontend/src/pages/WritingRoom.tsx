@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { GET_CURRENT_ROUND, GetCurrentRoundData } from '../graphql/queries/roundQueries';
 import { Round } from '../types';
 import { NEW_GAG } from '../graphql/mutations/gagMutations';
+import LoadingLogo from '../Components/LoadingLogo';
 
 const WritingRoom: React.FC = () => {
     const { gameId, playerId } = useParams();
@@ -14,8 +15,9 @@ const WritingRoom: React.FC = () => {
     const [round, setRound] = useState<Round | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { loading: loadingRound, error: errorRound, data: roundData } = useQuery<GetCurrentRoundData>(GET_CURRENT_ROUND, {
-    variables: { gameId},
-    skip: !gameId,
+        variables: { gameId},
+        skip: !gameId,
+        fetchPolicy: "network-only",
     });
     const [submitGag, { error: gagError}] = useMutation(NEW_GAG);
 
@@ -64,7 +66,7 @@ const WritingRoom: React.FC = () => {
     };
 
     if (loadingRound) {
-        return <CircularProgress size={24}/>
+        return <LoadingLogo/>
     }
 
   return (
