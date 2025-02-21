@@ -5,6 +5,7 @@ import { GET_RANDOM_PROMPTS, GetRandomPromptsData } from '../graphql/queries/pro
 import { Prompt } from '../types';
 import { Box } from '@mui/system';
 import { NEW_ROUND } from '../graphql/mutations/roundMutations';
+import LoadingLogo from './LoadingLogo';
 
 interface PromptSelectionProps {
   gameId: string;
@@ -12,7 +13,7 @@ interface PromptSelectionProps {
 }
 
 const PromptSelection: React.FC<PromptSelectionProps> = ({ gameId, turn }) => {
-    const { loading, error, data } = useQuery<GetRandomPromptsData>(GET_RANDOM_PROMPTS);
+    const { loading, data } = useQuery<GetRandomPromptsData>(GET_RANDOM_PROMPTS);
     const [selectedPrompt, setSelectedPrompt] = useState('');
     const [customPrompt, setCustomPrompt] = useState('THINGS ')
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -29,6 +30,10 @@ const PromptSelection: React.FC<PromptSelectionProps> = ({ gameId, turn }) => {
           }
     
         }
+
+      if (loading || startLoading) {
+        return <LoadingLogo />
+      }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

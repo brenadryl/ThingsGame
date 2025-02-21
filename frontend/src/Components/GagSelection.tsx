@@ -72,7 +72,7 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
                       >
                           {currGag?.text || ''}
                       </Button>
-                      {currGag.guessed && currGag.player.icon && (
+                      {currGag.guessed && currGag.player.icon !== undefined && (
                         <img 
                           src={AVATAR_LIST[currGag.player.icon].sad} 
                           key={`${currGag.player._id}-img`} 

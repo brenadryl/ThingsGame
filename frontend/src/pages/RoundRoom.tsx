@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Box, CircularProgress, Typography} from '@mui/material';
+import { Alert, Box, Typography} from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Gag, Game, Guess, Player } from '../types';
@@ -14,6 +14,7 @@ import GuessAnnouncementModal from '../Components/GuessAnnouncementModal';
 import ConfirmGuessModal from '../Components/ConfirmGuessModal';
 import PlayerDrawer from '../Components/PlayerDrawer';
 import { UPDATE_GAG } from '../graphql/mutations/gagMutations';
+import LoadingLogo from '../Components/LoadingLogo';
 
 
 const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess | undefined, turn: number, gagList: Gag[] | undefined) => {
@@ -182,7 +183,7 @@ const RoundRoom: React.FC = () => {
   }
 
   if(loadingGame) {
-    return <CircularProgress />
+    return <LoadingLogo />
   }
 
   const handleGagClick = (gag: Gag) => {

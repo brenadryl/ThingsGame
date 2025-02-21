@@ -8,6 +8,7 @@ import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import { CHANGE_GAME_MUTATION } from '../graphql/mutations/gameMutations';
 import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscriptions';
 import PlayerCard from '../Components/PlayerCards';
+import LoadingLogo from '../Components/LoadingLogo';
 
 
 const ScoreRoom: React.FC = () => {  
@@ -85,7 +86,7 @@ const ScoreRoom: React.FC = () => {
   }
 
   if(loadingGame) {
-    return <CircularProgress />
+    return <LoadingLogo />
   }
   const calculatePoints = (player: Player) => {
     let points = 0;

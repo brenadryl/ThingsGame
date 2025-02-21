@@ -11,6 +11,7 @@ import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscripti
 import PlayerList from '../Components/PlayerList';
 import AvatarSelection from '../Components/AvatarSelection';
 import { AVATAR_SELECTION_SUBSCRIPTION } from '../graphql/subscriptions/playerSubscriptions';
+import LoadingLogo from '../Components/LoadingLogo';
 
 
 const WaitingRoom: React.FC = () => {  
@@ -23,6 +24,7 @@ const WaitingRoom: React.FC = () => {
   const { loading: loadingGame, error: errorGame, data: gameData } = useQuery<GetGameData>(GET_GAME, {
     variables: {id: gameId},
     skip: !gameId,
+    fetchPolicy: "network-only",
   });
   const [startGame, {loading: startLoading, error: startError}] = useMutation(CHANGE_GAME_MUTATION);
 
@@ -36,6 +38,12 @@ const WaitingRoom: React.FC = () => {
       }
     },
   });
+
+  useEffect (() => {
+    if (errorAvatar) {
+      setErrorMessage(errorAvatar.message)
+    }
+  }, [errorAvatar])
 
   const { error: errorSubscription } = useSubscription(NEW_PLAYER_SUBSCRIPTION, {
     variables: { gameId },
@@ -106,7 +114,7 @@ const WaitingRoom: React.FC = () => {
   }
 
   if(loadingGame) {
-    return <CircularProgress />
+    return <LoadingLogo />
   }
 
   return (

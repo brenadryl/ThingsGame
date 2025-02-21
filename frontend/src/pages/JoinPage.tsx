@@ -1,9 +1,7 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Alert, Box, Button, CircularProgress, TextField} from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GET_PROMPTS, GET_RANDOM_PROMPTS, GetRandomPromptsData } from '../graphql/queries/promptQueries';
-import { Prompt } from '../types';
 import { ADD_PLAYER } from '../graphql/mutations/playerMutations';
 
 const JoinPage: React.FC = () => {
