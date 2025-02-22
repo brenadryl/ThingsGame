@@ -24,7 +24,7 @@ function App() {
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
 
       <CssBaseline enableColorScheme />
-      <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ flexGrow: 1 }} marginBottom="64px">
         <AppBar position="static">
           <Toolbar>
             <Box display="flex" alignContent="center" justifyContent="space-between" width="100%" alignItems="center" paddingX="16px" paddingY="8px">

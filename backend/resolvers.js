@@ -380,9 +380,8 @@ const resolvers = {
             const guessedGags = await Gag.find({round: existingGag.round, guessed: true}).populate("player")
             const players = await Player.find({game: existingGag.round.game})
             if(guessedGags.length === players.length) {
-              const round = await Round.findByIdAndUpdate(existingGag.round._id.toString(), {stage: 2}, {new: true}).populate("game")
-              const updatedGame = await Game.findByIdAndUpdate(round.game._id.toString(), {stage: 3}, {new: true})
-              pubsub.publish("gameStageChange", { gameStageChange: round.game._id.toString() });
+              Round.findByIdAndUpdate(existingGag.round._id.toString(), {stage: 2}, {new: true}).populate("game")
+              Game.findByIdAndUpdate(round.game._id.toString(), {stage: 3}, {new: true})
             }
 
             pubsub.publish("gagUpdate", { gagUpdate: { ...gag.toObject(), roundId: existingGag.round._id } });
