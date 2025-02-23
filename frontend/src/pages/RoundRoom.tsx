@@ -125,12 +125,10 @@ const RoundRoom: React.FC = () => {
           } catch (error) {
             console.error("Error selecting favorite: ", error)
             setErrorMessage("Response was not favorited")
-          } finally {
-            navigate(`/score-room/${gameId}/${playerId}`)
           }
         }
       }
-      navigate(`/score-room/${gameId}/${playerId}`)
+      setTimeout(() => navigate(`/score-room/${gameId}/${playerId}`), 3000); // Redirect after 3 seconds
     }
   }, [gagList, updateGag, favorite, gameId, navigate, playerId])
 
