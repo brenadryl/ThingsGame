@@ -35,6 +35,7 @@ export const GET_GAME = gql`
           isCorrect
         }
         gags {
+          _id
           guessed
           text
           votes
@@ -49,7 +50,17 @@ export const GET_GAME = gql`
         stage
         promptText
         turn
+        likes {
+          _id
+          player {
+            _id
+          }
+          gag {
+            _id
+          }
+        }
         gags {
+          _id
           player {
             _id
             icon
@@ -64,6 +75,15 @@ export const GET_GAME = gql`
         stage
         promptText
         turn
+        likes {
+          _id
+          player {
+            _id
+          }
+          gag {
+            _id
+          }
+        }
         gags {
           _id
           guessed

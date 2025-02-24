@@ -3,7 +3,6 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import BedtimeIcon from '@mui/icons-material/Bedtime';
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import TestPage from './pages/TestPage';
 import HomePage from './pages/HomePage';
 import { AppBar, Box, CssBaseline, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import { lightTheme, darkTheme } from "./themes/theme";
@@ -14,9 +13,10 @@ import HostPage from './pages/HostPage';
 import WaitingRoom from './pages/WaitingRoom';
 import PlayRoom from './pages/PlayRoom';
 import WritingRoom from './pages/WritingRoom';
-import RoundRoom from './pages/RoundRoom';
 import ScoreRoom from './pages/ScoreRoom';
 import { LOGO } from './themes/constants';
+import SubmittedRoom from './pages/SubmittedRoom';
+import GuessingRoom from './pages/GuessingRoom';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -41,7 +41,6 @@ function App() {
         </AppBar>
         <Container maxWidth="sm">
           <Routes>
-            <Route path="/test" element={<TestPage />} />
             <Route
               path="/"
               element={ <HomePage/>
@@ -73,8 +72,13 @@ function App() {
               }
             />
             <Route
-              path="/round-room/:gameId/:playerId"
-              element={ <RoundRoom/>
+              path="/submitted-room/:gameId/:playerId"
+              element={ <SubmittedRoom/>
+              }
+            />
+            <Route
+              path="/guessing-room/:gameId/:playerId"
+              element={ <GuessingRoom/>
               }
             />
             <Route

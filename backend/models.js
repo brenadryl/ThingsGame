@@ -26,6 +26,22 @@ const gagSchema = new mongoose.Schema({
     },
 });
 
+const likeSchema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now },
+    round: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Round'
+    },
+    player: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Player'
+    },
+    gag: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Gag'
+    },
+});
+
 const roundSchema = new mongoose.Schema({
     stage: { type: Number, max: 2, default: 1 },
     promptText: { type: String, required: true },
@@ -87,3 +103,4 @@ export const Round = mongoose.model('Round', roundSchema);
 export const Game = mongoose.model('Game', gameSchema);
 export const Gag = mongoose.model('Gag', gagSchema);
 export const Guess = mongoose.model('Guess', guessSchema);
+export const Like = mongoose.model('Like', likeSchema);

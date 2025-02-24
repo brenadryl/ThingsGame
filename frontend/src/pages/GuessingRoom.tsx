@@ -2,19 +2,21 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Alert, Box, Typography} from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Gag, Game, Guess, Player } from '../types';
+import { Gag, Game, Guess, Like, Player } from '../types';
 import { useSubscription } from '@apollo/client';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
-import { GAG_UPDATE_SUBSCRIPTION } from '../graphql/subscriptions/gagSubscriptions';
-import PlayerSelection from '../Components/PlayerSelection';
 import GagSelection from '../Components/GagSelection';
 import { NEW_GUESS } from '../graphql/mutations/guessMutations';
 import { NEW_GUESS_SUBSCRIPTION } from '../graphql/subscriptions/guessSubscription';
 import GuessAnnouncementModal from '../Components/GuessAnnouncementModal';
 import ConfirmGuessModal from '../Components/ConfirmGuessModal';
 import PlayerDrawer from '../Components/PlayerDrawer';
-import { UPDATE_GAG } from '../graphql/mutations/gagMutations';
 import LoadingLogo from '../Components/LoadingLogo';
+import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscriptions';
+import { NEW_LIKE_SUBSCRIPTION } from '../graphql/subscriptions/likeSubscriptions';
+import { NEW_LIKE } from '../graphql/mutations/likeMutation';
+import { GAG_UPDATE_SUBSCRIPTION } from '../graphql/subscriptions/gagSubscriptions';
+import PlayerTurnCarousel from '../Components/PlayerTurnCarousel';
 
 
 const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess | undefined, turn: number, gagList: Gag[] | undefined) => {
@@ -33,11 +35,10 @@ const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess 
  }
 
  
-const RoundRoom: React.FC = () => {  
+const GuessingRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
   const navigate = useNavigate();
   const processedGameData = useRef(false);
-  const roundEnded = useRef(false);
   const [game, setGame] = useState<Game | null>(null)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isModalOpen, setModalOpen] = useState(false)
@@ -46,6 +47,7 @@ const RoundRoom: React.FC = () => {
   const [newGuess, setNewGuess] = useState<Guess | null>(null)
   const [gagList, setGagList] = useState<Gag[]>([])
   const [guessList, setGuessList] = useState<Guess[]>([])
+  const [likes, setLikes] = useState<Like[]>([])
   const [selectedGag, setSelectedGag] = useState<Gag | null>(null);
   const [favorite, setFavorite] = useState("");
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
@@ -56,27 +58,61 @@ const RoundRoom: React.FC = () => {
     fetchPolicy: "network-only",
   });
   const [createGuess] = useMutation(NEW_GUESS)
-  const [updateGag] = useMutation(UPDATE_GAG)
-  const { error: errorSubscription } = useSubscription(GAG_UPDATE_SUBSCRIPTION, {
+  const [createLike] = useMutation(NEW_LIKE)
+
+
+  useSubscription(GAME_STAGE_SUBSCRIPTION, {
+    variables: {gameId},
+    onSubscriptionData: ({subscriptionData}) => {
+      const updatedGame = subscriptionData?.data?.gameStageChange;
+      if (updatedGame.stage === 3) {
+        console.log("Round ended! Navigating to ScoreRoom...")
+        navigate(`/score-room/${gameId}/${playerId}`)
+      }
+    }
+  })
+
+  const { error: likesSubscriptionError } = useSubscription(NEW_LIKE_SUBSCRIPTION, {
     variables: { roundId: game?.currentRound._id },
     skip: !game?.currentRound._id,
     onSubscriptionData: ({subscriptionData}) => {
-      console.log("gag subscriptionData",subscriptionData )
       try {
-        if (subscriptionData?.data?.gagUpdate) {
-          console.log("Subscription received updated Gag data:", subscriptionData.data?.gagUpdate);
-          const updatedGags = subscriptionData.data?.gagUpdate;
-          setGagList(updatedGags)
+        if (subscriptionData?.data?.newLike) {
+          console.log("Subscription received new like data:", subscriptionData.data?.newLike);
+          const updateLikes = subscriptionData.data?.newLike;
+          console.log("updateLikes", updateLikes)
+          const fav = updateLikes.find((l: any) => l.player._id === playerId)?.gag?._id || '';
+          setFavorite(fav)
+          setLikes(updateLikes)
         } else {
           console.warn("Subscription did not return expected data.");
         }
       } catch (err) {
         console.error("Error processing subscription data:", err);
-        setErrorMessage("Error processing player updates.");
+        setErrorMessage("Error processing like updates.");
       }
-      console.log("gagList: ", gagList)
     }
   });
+
+    const { error: gagErrorSubscription } = useSubscription(GAG_UPDATE_SUBSCRIPTION, {
+      variables: { roundId: game?.currentRound._id },
+      skip: !game?.currentRound._id,
+      onSubscriptionData: ({subscriptionData}) => {
+        console.log("gag subscriptionData",subscriptionData )
+        try {
+          if (subscriptionData?.data?.gagUpdate) {
+            console.log("Subscription received updated Gag data:", subscriptionData.data?.gagUpdate);
+            const updatedGags = subscriptionData.data?.gagUpdate;
+            setGagList(updatedGags)
+          } else {
+            console.warn("Subscription did not return expected data.");
+          }
+        } catch (err) {
+          console.error("Error processing subscription data:", err);
+          setErrorMessage("Error processing player updates.");
+        }
+      }
+    });
 
   const { error: guessSubscriptionError } = useSubscription(NEW_GUESS_SUBSCRIPTION, {
     variables: { roundId: game?.currentRound._id },
@@ -109,35 +145,17 @@ const RoundRoom: React.FC = () => {
   });
 
   useEffect(() => {
-    if (gagList.length > 0 && gagList.every((gag: Gag) => gag.guessed)) {
-      console.log("End of round")
-      if (!roundEnded.current) {
-        roundEnded.current = true;
-  
-        if (favorite !== '') {
-          try {
-              updateGag({
-              variables: {
-                id: favorite,
-                votes: 1,
-              }
-            })
-          } catch (error) {
-            console.error("Error selecting favorite: ", error)
-            setErrorMessage("Response was not favorited")
-          }
-        }
-      }
-      setTimeout(() => navigate(`/score-room/${gameId}/${playerId}`), 3000); // Redirect after 3 seconds
-    }
-  }, [gagList, updateGag, favorite, gameId, navigate, playerId])
-
-  useEffect(() => {
     if(gameData?.getGame && !processedGameData.current) {
+      console.log("gameData ", gameData)
       processedGameData.current = true;
       setGame(gameData.getGame)
       if (gameData.getGame.currentRound.gags.length > gagList.length) {
         setGagList(gameData.getGame.currentRound.gags)
+      }
+      if (gameData.getGame.currentRound.likes && gameData.getGame.currentRound.likes.length > likes.length) {
+        setLikes(gameData.getGame.currentRound.likes)
+        const fav = gameData.getGame.currentRound.likes.find(l => l.player._id === playerId)?.gag?._id || "";
+        setFavorite(fav)
       }
       setGuessList(gameData.getGame.currentRound.guesses)
 
@@ -158,23 +176,25 @@ const RoundRoom: React.FC = () => {
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
       }
 
-      if (gameData.getGame.currentRound.stage === 2) {
+      if (gameData.getGame.stage === 3) {
         navigate(`/score-room/${gameData.getGame._id}/${playerId}`)
       }
     }
-  }, [gameData, playerId, navigate, gagList.length])
+  }, [gameData, playerId, navigate, gagList, likes])
 
   useEffect(() => {
     if (!gameId || !playerId) {
       setErrorMessage("Invalid Game ID or Player ID")
     } else if (errorGame) {
       setErrorMessage("Error fetching game data: " + errorGame.message)
-    } else if (errorSubscription) {
-      setErrorMessage("Error fetching gags: " + errorSubscription.message)
     } else if (guessSubscriptionError) {
       setErrorMessage("Error fetching guesses: " + guessSubscriptionError.message)
+    } else if (gagErrorSubscription) {
+      setErrorMessage("Error fetching guesses: " + gagErrorSubscription.message)
+    } else if (likesSubscriptionError) {
+      setErrorMessage("Error fetching guesses: " + likesSubscriptionError.message)
     }
-  }, [gameId, playerId, errorGame, errorSubscription, guessSubscriptionError])
+  }, [gameId, playerId, errorGame, guessSubscriptionError, likesSubscriptionError, gagErrorSubscription])
 
   if (errorMessage) {
     return <Alert severity="error">{errorMessage}</Alert>
@@ -192,8 +212,15 @@ const RoundRoom: React.FC = () => {
     setDrawerOpen(false)
     setSelectedGag(null)
   }
-  const handleFavorite = (favId: string) => {
+  const handleFavorite = async (favId: string) => {
     setFavorite(favId)
+    await createLike({
+      variables: {
+        playerId: playerId,
+        roundId: game?.currentRound._id,
+        gagId: favId,
+      }
+    })
   }
   const handleCloseModal = () => {
     setModalOpen(false)
@@ -241,6 +268,9 @@ const RoundRoom: React.FC = () => {
         <Box textAlign="center" alignItems="center"  marginBottom="32px" marginTop="8px">
           <Typography color="info" variant="h3">{game?.currentRound.promptText}</Typography>
         </Box>
+
+        <PlayerTurnCarousel players={game?.players || []} currentPlayerTurn={currentTurnPlayer} gags={gagList} playerId={playerId || ''}/>
+
         <Box bgcolor="background.default" padding="8px" zIndex={1}>
           {newGuess !== null ? 
             <Typography color="text.default"> GUESSING</Typography>
@@ -249,12 +279,9 @@ const RoundRoom: React.FC = () => {
             </>
           }
         </Box>
-
-        {(game?.players.length === game?.currentRound.gags.length) || (game?.players.length === gagList.length) ? 
-        (<GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite}/>): 
-        (<PlayerSelection playerList={game?.players || []} gagList={gagList || []} onClick={() => {}}/>)}
+        <GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite} likes={likes} favorite={favorite}/>
       </Box>
     </>
   )
 }
-export default RoundRoom;
+export default GuessingRoom;

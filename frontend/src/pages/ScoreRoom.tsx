@@ -15,6 +15,7 @@ const ScoreRoom: React.FC = () => {
   const { gameId, playerId } = useParams();
   const navigate = useNavigate();
   const [game, setGame] = useState<Game | null>(null)
+  const [allLikeCounts, setAllLikeCounts] = useState<Record<string, number>>({})
   const [favoriteGags, setFavoriteGags] = useState<(Gag | null)[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { loading: loadingGame, error: errorGame, data: gameData } = useQuery<GetGameData>(GET_GAME, {
@@ -39,12 +40,34 @@ const ScoreRoom: React.FC = () => {
     if(gameData?.getGame) {
       setGame(gameData.getGame)
       console.log("SCORE GAME  ", gameData.getGame)
+      const totalLikeCounts: Record<string, number> = {};
       const faves = gameData.getGame.rounds.map((round) => {
-        if (!round.gags || round.gags.length === 0) return null;
-        const maxVotes = Math.max(...round.gags.map(gag => gag.votes))
-        const topGags = round.gags.filter(gag => gag.votes === maxVotes)
-        return topGags.length === 1 ? topGags[0] : null;
-      }).filter((gag) => gag !== null)
+        if (!round.likes || round.likes.length === 0) return null;
+        const likeCounts: Record<string, number> = {};
+        for (const like of round.likes) {
+            likeCounts[like.gag._id] = (likeCounts[like.gag._id] || 0) + 1;
+            totalLikeCounts[like.gag._id] = (totalLikeCounts[like.gag._id] || 0) + 1;
+        }
+        console.log("likeCounts", likeCounts)
+        console.log("totalLikeCounts", totalLikeCounts)
+        let mostLikedGagId: string | null = null;
+        let maxLikes = 0;
+        let hasTie = false;
+        for (const [gagId, count] of Object.entries(likeCounts)) {
+            if (count > maxLikes) {
+                mostLikedGagId = gagId;
+                maxLikes = count;
+                hasTie = false; // Reset tie flag when a new max is found
+            } else if (count === maxLikes) {
+                hasTie = true;
+            }
+        }
+        let foundGag = round.gags.find((gag) => gag._id === mostLikedGagId);
+        
+        return hasTie || !foundGag ? null : foundGag
+      })
+      console.log("faves", faves)
+      setAllLikeCounts(totalLikeCounts)
       if (faves) {
         setFavoriteGags(faves);
       }
@@ -88,12 +111,12 @@ const ScoreRoom: React.FC = () => {
   if(loadingGame) {
     return <LoadingLogo />
   }
+  console.log("allLikeCounts", allLikeCounts)
+
   const calculatePoints = (player: Player) => {
-    let points = 0;
-    if (player.guessesMade) {
-        points += player.guessesMade.filter((guess) => guess.isCorrect).length || 0;
-    }
-    points += favoriteGags.filter((gag) => gag?.player._id === player._id).length || 0;
+    let points = player.points;
+    const favorites = favoriteGags.filter((gag) => gag?.player._id === player._id);
+    points += (favorites.length * 2)
     return points;
   }
 
@@ -140,7 +163,7 @@ const ScoreRoom: React.FC = () => {
                     >
                         <Typography color="secondary" textAlign="left" key={`${gag?._id}-gag`}> {gag.text}</Typography>
                         <Box marginLeft="16px">
-                            <Typography color="secondary" key={`${gag?._id}-votes`}>{gag.votes}</Typography>
+                            <Typography color="secondary" key={`${gag?._id}-votes`}>{allLikeCounts[gag?._id]}</Typography>
                         </Box>
                     </Box>
                 )

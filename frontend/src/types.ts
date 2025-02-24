@@ -25,6 +25,7 @@ export interface Prompt {
     turn: number;
     gags: Gag[];
     guesses: Guess[];
+    likes: Like[];
   }
   
   export interface Player {
@@ -59,6 +60,13 @@ export interface Prompt {
     createdAt: number;
     guesser: Player;
     guessed: Player;
+    gag: Gag;
+  }  
+
+  export interface Like {
+    _id: string;
+    round: Round;
+    player: Player;
     gag: Gag;
   }
   

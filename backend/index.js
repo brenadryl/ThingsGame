@@ -23,8 +23,8 @@ async function startServer() {
   const app = express();
 
   // Configure CORS
-  // app.use(cors({ credentials: true, origin: '*' }));
-  app.use(cors({ credentials: true, origin: allowedOrigins }));
+  app.use(cors({ credentials: true, origin: '*' }));
+  // app.use(cors({ credentials: true, origin: allowedOrigins }));
 
   // Create an HTTP server
   const httpServer = createServer(app);
