@@ -28,6 +28,9 @@
   color: #61dafb;
 }
 
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

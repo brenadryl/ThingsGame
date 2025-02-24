@@ -1,4 +1,4 @@
-import { Gag, Game, Guess, Player, Round, Prompt } from './models.js';
+import { Gag, Game, Guess, Player, Round, Prompt, Like } from './models.js';
 import { withFilter } from 'graphql-subscriptions';
 import pubsub from './pubsub.js';
 import { UserInputError } from 'apollo-server-express';
@@ -97,6 +97,7 @@ const resolvers = {
           const players = await Player.find({game: game._id}).sort({createdAt: 1})
           const rounds = await Round.find({game: game._id})
           const currentGags = await Gag.find({round: game.currentRound}).populate("player")
+          const currentLikes = await Like.find({round: game.currentRound})
           let currentGuesses = []; 
           let playersWithDetails = [];
           if (players && players.length > 0) {
@@ -121,9 +122,11 @@ const resolvers = {
             roundsWithDetails = await Promise.all(
               rounds.map(async (round) => {
                 const gags = await Gag.find({round: round._id}).populate("round").populate("player")
+                const likes = await Like.find({round: round._id})
                 return {
                   ...round.toObject(),
                   gags,
+                  likes,
                 }
               })
             );
@@ -134,12 +137,7 @@ const resolvers = {
             const gagIds = currentGags.map((gag) => gag._id)
             currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1});
           }
-          const currentRound = game.currentRound ? {...game.currentRound.toObject(), gags: currentGags, guesses: currentGuesses} : undefined;
-          // console.log("currentRound1: ", currentRound)
-          // console.log("rounds1: ", rounds)
-          // console.log("currentGags1: ", currentGags)
-          // console.log("currentGuesses1: ", currentGuesses)
-          // console.log("players1: ", playersWithDetails)
+          const currentRound = game.currentRound ? {...game.currentRound.toObject(), gags: currentGags, guesses: currentGuesses, likes: currentLikes} : undefined;
           return {
             ...game.toObject(),
             players: playersWithDetails,
@@ -233,6 +231,28 @@ const resolvers = {
         } catch (error) {
             throw error;
         }
+      },
+
+      createLike: async (_, {playerId, roundId, gagId}) => {
+        const createdAt = Math.floor(Date.now() / 1000);
+        const existingLike = await Like.findOne({round: roundId, player: playerId})
+        if (existingLike) {
+          await Like.findByIdAndDelete(existingLike._id)
+          await Gag.findByIdAndUpdate(
+            gagId,
+            { $inc: { votes: -1 } },
+            { new: true }
+          )
+        }
+        const like = new Like({player: playerId, createdAt, round: roundId, gag: gagId});
+        await like.save();
+        await Gag.findByIdAndUpdate(
+          gagId,
+          { $inc: { votes: 1 } },
+          { new: true }
+        )
+        pubsub.publish("newLike", { newLike: { ...like.toObject(), roundId: roundId } });
+        return like;
       },
 
       createGame: async (_, {}) => {
@@ -370,28 +390,26 @@ const resolvers = {
           const savedGuess = await Guess.findById(guess._id).populate("guesser").populate("guessed").populate("gag");
           if (!savedGuess || !savedGuess._id) throw new Error("Failed to retrieve saved guess")
           if (isCorrect) {
+            const player = await Player.findByIdAndUpdate(guesserId, {$inc: { points: 1 }}, {new: true})
             const gag = await Gag.findByIdAndUpdate(
               gagId,
-              { guessed: true, guesser: guesserId },
+              { guessed: true, guesser: player._id },
               { new: true }
             );
-
-
             const guessedGags = await Gag.find({round: existingGag.round, guessed: true}).populate("player")
             const players = await Player.find({game: existingGag.round.game})
             if(guessedGags.length === players.length) {
               const round = await Round.findByIdAndUpdate(existingGag.round._id.toString(), {stage: 2}, {new: true}).populate("game")
               const game = await Game.findByIdAndUpdate(round.game._id.toString(), {stage: 3}, {new: true})
+              pubsub.publish("gameStageChange", { gameStageChange: game });
               console.log("GAME UPDATE ", game)
               console.log("ROUND UPDATE ", round)
             }
-
             pubsub.publish("gagUpdate", { gagUpdate: { ...gag.toObject(), roundId: existingGag.round._id } });
           }
           pubsub.publish("newGuess", { newGuess: { ...savedGuess.toObject(), roundId: existingGag.round._id } });
           return savedGuess;
         }
-
         throw new UserInputError("No such gag.");
       },
 
@@ -502,6 +520,23 @@ const resolvers = {
           } catch (error) {
             console.error("Error fetching guesses for subscription")
             throw new Error("Failed to fetch guesses for subscription")
+          }
+        }
+      },
+      newLike: {
+        subscribe: withFilter(
+          () => pubsub.asyncIterableIterator('newLike'),
+          (payload, variables) => {
+            return payload.newLike.roundId.toString() === variables.roundId.toString();
+          }
+        ),
+        resolve: async (payload) => {
+          try {
+            const likes = await Like.find({round: payload.newLike.roundId})
+            return likes;
+          } catch (error) {
+            console.error("Error fetching likes for subscription")
+            throw new Error("Failed to fetch likes for subscription")
           }
         }
       },

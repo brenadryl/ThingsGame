@@ -14,6 +14,13 @@ const typeDefs = `
     text: String!
   }
 
+  type Like {
+    _id: ID!
+    player: Player
+    round: Round
+    gag: Gag
+  }
+
   type Gag {
     _id: ID!
     guessed: Boolean!
@@ -35,6 +42,7 @@ const typeDefs = `
     turn: Int!
     gags: [Gag]
     guesses: [Guess]
+    likes: [Like]
   }
 
   type Player {
@@ -94,6 +102,7 @@ const typeDefs = `
     updateVote(id: ID!): Gag!
     createGuess(gagId: ID!, guesserId: ID!, guessedId: ID!): Guess!
     createPrompt(text: String!): Prompt!
+    createLike(playerId: ID!, roundId: ID!, gagId: ID!): Like!
   }
 
   type Subscription {
@@ -107,6 +116,7 @@ const typeDefs = `
     newRound(gameId: ID!): Round
     roundChange(gameId: ID!): Round
     gameStageChange(gameId: ID!): Game
+    newLike(roundId: ID!): [Like]
   }
 `;
 

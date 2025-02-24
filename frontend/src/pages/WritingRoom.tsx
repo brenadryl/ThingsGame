@@ -39,7 +39,7 @@ const WritingRoom: React.FC = () => {
             navigate(`/play-room/${gameId}/${playerId}`)
           } else if (roundData.getCurrentRound.gags && roundData.getCurrentRound.gags.find(g => g.player._id === playerId)) {
             console.log("Player has already submitted a response to this round")
-            navigate(`/round-room/${gameId}/${playerId}`)
+            navigate(`/submitted-room/${gameId}/${playerId}`)
           }
         }
     }, [roundData, gameId, playerId, navigate, errorRound])
@@ -60,7 +60,7 @@ const WritingRoom: React.FC = () => {
         try {
             const {data: gagData} = await submitGag({variables: { roundId: round?._id, playerId: playerId, text: gag }})
             if (gagData?.createGag) {
-                navigate(`/round-room/${gameId}/${playerId}`)
+                navigate(`/submitted-room/${gameId}/${playerId}`)
             }
         } catch (error: any) {
             console.error("Error submitting gag:", error)

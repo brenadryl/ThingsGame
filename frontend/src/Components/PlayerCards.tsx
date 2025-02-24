@@ -10,9 +10,11 @@ interface PlayerCardProps {
   points?: number;
   happy?: Boolean;
   emotion?: Emotion;
+  mini?: Boolean
 }
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emotion = "neutral" }) => {
+const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emotion = "neutral", mini }) => {
+  const size = mini ? 50 : 70;
   return (
     <Box
       sx={{
@@ -30,17 +32,17 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emot
         justifyContent="center"
         padding="8px"
         sx={{
-          width: 80,
-          height: 80,
+          width: size + 10,
+          height: size + 10,
           bgcolor: color,
           borderRadius: '20%',
         }}
       >
-        { icon !== undefined && (<img src={AVATAR_LIST[icon][emotion]} key={`${name}-img`} alt={name} style={{ maxWidth: '70px', maxHeight: '70px', width: 'auto', height: 'auto' }} />) }
+        { icon !== undefined && (<img src={AVATAR_LIST[icon][emotion]} key={`${name}-img`} alt={name} style={{ maxWidth: size, maxHeight: size, width: 'auto', height: 'auto' }} />) }
         
       </Box>
       <Box borderRadius="10px">
-        <Typography variant="h4" color={color}>{name}</Typography>
+        <Typography variant="h5" color={color} sx={{textDecoration: color === "grey" ? "line-through" : undefined, textDecorationThickness: '2px',}}>{name}</Typography>
         <Typography variant="h3" color={color}>{points}</Typography>
       </Box>
     </Box>
