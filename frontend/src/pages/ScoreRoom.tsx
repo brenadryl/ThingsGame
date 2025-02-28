@@ -13,12 +13,12 @@ import SuperlativeCard from '../Components/Superlatives';
 
 const SUPERLATIVE_DESCRIPTIONS = {
     mostLiked: { title: "mr popular" , description: "most liked", emotion: "happy" },
-    liker: { title: "hype man" , description: "liked the most", emotion: "neutral"  },
+    liker: { title: "hype man" , description: "liked everyone", emotion: "neutral"  },
     mostSus: { title: "most sus" , description: "fooled everyone", emotion: "suspicious"  },
     easyOut: { title: "captain obvious" , description: "easiest to guess", emotion: "sad"  },
-    probablyBot: { title: "bot" , description: "liked the least", emotion: "sad"  }, // least liked
+    probablyBot: { title: "probs a bot" , description: "blandest answers", emotion: "sad"  }, // least liked
     sniper: { title: "sniper" , description: "most accurate guesser", emotion: "suspicious"  },
-    selfLike: { title: "self five" , description: "liked their own answers the most", emotion: "happy"  },
+    selfLike: { title: "self five" , description: "liked themself most", emotion: "happy"  },
     tldr: { title: "rambler" , description: "most verbose", emotion: "neutral"  }, //rambler
     minimalist: { title: "one word wonder" , description: "master of brevity", emotion: "neutral"  }, //one word wonder
 }
