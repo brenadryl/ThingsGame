@@ -16,6 +16,28 @@ export const GET_GAME = gql`
         active
         color
         icon
+        likesGiven {
+          player {
+            _id
+          }
+          gag {
+            _id
+            player {
+              _id
+            }
+          }
+        }
+        likesReceived {
+          player {
+            _id
+          }
+          gag {
+            _id
+            player {
+              _id
+            }
+          }
+        }
         guessesMade {
           guessed {
             _id

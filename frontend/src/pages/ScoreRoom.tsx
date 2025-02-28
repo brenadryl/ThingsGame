@@ -2,14 +2,77 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Alert, Box, Button, CircularProgress, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Gag, Game, Player } from '../types';
+import { Emotion, Gag, Game, Player } from '../types';
 import { useSubscription } from '@apollo/client';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import { CHANGE_GAME_MUTATION } from '../graphql/mutations/gameMutations';
 import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscriptions';
 import PlayerCard from '../Components/PlayerCards';
 import LoadingLogo from '../Components/LoadingLogo';
+import SuperlativeCard from '../Components/Superlatives';
 
+const SUPERLATIVE_DESCRIPTIONS = {
+    mostLiked: { title: "mr popular" , description: "most liked", emotion: "happy" },
+    liker: { title: "hype man" , description: "liked the most", emotion: "neutral"  },
+    mostSus: { title: "most sus" , description: "fooled everyone", emotion: "suspicious"  },
+    easyOut: { title: "captain obvious" , description: "easiest to guess", emotion: "sad"  },
+    probablyBot: { title: "bot" , description: "liked the least", emotion: "sad"  }, // least liked
+    sniper: { title: "sniper" , description: "most accurate guesser", emotion: "suspicious"  },
+    selfLike: { title: "self five" , description: "liked their own answers the most", emotion: "happy"  },
+    tldr: { title: "rambler" , description: "most verbose", emotion: "neutral"  }, //rambler
+    minimalist: { title: "one word wonder" , description: "master of brevity", emotion: "neutral"  }, //one word wonder
+}
+
+type SuperlativeKey = keyof typeof SUPERLATIVE_DESCRIPTIONS;
+
+
+const getSuperlatives = (players: Player[]) => {
+    let superlatives = {
+        mostLiked: "",
+        liker: "",
+        mostSus: "",
+        easyOut:"",
+        probablyBot: "", // least liked
+        sniper: "",
+        selfLike: "",
+        tldr: "", //rambler
+        minimalist: "", //one word wonder
+    }
+
+    if (players && players.length > 0) {
+        const getTotalLikesReceived = (player: Player) => player.likesReceived.length;
+        const getTotalLikesGiven = (player: Player) => player.likesGiven.length;
+        const getIncorrectGuessesReceived = (player: Player) => player.guessesReceived.filter((guess) => !guess.isCorrect).length;
+        const getCorrectGuessesMade = (player: Player) => player.guessesMade.filter((guess) => guess.isCorrect).length;
+        const getSelfLikes = (player: Player) => player.likesGiven.filter((like) => like.gag && like.gag.player._id === player._id).length;
+        const getTotalGagTextLength = (player: Player) => player.gags.reduce((sum, gag) => sum + (gag.text?.length || 0), 0);
+
+        const mostLiked = players.reduce((max, p) => (getTotalLikesReceived(p) > getTotalLikesReceived(max) ? p : max), players[0]);
+        const liker = players.reduce((max, p) => (getTotalLikesGiven(p) > getTotalLikesGiven(max) ? p : max), players[0]);
+        const mostSus = players.reduce((max, p) => (getIncorrectGuessesReceived(p) > getIncorrectGuessesReceived(max) ? p : max), players[0]);
+
+        const easyOut = players.reduce((min, p) =>
+            (getIncorrectGuessesReceived(p) < getIncorrectGuessesReceived(min) || (getIncorrectGuessesReceived(p) === getIncorrectGuessesReceived(min) && p.guessesMade.length < min.guessesMade.length)) ? p : min, players[0]);
+        const sniper = players.reduce((max, p) => (getCorrectGuessesMade(p) > getCorrectGuessesMade(max) ? p : max), players[0]);
+        const leastLiked = players.reduce((min, p) => (getTotalLikesReceived(p) < getTotalLikesReceived(min) ? p : min), players[0]);
+        const minimalist = players.reduce((min, p) => (getTotalGagTextLength(p) < getTotalGagTextLength(min) ? p : min), players[0]);
+        const rambler = players.reduce((max, p) => (getTotalGagTextLength(p) > getTotalGagTextLength(max) ? p : max), players[0]);
+        const selfLike = players.reduce((max, p) => (getSelfLikes(p) > getSelfLikes(max) ? p : max), players[0]);
+        superlatives = {
+            mostLiked: mostLiked._id,
+            liker: liker._id,
+            mostSus: mostSus._id,
+            easyOut: easyOut._id,
+            probablyBot: leastLiked._id, // least liked
+            sniper: sniper._id,
+            selfLike: selfLike._id,
+            tldr: rambler._id, //rambler
+            minimalist: minimalist._id, //one word wonder
+        }
+
+    }
+    return superlatives;
+}
 
 const ScoreRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
@@ -115,10 +178,9 @@ const ScoreRoom: React.FC = () => {
 
   const calculatePoints = (player: Player) => {
     let points = player.points;
-    const favorites = favoriteGags.filter((gag) => gag?.player._id === player._id);
-    points += (favorites.length * 2)
     return points;
   }
+  const superlatives = getSuperlatives(game?.players || []);
 
   return (
     <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
@@ -171,11 +233,25 @@ const ScoreRoom: React.FC = () => {
                 return null;
             }
         })}
+
+
       {game?.players?.[0]?._id === playerId && (
         <Button onClick={handleUpdateGame} variant='contained' disabled={updateGameLoading} sx={{marginTop: '24px'}}>
           {updateGameLoading ? <CircularProgress size={24}/> : "START NEXT ROUND"}
         </Button>
       )}
+        <Box display="flex" flexDirection="row" flexWrap="wrap" justifyContent="center" paddingY="16px">
+            {Object.entries(superlatives).map(([key, playerId]) => {
+                const player = game?.players.find(p => p._id === playerId);
+                const details = SUPERLATIVE_DESCRIPTIONS[key as SuperlativeKey];
+    
+                if (!player || !details) return null; // Skip if player or details are missing
+    
+                return (
+                    <SuperlativeCard player={player} superlative={details.title} description={details.description} emotion={details.emotion as Emotion} />
+                );
+            })}
+        </Box>
       {updateGameError && <Alert severity="error">Error starting game: {updateGameError.message}</Alert>}
     </Box>
   )

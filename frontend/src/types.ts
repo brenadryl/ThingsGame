@@ -41,6 +41,8 @@ export interface Prompt {
     gags: Gag[];
     guessesMade: Guess[];
     guessesReceived: Guess[];
+    likesGiven: [Like];
+    likesReceived: [Like];
   }
   
   export interface Game {

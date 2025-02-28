@@ -105,12 +105,17 @@ const resolvers = {
               players.map(async (player) => {
                 const guessesMade = await Guess.find({guesser: player._id})
                 const guessesReceived = await Guess.find({guessed: player._id})
+                const likesGiven = await Like.find({player: player._id}).populate("gag")
                 const gags = await Gag.find({player: player._id}).populate("round").populate("player")
+                const gagIds = gags.map(gag => gag._id)
+                const likesReceived = await Like.find({gag: { $in: gagIds }}).populate("gag")
                 return {
                   ...player.toObject(),
                   guessesMade,
                   guessesReceived,
                   gags,
+                  likesGiven,
+                  likesReceived,
                 }
               })
             );
@@ -404,6 +409,27 @@ const resolvers = {
               pubsub.publish("gameStageChange", { gameStageChange: game });
               console.log("GAME UPDATE ", game)
               console.log("ROUND UPDATE ", round)
+              const roundLikes = await Like.find({round: round._id})
+              const likeCounts = roundLikes.reduce((acc, like) => {
+                acc[like.gag] = (acc[like.gag] || 0) + 1
+                return acc;
+              }, {})
+              const maxLikes = Math.max(...Object.values(likeCounts));
+              console.log("maxLikes: ", maxLikes)
+
+              const mostLikedGagIds = Object.keys(likeCounts).filter((gagId) => likeCounts[gagId] === maxLikes)
+              console.log("mostLikedGagIds: ", mostLikedGagIds)
+              console.log("(mostLikedGagIds.length === 1: ", mostLikedGagIds.length === 1)
+              if (mostLikedGagIds.length === 1) {
+                console.log("HIII BREN")
+                const favGag = await Gag.findById(mostLikedGagIds[0]).populate("player");
+                console.log("playerID: ", favGag.player._id)
+                await Player.findByIdAndUpdate(
+                  favGag.player._id,
+                  {$inc: { points: 1 }},
+                  { new: true }
+                )
+              }
             }
             pubsub.publish("gagUpdate", { gagUpdate: { ...gag.toObject(), roundId: existingGag.round._id } });
           }

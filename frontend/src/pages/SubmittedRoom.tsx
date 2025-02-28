@@ -45,7 +45,7 @@ const SubmittedRoom: React.FC = () => {
   useEffect(() => {
     if (gagList.length > 0 && (game?.players.length || 0) > 0 &&  gagList.length === game?.players.length) {
 
-      setTimeout(() => navigate(`/guessing-room/${gameId}/${playerId}`), 3000); // Redirect after 3 seconds
+      setTimeout(() => navigate(`/guessing-room/${gameId}/${playerId}`), 1000); // Redirect after 3 seconds
     }
   }, [game, gagList, gameId, playerId, navigate])
 
