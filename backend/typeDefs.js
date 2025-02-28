@@ -58,6 +58,8 @@ const typeDefs = `
     gags: [Gag]
     guessesMade: [Guess]
     guessesReceived: [Guess]
+    likesGiven: [Like]
+    likesReceived: [Like]
   }
 
   type Game {

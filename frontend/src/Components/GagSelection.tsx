@@ -19,6 +19,7 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
   const [favoriteGag, setFavoriteGag] = useState(favorite || '');
   console.log("favoriteGag", favoriteGag)
   console.log("favorite", favorite)
+  console.log("gaglost", gagList)
   if (!myTurn && selectedGag !== '') {
       setSelectedGag('')
   }

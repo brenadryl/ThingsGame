@@ -39,6 +39,7 @@ const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players, curren
                 padding: "8px",
                 whitespace: "nowrap",
                 scrollBehavior: "smooth",
+                height: "200px",
                 width: "100vw",
                 maxWidth: "100%",
             }}
