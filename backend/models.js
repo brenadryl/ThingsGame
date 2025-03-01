@@ -73,6 +73,7 @@ const gameSchema = new mongoose.Schema({
     active: { type: Boolean, default: true },
     gameCode: { type: String, required: true },
     stage: { type: Number, max: 3, default: 1 },
+    mode: {type: String, default: "standard"},
     createdAt: { type: Date, default: Date.now },
     currentRound: {
         type: mongoose.Schema.Types.ObjectId,

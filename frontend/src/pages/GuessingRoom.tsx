@@ -281,7 +281,7 @@ const GuessingRoom: React.FC = () => {
             </>
           }
         </Box>
-        <GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite} likes={likes} favorite={favorite}/>
+        <GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite} likes={likes} favorite={favorite} guesses={guessList}/>
       </Box>
     </>
   )

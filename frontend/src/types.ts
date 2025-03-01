@@ -51,6 +51,7 @@ export interface Prompt {
     gameCode: string;
     active: boolean;
     createdAt: number;
+    mode: string;
     currentRound: Round;
     rounds: Round[];
     players: Player[];

@@ -68,6 +68,7 @@ const typeDefs = `
     gameCode: String!
     active: Boolean!
     createdAt: Float!
+    mode: String
     currentRound: Round
     rounds: [Round]
     players: [Player]
@@ -95,7 +96,7 @@ const typeDefs = `
     updatePlayer(id: ID!, name: String, points: Int): Player!
     updatePlayerIcon(gameId: ID!, playerId: ID!, icon: Int, color: String): Player!
     createGame: Game!
-    updateGameStage(id: ID!, active: Boolean, stage: Int): Game!
+    updateGameStage(id: ID!, active: Boolean, stage: Int, mode: String): Game!
     deleteOld: DeleteResponse
     createRound(gameId: ID!, promptText: String!, turn: Int!): Round!
     updateRound(id: ID!, turn: Int, stage: Int): Round!
