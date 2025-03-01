@@ -37,6 +37,7 @@ const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players, curren
                 overflowX: "auto",
                 gap: "24px",
                 padding: "8px",
+                paddingX:"16px",
                 whitespace: "nowrap",
                 scrollBehavior: "smooth",
                 height: "200px",
@@ -51,6 +52,7 @@ const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players, curren
                     <Box 
                         ref={currentPlayerTurn?._id === player._id ? selectedRef : null}
                         key={player._id}
+                        marginLeft={index === 0 ? "50px" : "0px"}
                         sx={{
                             maxWidth: "90px",
                             transform: currentPlayerTurn?._id === player._id ? "scale(1.2)" : "scale(1.0)",

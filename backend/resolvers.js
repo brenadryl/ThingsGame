@@ -2,6 +2,7 @@ import { Gag, Game, Guess, Player, Round, Prompt, Like } from './models.js';
 import { withFilter } from 'graphql-subscriptions';
 import pubsub from './pubsub.js';
 import { UserInputError } from 'apollo-server-express';
+import { FUN_COLORS } from './constants.js';
 
 function generateRandomString(length) {
   let result = '';
@@ -106,7 +107,7 @@ const resolvers = {
                 const guessesMade = await Guess.find({guesser: player._id})
                 const guessesReceived = await Guess.find({guessed: player._id})
                 const likesGiven = await Like.find({player: player._id}).populate("gag")
-                const gags = await Gag.find({player: player._id}).populate("round").populate("player")
+                const gags = await Gag.find({player: player._id}).sort({createdAt: 1}).populate("round").populate("player")
                 const gagIds = gags.map(gag => gag._id)
                 const likesReceived = await Like.find({gag: { $in: gagIds }}).populate("gag")
                 return {
@@ -168,7 +169,7 @@ const resolvers = {
             if (players.length > 19) {
               throw new UserInputError("This game is full.");
             }
-            const TOTAL_ICONS = 48
+            const TOTAL_ICONS = 57
             const assignedIcons = players.map(player => player.icon);
             let availableIcon = -1;
             let i = TOTAL_ICONS;
@@ -183,7 +184,8 @@ const resolvers = {
             }
 
             const createdAt = Math.floor(Date.now() / 1000);
-            const player = new Player({ name, game: existingGame._id, createdAt, color: '#FF5733', icon: availableIcon, turn: players.length });
+            const color = FUN_COLORS[Math.floor(Math.random() * FUN_COLORS.length)];
+            const player = new Player({ name, game: existingGame._id, createdAt, color, icon: availableIcon, turn: players.length });
             await player.save();
             await player.populate('game');
             pubsub.publish("newPlayer", { newPlayer: { ...player.toObject(), gameId: existingGame._id } });
