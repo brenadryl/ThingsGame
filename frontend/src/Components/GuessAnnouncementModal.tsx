@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Guess, Player } from '../types';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
-import PlayerList from './PlayerList';
+import { Guess } from '../types';
+import { Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PlayerCard from './PlayerCards';
 import { AVATAR_LIST } from '../themes/constants';
@@ -17,7 +16,7 @@ const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ hasNewG
     const guessed = newGuess?.guessed || null;
     const selfGuess = guesser?._id === guessed?._id;
     const [delayedAnnouncement, setDelayedAnnouncement] = useState("...")
-    const delay = selfGuess ? 0 : 4000;
+    const delay = selfGuess ? 0 : 3000;
     useEffect(() => {
         if (hasNewGuess) {
             setDelayedAnnouncement("...")
@@ -43,7 +42,7 @@ const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ hasNewG
                   <Box maxWidth="220px" marginBottom={delayedAnnouncement === "WRONG" ? "0px" : "12px"} marginTop={delayedAnnouncement === "CORRECT!" ? "0px" : "12px"}>
                     <Box position="relative" maxWidth="220px" marginY="12px">
                       <PlayerCard name={guesser?.name || ''} color={guesser?.color || ''} icon={guesser?.icon} emotion={delayedAnnouncement === "CORRECT!" ? "happy" : (delayedAnnouncement === "WRONG" ? "sad" : "suspicious")}/>
-                      {delayedAnnouncement !== "..."  && guesser?.icon && <Box
+                      {delayedAnnouncement !== "..."  && guesser?.icon !== undefined && <Box
                         position="absolute"
                         top="-20px"
                         right="-60px"
@@ -64,7 +63,7 @@ const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ hasNewG
                   <Box maxWidth="220px" marginBottom={delayedAnnouncement === "CORRECT!" ? "0px" : "12px"} marginTop={delayedAnnouncement === "WRONG" ? "0px" : "12px"}>
                     <Box position="relative" maxWidth="220px" marginY="12px">
                     <PlayerCard name={guessed?.name || ''} color={guessed?.color || ''} icon={guessed?.icon} emotion={delayedAnnouncement === "CORRECT!" ? "sad" : (delayedAnnouncement === "WRONG" ? "happy" : "nervous")}/>
-                      {delayedAnnouncement !== "..." && guessed?.icon && <Box
+                      {delayedAnnouncement !== "..." && guessed?.icon !== undefined && <Box
                         position="absolute"
                         bottom="19px"
                         left="-50px"

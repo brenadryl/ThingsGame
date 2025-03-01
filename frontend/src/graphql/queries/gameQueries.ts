@@ -58,6 +58,7 @@ export const GET_GAME = gql`
         }
         gags {
           _id
+          createdAt
           guessed
           text
           votes

@@ -11,14 +11,51 @@ import PlayerCard from '../Components/PlayerCards';
 import LoadingLogo from '../Components/LoadingLogo';
 import SuperlativeCard from '../Components/Superlatives';
 
+
+
+function getEarliestAndLatestGagCreators(players: Player[]) {
+    if (!players || players.length === 0) return { earliest: null, latest: null };
+  
+    const calculateAverageCreatedAt = (gags: Gag[]) => {
+      if (gags.length === 0) return Infinity; // No gags means we can't calculate an average
+      return gags.reduce((sum, gag) => sum + gag.createdAt, 0) / gags.length;
+    };
+  
+    let earliestPlayer: Player | null = null;
+    let latestPlayer: Player | null = null;
+    let earliestTime = Infinity;
+    let latestTime = -Infinity;
+  
+    for (const player of players) {
+      const avgCreatedAt = calculateAverageCreatedAt(player.gags);
+      
+      if (avgCreatedAt < earliestTime) {
+        earliestTime = avgCreatedAt;
+        earliestPlayer = player;
+      }
+  
+      if (avgCreatedAt > latestTime) {
+        latestTime = avgCreatedAt;
+        latestPlayer = player;
+      }
+    }
+  
+    return { earliest: earliestPlayer, latest: latestPlayer };
+  }
+
+
+
 const SUPERLATIVE_DESCRIPTIONS = {
-    mostLiked: { title: "mr popular" , description: "most liked", emotion: "happy" },
-    liker: { title: "hype man" , description: "liked everyone", emotion: "neutral"  },
+    sniper: { title: "sniper" , description: "most accurate guesser", emotion: "suspicious"  },
+    conspiracyTheorist: { title: "conspiracy theorist" , description: "most clueless", emotion: "sad" },
     mostSus: { title: "most sus" , description: "fooled everyone", emotion: "suspicious"  },
     easyOut: { title: "captain obvious" , description: "easiest to guess", emotion: "sad"  },
-    probablyBot: { title: "probs a bot" , description: "blandest answers", emotion: "sad"  }, // least liked
-    sniper: { title: "sniper" , description: "most accurate guesser", emotion: "suspicious"  },
+    quickest: { title: "keyboard cheetah" , description: "quickest typer", emotion: "happy"  }, //one word wonder
+    slowest: { title: "still buffering" , description: "slowest typer", emotion: "sad" },
+    mostLiked: { title: "mr popular" , description: "most liked", emotion: "happy" },
+    liker: { title: "hype man" , description: "liked everyone", emotion: "neutral"  },
     selfLike: { title: "self five" , description: "liked themself most", emotion: "happy"  },
+    probablyBot: { title: "probs a bot" , description: "blandest answers", emotion: "sad"  }, // least liked
     tldr: { title: "rambler" , description: "most verbose", emotion: "neutral"  }, //rambler
     minimalist: { title: "one word wonder" , description: "master of brevity", emotion: "neutral"  }, //one word wonder
 }
@@ -37,37 +74,93 @@ const getSuperlatives = (players: Player[]) => {
         selfLike: "",
         tldr: "", //rambler
         minimalist: "", //one word wonder
+        conspiracyTheorist: "",
+        quickest: "",
+        slowest: "",
     }
+
+    console.log("players", players)
 
     if (players && players.length > 0) {
         const getTotalLikesReceived = (player: Player) => player.likesReceived.length;
-        const getTotalLikesGiven = (player: Player) => player.likesGiven.length;
+        const getTotalLikesGiven = (player: Player) => player.likesGiven.filter((like) => like.gag.player._id !== player._id).length;
         const getIncorrectGuessesReceived = (player: Player) => player.guessesReceived.filter((guess) => !guess.isCorrect).length;
         const getCorrectGuessesMade = (player: Player) => player.guessesMade.filter((guess) => guess.isCorrect).length;
-        const getSelfLikes = (player: Player) => player.likesGiven.filter((like) => like.gag && like.gag.player._id === player._id).length;
+        const getIncorrectGuessesMade = (player: Player) => player.guessesMade.filter((guess) => !guess.isCorrect).length;
+        const getSelfLikes = (player: Player) => player.likesGiven.filter((like) => like.gag.player._id === player._id).length;
         const getTotalGagTextLength = (player: Player) => player.gags.reduce((sum, gag) => sum + (gag.text?.length || 0), 0);
+          
+        // Helper function to check if there's a unique max/min value
+        const hasUniqueMax = (players: Player[], metric: (p: Player) => number) => {
+            const maxValue = Math.max(...players.map(metric));
+            return players.filter((p) => metric(p) === maxValue).length === 1;
+        };
+        
+        const hasUniqueMin = (players: Player[], metric: (p: Player) => number) => {
+            const minValue = Math.min(...players.map(metric));
+            return players.filter((p) => metric(p) === minValue).length === 1;
+        };
+        
+        // Superlative Calculations
+        const mostLiked = hasUniqueMax(players, getTotalLikesReceived)
+            ? players.reduce((max, p) => (getTotalLikesReceived(p) > getTotalLikesReceived(max) ? p : max), players[0])
+            : null;
+        
+        const liker = hasUniqueMax(players, getTotalLikesGiven)
+            ? players.reduce((max, p) => (getTotalLikesGiven(p) > getTotalLikesGiven(max) ? p : max), players[0])
+            : null;
+        
+        const mostSus = hasUniqueMax(players, getIncorrectGuessesReceived)
+            ? players.reduce((max, p) => (getIncorrectGuessesReceived(p) > getIncorrectGuessesReceived(max) ? p : max), players[0])
+            : null;
+        
+        const easyOut = hasUniqueMin(players, getIncorrectGuessesReceived)
+            ? players.reduce((min, p) =>
+                (getIncorrectGuessesReceived(p) < getIncorrectGuessesReceived(min) || 
+                (getIncorrectGuessesReceived(p) === getIncorrectGuessesReceived(min) && p.guessesMade.length < min.guessesMade.length))
+                ? p
+                : min, players[0])
+            : null;
+        
+        const sniper = hasUniqueMax(players, getCorrectGuessesMade)
+            ? players.reduce((max, p) => (getCorrectGuessesMade(p) > getCorrectGuessesMade(max) ? p : max), players[0])
+            : null;
 
-        const mostLiked = players.reduce((max, p) => (getTotalLikesReceived(p) > getTotalLikesReceived(max) ? p : max), players[0]);
-        const liker = players.reduce((max, p) => (getTotalLikesGiven(p) > getTotalLikesGiven(max) ? p : max), players[0]);
-        const mostSus = players.reduce((max, p) => (getIncorrectGuessesReceived(p) > getIncorrectGuessesReceived(max) ? p : max), players[0]);
+        const conspiracyTheorist = hasUniqueMax(players, getIncorrectGuessesMade)
+            ? players.reduce((max, p) => (getIncorrectGuessesMade(p) > getIncorrectGuessesMade(max) ? p : max), players[0])
+            : null;
+        
+        const leastLiked = hasUniqueMin(players, getTotalLikesReceived)
+            ? players.reduce((min, p) => (getTotalLikesReceived(p) < getTotalLikesReceived(min) ? p : min), players[0])
+            : null;
+        
+        const minimalist = hasUniqueMin(players, getTotalGagTextLength)
+            ? players.reduce((min, p) => (getTotalGagTextLength(p) < getTotalGagTextLength(min) ? p : min), players[0])
+            : null;
+        
+        const rambler = hasUniqueMax(players, getTotalGagTextLength)
+            ? players.reduce((max, p) => (getTotalGagTextLength(p) > getTotalGagTextLength(max) ? p : max), players[0])
+            : null;
+        
+        const selfLike = hasUniqueMax(players, getSelfLikes)
+            ? players.reduce((max, p) => (getSelfLikes(p) > getSelfLikes(max) ? p : max), players[0])
+            : null;
 
-        const easyOut = players.reduce((min, p) =>
-            (getIncorrectGuessesReceived(p) < getIncorrectGuessesReceived(min) || (getIncorrectGuessesReceived(p) === getIncorrectGuessesReceived(min) && p.guessesMade.length < min.guessesMade.length)) ? p : min, players[0]);
-        const sniper = players.reduce((max, p) => (getCorrectGuessesMade(p) > getCorrectGuessesMade(max) ? p : max), players[0]);
-        const leastLiked = players.reduce((min, p) => (getTotalLikesReceived(p) < getTotalLikesReceived(min) ? p : min), players[0]);
-        const minimalist = players.reduce((min, p) => (getTotalGagTextLength(p) < getTotalGagTextLength(min) ? p : min), players[0]);
-        const rambler = players.reduce((max, p) => (getTotalGagTextLength(p) > getTotalGagTextLength(max) ? p : max), players[0]);
-        const selfLike = players.reduce((max, p) => (getSelfLikes(p) > getSelfLikes(max) ? p : max), players[0]);
+            const { earliest, latest } = getEarliestAndLatestGagCreators(players);
+
         superlatives = {
-            mostLiked: mostLiked._id,
-            liker: liker._id,
-            mostSus: mostSus._id,
-            easyOut: easyOut._id,
-            probablyBot: leastLiked._id, // least liked
-            sniper: sniper._id,
-            selfLike: selfLike._id,
-            tldr: rambler._id, //rambler
-            minimalist: minimalist._id, //one word wonder
+            mostLiked: mostLiked?._id || "",
+            liker: liker?._id || "",
+            mostSus: mostSus?._id || "",
+            easyOut: easyOut?._id || "",
+            probablyBot: leastLiked?._id || "", // least liked
+            sniper: sniper?._id || "",
+            selfLike: selfLike?._id || "",
+            tldr: rambler?._id || "", //rambler
+            minimalist: minimalist?._id || "", //one word wonder\
+            conspiracyTheorist: conspiracyTheorist?._id || "",
+            quickest: earliest?._id || "",
+            slowest: latest?._id || "",
         }
 
     }
