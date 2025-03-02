@@ -4,7 +4,7 @@ import BedtimeIcon from '@mui/icons-material/Bedtime';
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import { AppBar, Box, CssBaseline, ThemeProvider, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, CssBaseline, ThemeProvider, Toolbar } from "@mui/material";
 import { lightTheme, darkTheme } from "./themes/theme";
 import GradientButton from './Components/GradientButton';
 import { Container } from '@mui/system';

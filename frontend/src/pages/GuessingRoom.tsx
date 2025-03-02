@@ -103,7 +103,8 @@ const GuessingRoom: React.FC = () => {
           if (subscriptionData?.data?.gagUpdate) {
             console.log("Subscription received updated Gag data:", subscriptionData.data?.gagUpdate);
             const updatedGags = subscriptionData.data?.gagUpdate;
-            setGagList(updatedGags)
+            const sortedGags = [...updatedGags].sort((a, b) => a.text.localeCompare(b.text));
+            setGagList(sortedGags)
           } else {
             console.warn("Subscription did not return expected data.");
           }
@@ -150,7 +151,8 @@ const GuessingRoom: React.FC = () => {
       processedGameData.current = true;
       setGame(gameData.getGame)
       if (gameData.getGame.currentRound.gags.length > gagList.length) {
-        setGagList(gameData.getGame.currentRound.gags)
+        const sortedGags = [...gameData.getGame.currentRound.gags].sort((a, b) => a.text.localeCompare(b.text));
+        setGagList(sortedGags)
       }
       if (gameData.getGame.currentRound.likes && gameData.getGame.currentRound.likes.length > likes.length) {
         setLikes(gameData.getGame.currentRound.likes)
@@ -279,7 +281,7 @@ const GuessingRoom: React.FC = () => {
             </>
           }
         </Box>
-        <GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite} likes={likes} favorite={favorite}/>
+        <GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite} likes={likes} favorite={favorite} guesses={guessList}/>
       </Box>
     </>
   )

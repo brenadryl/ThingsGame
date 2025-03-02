@@ -10,11 +10,12 @@ export const CREATE_GAME = gql`
 `;
 
 export const CHANGE_GAME_MUTATION = gql`
-  mutation ChangeGame($id: ID!, $active: Boolean, $stage: Int ) {
-    updateGameStage(id: $id, active: $active, stage: $stage) {
+  mutation ChangeGame($id: ID!, $active: Boolean, $stage: Int, $mode: String ) {
+    updateGameStage(id: $id, active: $active, stage: $stage, mode: $mode) {
       _id
       stage
       active
+      mode
     }
   }
 `;

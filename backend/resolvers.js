@@ -141,7 +141,7 @@ const resolvers = {
 
           if (currentGags && currentGags.length > 0) {
             const gagIds = currentGags.map((gag) => gag._id)
-            currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1});
+            currentGuesses = await Guess.find({gag: { $in: gagIds}}).sort({createdAt: -1}).populate("guesser").populate("guessed");
           }
           const currentRound = game.currentRound ? {...game.currentRound.toObject(), gags: currentGags, guesses: currentGuesses, likes: currentLikes} : undefined;
           return {
@@ -275,11 +275,11 @@ const resolvers = {
         return game;
       },
   
-      updateGameStage: async (_, { id, active, stage }) => {
+      updateGameStage: async (_, { id, active, stage, mode }) => {
         try {
           const game = await Game.findByIdAndUpdate(
             id,
-            { active, stage },
+            { active, stage, mode },
             { new: true }
           );
           if (!game) {

@@ -7,6 +7,7 @@ export const GET_GAME = gql`
       _id
       stage
       gameCode
+      mode
       active
       players {
         _id
@@ -124,9 +125,15 @@ export const GET_GAME = gql`
           isCorrect
           guesser {
             _id
+            icon
+            name
+            color
           }
           guessed {
             _id
+            icon
+            name
+            color
           }
           gag {
             _id

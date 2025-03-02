@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { Alert, Box, Button, CircularProgress, Typography} from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Switch, ToggleButton, ToggleButtonGroup, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Game, Player } from '../types';
@@ -21,6 +21,7 @@ const WaitingRoom: React.FC = () => {
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
   const [playerList, setPlayerList] = useState<Player[]>([])
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [mode, setMode] = useState("easy");
   const { loading: loadingGame, error: errorGame, data: gameData } = useQuery<GetGameData>(GET_GAME, {
     variables: {id: gameId},
     skip: !gameId,
@@ -101,11 +102,17 @@ const WaitingRoom: React.FC = () => {
   const handleStartGame = async () => {
     if (!gameId) return;
     try {
-      await startGame({variables: { id: gameId, active: true, stage: 2 }})
+      await startGame({variables: { id: gameId, active: true, stage: 2, mode }})
       console.log("Game started!")
     } catch (error) {
       console.error("Error starting game:", error)
       setErrorMessage("Failed to start game.");
+    }
+  }
+
+  const handleToggle = (_event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
+    if(newMode !== null) {
+      setMode(newMode)
     }
   }
 
@@ -124,9 +131,43 @@ const WaitingRoom: React.FC = () => {
         <Typography color="info" variant="h3">{game?.gameCode}</Typography>
       </Box>
       {game?.players?.[0]?._id === playerId && (
-        <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginBottom: '16px'}}>
-          {startLoading ? <CircularProgress size={24}/> : "START GAME"}
-        </Button>
+        <>
+          <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginBottom: '16px'}}>
+            {startLoading ? <CircularProgress size={24}/> : <Typography variant="h2" color="primary.contrastText">START GAME</Typography>}
+          </Button>
+
+          <Box marginBottom="16px" display="flex" flexDirection="column" alignItems="center">
+            <ToggleButtonGroup
+              value={mode}
+              exclusive
+              onChange={handleToggle}
+              sx={{
+                borderRadius: "50px",
+                overflow: "hidden",
+                backgroundColor: "grey",
+                "& .MuiToggleButton-root": {
+                  border: "none",
+                  padding: "8px 20px",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  textTransform: "none",
+                  transition: "0.3s",
+                  "&.Mui-selected": {
+                    backgroundColor: "info.main",
+                    color: "white",
+                  },
+                  "&:not(.Mui-selected)": {
+                    backgroundColor: "grey",
+                    color: "white",
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="easy" sx={{ width: "100px"}}>EASY</ToggleButton>
+              <ToggleButton value="standard" sx={{ width: "100px"}}>STANDARD</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        </>
       )}
       {startError && <Alert severity="error">Error starting game: {startError.message}</Alert>}
       <PlayerList playerList={playerList.length > (game?.players?.length || 0) ? playerList : (game?.players || [])}/>
