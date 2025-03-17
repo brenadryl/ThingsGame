@@ -40,7 +40,7 @@ const useDirector = (gameId: String | undefined, playerId: String | undefined, r
             }
         }
         if (!loadingGame && errorGame) {
-            setTimeout(() => navigate('/'), 5000);
+            setTimeout(() => navigate('/'), 3000);
         }
 
     }, [gameData, gameId, navigate, playerId, room, errorGame, loadingGame])
