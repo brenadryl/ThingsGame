@@ -12,10 +12,12 @@ import PlayerList from '../Components/PlayerList';
 import AvatarSelection from '../Components/AvatarSelection';
 import { AVATAR_SELECTION_SUBSCRIPTION } from '../graphql/subscriptions/playerSubscriptions';
 import LoadingLogo from '../Components/LoadingLogo';
+import useDirector from '../Hooks/useDirector';
 
 
 const WaitingRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
+  useDirector(gameId, playerId, "waiting")
   const navigate = useNavigate();
   const [game, setGame] = useState<Game | null>(null)
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null)
@@ -83,7 +85,7 @@ const WaitingRoom: React.FC = () => {
         console.log("You are not a part of this game")
         setTimeout(() => navigate('/'), 5000); // Redirect after 3 seconds
       }
-      if (gameData.getGame.stage !== 1) {
+      if (gameData.getGame.stage === 2) {
         navigate(`/play-room/${gameData.getGame._id}/${playerId}`)
       }
     }

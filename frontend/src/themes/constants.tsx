@@ -574,7 +574,7 @@ export const AVATAR_LIST = [
         happy: process.env.PUBLIC_URL + '/data/avatars/raccoon/IMG_1940.PNG',
         suspicious: process.env.PUBLIC_URL + '/data/avatars/raccoon/IMG_1939.PNG',
         nervous: process.env.PUBLIC_URL + '/data/avatars/raccoon/IMG_2064.PNG',
-        sad: process.env.PUBLIC_URL + '/data/avatars/raccoon/IMG_1962.PNG',
+        sad: process.env.PUBLIC_URL + '/data/avatars/raccoon/IMG_2162.PNG',
         sad_phrase: 'This is garbage.',
         happy_phrase: 'I made out like a bandit.',
     },

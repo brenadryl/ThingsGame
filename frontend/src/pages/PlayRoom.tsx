@@ -8,10 +8,12 @@ import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import PromptSelection from '../Components/PromptSelection';
 import { NEW_ROUND_SUBSCRIPTION } from '../graphql/subscriptions/roundSubscriptions';
 import LoadingLogo from '../Components/LoadingLogo';
+import useDirector from '../Hooks/useDirector';
 
 
 const PlayRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
+  useDirector(gameId, playerId, "play")
   const navigate = useNavigate();
   const [game, setGame] = useState<Game | null>(null)
   const [playerList, setPlayerList] = useState<Player[]>([])

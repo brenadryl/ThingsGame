@@ -6,9 +6,11 @@ import { GET_CURRENT_ROUND, GetCurrentRoundData } from '../graphql/queries/round
 import { Round } from '../types';
 import { NEW_GAG } from '../graphql/mutations/gagMutations';
 import LoadingLogo from '../Components/LoadingLogo';
+import useDirector from '../Hooks/useDirector';
 
 const WritingRoom: React.FC = () => {
     const { gameId, playerId } = useParams();
+    useDirector(gameId, playerId, "writing")
     const navigate = useNavigate();
     const [gag, setGag] = useState('');
     const [loading, setLoading] = useState(false);
@@ -35,9 +37,7 @@ const WritingRoom: React.FC = () => {
         }
         if(roundData?.getCurrentRound) {
             setRound(roundData.getCurrentRound)
-          if (roundData.getCurrentRound.stage !== 1) {
-            navigate(`/play-room/${gameId}/${playerId}`)
-          } else if (roundData.getCurrentRound.gags && roundData.getCurrentRound.gags.find(g => g.player._id === playerId)) {
+          if (roundData.getCurrentRound.stage === 1 && roundData.getCurrentRound.gags && roundData.getCurrentRound.gags.find(g => g.player._id === playerId)) {
             console.log("Player has already submitted a response to this round")
             navigate(`/submitted-room/${gameId}/${playerId}`)
           }

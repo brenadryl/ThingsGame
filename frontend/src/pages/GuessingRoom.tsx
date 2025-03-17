@@ -17,6 +17,7 @@ import { NEW_LIKE_SUBSCRIPTION } from '../graphql/subscriptions/likeSubscription
 import { NEW_LIKE } from '../graphql/mutations/likeMutation';
 import { GAG_UPDATE_SUBSCRIPTION } from '../graphql/subscriptions/gagSubscriptions';
 import PlayerTurnCarousel from '../Components/PlayerTurnCarousel';
+import useDirector from '../Hooks/useDirector';
 
 
 const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess | undefined, turn: number, gagList: Gag[] | undefined) => {
@@ -37,6 +38,7 @@ const getCurrentTurn = (playerList: Player[] | undefined, lastWrongGuess: Guess 
  
 const GuessingRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
+  useDirector(gameId, playerId, "guessing")
   const navigate = useNavigate();
   const processedGameData = useRef(false);
   const [game, setGame] = useState<Game | null>(null)
@@ -281,7 +283,7 @@ const GuessingRoom: React.FC = () => {
             </>
           }
         </Box>
-        <GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite} likes={likes} favorite={favorite} guesses={guessList}/>
+        <GagSelection gagList={gagList || []} onClick={handleGagClick} myTurn={myTurn} setFavorite={handleFavorite} likes={likes} favorite={favorite} guesses={guessList} isStandardMode={game?.mode === "standard"}/>
       </Box>
     </>
   )

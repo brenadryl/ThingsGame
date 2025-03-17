@@ -132,3 +132,6 @@ export interface Prompt {
   }
 
   export type Emotion = 'neutral' | 'happy' | 'suspicious' | 'nervous' | 'sad';
+
+
+  export type Page = 'guessing' | 'waiting' | 'writing' | 'submitted' | 'score' | 'play';
