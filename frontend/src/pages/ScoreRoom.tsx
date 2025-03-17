@@ -10,6 +10,7 @@ import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscripti
 import PlayerCard from '../Components/PlayerCards';
 import LoadingLogo from '../Components/LoadingLogo';
 import SuperlativeCard from '../Components/Superlatives';
+import useDirector from '../Hooks/useDirector';
 
 
 
@@ -169,6 +170,7 @@ const getSuperlatives = (players: Player[]) => {
 
 const ScoreRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
+  useDirector(gameId, playerId, "score")
   const navigate = useNavigate();
   const [game, setGame] = useState<Game | null>(null)
   const [allLikeCounts, setAllLikeCounts] = useState<Record<string, number>>({})

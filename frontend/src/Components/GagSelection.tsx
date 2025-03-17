@@ -13,9 +13,10 @@ interface GagSelectionProps {
   likes?: Like[];
   favorite?: string;
   guesses?: Guess[];
+  isStandardMode?: Boolean;
 }
 
-const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, setFavorite, likes = [], favorite, guesses}) => {
+const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, setFavorite, likes = [], favorite, guesses, isStandardMode}) => {
   const [selectedGag, setSelectedGag] = useState('');
   const [favoriteGag, setFavoriteGag] = useState(favorite || '');
   if (!myTurn && selectedGag !== '') {
@@ -101,11 +102,11 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
                         />
                       )}
                     </Box>
-                    {gagGuesses.length > 0 && (
+                    {gagGuesses.length > 0 && !isStandardMode && (
                       <Box display="flex" alignContent="left" marginBottom="4px">
                         <Typography color="grey" variant="body2">GUESSED: </Typography>
                         {gagGuesses.map((currGuess) => (
-                          currGuess?.guessed?.icon && <img src={AVATAR_LIST[currGuess.guessed.icon]["suspicious"]} key={`${currGuess.guessed.name}-img`} alt={currGuess.guessed.name} style={{ maxWidth: 30, maxHeight: 30, width: 'auto', height: 'auto', marginLeft: "8px" }} />
+                          currGuess?.guessed?.icon !== undefined && <img src={AVATAR_LIST[currGuess.guessed.icon]["suspicious"]} key={`${currGuess.guessed.name}-img`} alt={currGuess.guessed.name} style={{ maxWidth: 30, maxHeight: 30, width: 'auto', height: 'auto', marginLeft: "8px" }} />
                         ))}
                       </Box>
                     )}
