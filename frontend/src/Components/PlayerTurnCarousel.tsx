@@ -1,16 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Button } from "@mui/material";
 import { Gag, Player } from "../types";
 import PlayerCard from "./PlayerCards";
+import { shallowEqual } from "../utils/gameUtils";
+import { useGameStore } from "../stores/useGameStore";
 
 interface PlayerTurnCarouselProps {
   players: Player[];
-  currentPlayerTurn: Player | null;
-  gags: Gag[];
   playerId: string;
 }
 
-const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players, currentPlayerTurn, gags, playerId }) => {
+const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players}) => {
+    const gagList = useGameStore((state) => state.gagList)
+    const currentPlayerTurn = useGameStore((state) => state.currentTurnPlayer)
+
     const containerRef = useRef<HTMLDivElement | null>(null);
     const selectedRef = useRef<HTMLDivElement | null>(null);
     useEffect(() => { 
@@ -46,7 +49,7 @@ const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players, curren
             }}
         >
             {players.map((player, index) => {
-                const gag = gags.find((gag) => gag.player._id === player._id)
+                const gag = gagList.find((gag) => gag.player._id === player._id)
                 const currentTurn = currentPlayerTurn?._id === player._id;
                 return (
                     <Box 
@@ -79,4 +82,8 @@ const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players, curren
     );
 };
 
-export default PlayerTurnCarousel;
+export default React.memo(PlayerTurnCarousel, (prev, next) => {
+    return (
+        shallowEqual(prev.players, next.players)
+    )
+});

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { CREATE_GAME } from '../graphql/mutations/gameMutations';
 import { ADD_PLAYER } from '../graphql/mutations/playerMutations';
 import { DELETE_OLD } from '../graphql/mutations/otherMutations';
+import LoadingLogo from '../Components/LoadingLogo';
 
 const HostPage: React.FC = () => {
     const navigate = useNavigate();
@@ -56,7 +57,7 @@ const HostPage: React.FC = () => {
     
             if (playerData?.createPlayer) {
               const player = playerData.createPlayer;
-              navigate(`/waiting-room/${game._id}/${player._id}`);
+              navigate(`/game/${game._id}/${player._id}`);
             }
           }
         } catch (error: any) {
@@ -65,24 +66,28 @@ const HostPage: React.FC = () => {
         } finally {
           setLoading(false)
         }
-      };
+    };
 
-  return (
-    <form onSubmit={handleSubmit}>
-        <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-          {errorMessage && <Alert severity="error" sx={{ mb: 2}}> {errorMessage}</Alert>}
-            <TextField 
-                label="Name" 
-                required
-                value={name} 
-                onChange={handleChange} 
-                variant="outlined"
-            />
-            <Box marginY="24px">
-                <Button type="submit" variant="contained">HOST</Button>
-            </Box>
-        </Box>
-    </form>
-  )
+    if (loading) {
+      return <LoadingLogo />
+    }
+    
+    return (
+      <form onSubmit={handleSubmit}>
+          <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
+            {errorMessage && <Alert severity="error" sx={{ mb: 2}}> {errorMessage}</Alert>}
+              <TextField 
+                  label="Name" 
+                  required
+                  value={name} 
+                  onChange={handleChange} 
+                  variant="outlined"
+              />
+              <Box marginY="24px">
+                  <Button type="submit" variant="contained">HOST</Button>
+              </Box>
+          </Box>
+      </form>
+    )
 }
 export default HostPage;

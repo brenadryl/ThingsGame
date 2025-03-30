@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
-import { Gag, Guess, Like } from '../types';
-import { Button, IconButton, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Gag } from '../types';
+import { IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { AVATAR_LIST } from '../themes/constants';
+import { useGameStore } from '../stores/useGameStore';
+import GagButton from './GagButton';
 
 interface GagSelectionProps {
-  gagList: Gag[];
   onClick: (gag: Gag) => void;
-  myTurn: Boolean;
+  playerId: string;
   setFavorite: (gagId: string) => void;
-  likes?: Like[];
-  favorite?: string;
-  guesses?: Guess[];
   isStandardMode?: Boolean;
 }
 
-const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, setFavorite, likes = [], favorite, guesses, isStandardMode}) => {
+const GagSelection: React.FC<GagSelectionProps> = ({ onClick, playerId, setFavorite, isStandardMode}) => {
+  const gags = useGameStore((state) => state.gagList)
+  const likes = useGameStore((state) => state.likes)
+  const myTurn = useGameStore((state) => state.myTurn)
+
   const [selectedGag, setSelectedGag] = useState('');
-  const [favoriteGag, setFavoriteGag] = useState(favorite || '');
+  const [favoriteGag, setFavoriteGag] = useState("");
+
+  useEffect(() => {
+    const fav = likes.find(l => l.player._id === playerId)?.gag?._id || "";
+    setFavoriteGag(fav)
+  }, [likes, playerId])
+
   if (!myTurn && selectedGag !== '') {
       setSelectedGag('')
   }
@@ -49,10 +56,9 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
         }}
       >
         {myTurn && <Typography variant="body2" color="warning.main" sx={{paddingBottom: "16px", marginTop: "-16px", zIndex: 1}}>SELECT A RESPONSE TO GUESS</Typography>}
-        {gagList.map((currGag) => {
+        {gags.map((currGag) => {
           const gagLikes = likes.filter((l) => l.gag._id === currGag._id).length || 0;
-          const favId = favoriteGag || favorite;
-          const gagGuesses = guesses?.filter((guess) => guess.gag._id === currGag._id && !guess.isCorrect) || [];
+          const favId = favoriteGag;
 
             return (
                 <Box width="100%" key={`${currGag._id}-container`} display="flex" alignItems="center" position="relative">
@@ -62,56 +68,7 @@ const GagSelection: React.FC<GagSelectionProps> = ({ gagList, onClick, myTurn, s
                     </IconButton>
                     {gagLikes !== 0 && <Typography variant='body2' color="grey" key={`${currGag._id}-like-cound`} marginTop="-14px"> {gagLikes}</Typography>}
                   </Box>
-                  <Box>
-                    <Box position="relative" paddingTop="4px" paddingBottom={gagGuesses.length > 0 ? "0px" : "4px"} marginBottom={gagGuesses.length > 0 ? "-4px" : "0px"}>
-                      <Button 
-                          variant={selectedGag === currGag._id ? "contained" :"outlined"}
-                          color="secondary"
-                          key={currGag._id}
-                          disabled={currGag.guessed || !myTurn}
-                          sx={{
-                              pointerEvents: myTurn ? "auto" : "none",
-                              opacity: myTurn ? 1 : 1,
-                              width: '270px', 
-                              marginBottom: '8px',
-                              borderRadius: .5,
-                              border: '2px solid',
-                              textDecoration: currGag.guessed ? "line-through" : undefined,
-                              textDecorationThickness: '3px',
-                          }}
-                          onClick={()=>{selectGag(currGag)}}
-                      >
-                          {currGag?.text || ''}
-                      </Button>
-                      {currGag.guessed && currGag.player.icon !== undefined && (
-                        <img 
-                          src={AVATAR_LIST[currGag.player.icon].sad} 
-                          key={`${currGag.player._id}-img`} 
-                          alt={currGag.player._id} 
-                          style={{
-                            position: 'absolute',
-                            top: '45%', 
-                            left: '90%', 
-                            transform: 'translate(-50%, -50%)', // Centers it over the button
-                            maxWidth: '50px', // Adjust size as needed
-                            maxHeight: '50px',
-                            width: 'auto',
-                            height: 'auto',
-                            pointerEvents: 'none', // Prevents it from interfering with button clicks
-                          }} 
-                        />
-                      )}
-                    </Box>
-                    {gagGuesses.length > 0 && !isStandardMode && (
-                      <Box display="flex" alignContent="left" marginBottom="4px">
-                        <Typography color="grey" variant="body2">GUESSED: </Typography>
-                        {gagGuesses.map((currGuess) => (
-                          currGuess?.guessed?.icon !== undefined && <img src={AVATAR_LIST[currGuess.guessed.icon]["suspicious"]} key={`${currGuess.guessed.name}-img`} alt={currGuess.guessed.name} style={{ maxWidth: 30, maxHeight: 30, width: 'auto', height: 'auto', marginLeft: "8px" }} />
-                        ))}
-                      </Box>
-                    )}
-                  </Box>
-                    
+                  <GagButton selectGag={selectGag} currGag={currGag} isStandardMode={isStandardMode} selectedGag={selectedGag} />
                 </Box>
         )})}
     </Box>

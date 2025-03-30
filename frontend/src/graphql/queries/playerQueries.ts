@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 import { Player } from "../../types";
 
 export const GET_PLAYERS = gql`
-  query getPlayers($gameId: ID!) {
-    getPlayers(gameId: $gameId) {
+  query getPlayers($gameId: ID!, $roundId: ID) {
+    getPlayers(gameId: $gameId, roundId: $roundId) {
         _id
         turn
         points
@@ -11,26 +11,51 @@ export const GET_PLAYERS = gql`
         active
         icon
         color
+        likesGiven {
+          _id
+          player {
+            _id
+          }
+          gag {
+            _id
+            player {
+              _id
+            }
+          }
+        }
+        likesReceived {
+          _id
+          player {
+            _id
+          }
+          gag {
+            _id
+            player {
+              _id
+            }
+          }
+        }
         guessesMade {
-            guessed {
-                _id
-            }
-            gag {
-                _id
-            }
-            isCorrect
+          guessed {
+            _id
+          }
+          gag {
+            _id
+          }
+          isCorrect
         }
         guessesReceived {
-            guesser {
-                _id
-            }
-            gag {
-                _id
-            }
-            isCorrect
+          guesser {
+            _id
+          }
+          gag {
+            _id
+          }
+          isCorrect
         }
         gags {
             guessed
+            createdAt
             text
             votes
             round {
@@ -83,7 +108,7 @@ export const GET_PLAYER = gql`
 `;
 
 export interface GetPlayersData {
-    players: Player[];
+  getPlayers: Player[];
 }
 export interface GetPlayerData {
     player: Player;

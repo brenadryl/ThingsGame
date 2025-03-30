@@ -13,7 +13,7 @@ interface PromptSelectionProps {
 }
 
 const PromptSelection: React.FC<PromptSelectionProps> = ({ gameId, turn }) => {
-    const { loading, data } = useQuery<GetRandomPromptsData>(GET_RANDOM_PROMPTS);
+    const { loading, data } = useQuery<GetRandomPromptsData>(GET_RANDOM_PROMPTS, {fetchPolicy: 'network-only'});
     const [selectedPrompt, setSelectedPrompt] = useState('');
     const [customPrompt, setCustomPrompt] = useState('THINGS ')
     const [errorMessage, setErrorMessage] = useState<string | null>(null);

@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 import { Game } from "../../types";
 
 export const GET_GAME = gql`
-  query GetGame($id: ID!) {
-    getGame(id: $id) {
+  query GetGame($id: ID!, $roundId: ID) {
+    getGame(id: $id, roundId: $roundId) {
       _id
       stage
       gameCode
@@ -93,6 +93,25 @@ export const GET_GAME = gql`
           guessed
           text
         }
+        guesses {
+          isCorrect
+          createdAt
+          guesser {
+            _id
+            icon
+            name
+            color
+          }
+          guessed {
+            _id
+            icon
+            name
+            color
+          }
+          gag {
+            _id
+          }
+        }
       }
       currentRound {
         _id
@@ -120,9 +139,13 @@ export const GET_GAME = gql`
           guesser {
             _id
           }
+          round {
+            _id
+          }
         }
         guesses {
           isCorrect
+          createdAt
           guesser {
             _id
             icon

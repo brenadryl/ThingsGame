@@ -50,7 +50,7 @@ const JoinPage: React.FC = () => {
 
         if (playerData && playerData.createPlayer) {
           const player = playerData.createPlayer;
-          navigate(`/waiting-room/${player.game._id}/${player._id}`);
+          navigate(`/game/${player.game._id}/${player._id}`);
         }
       } catch (error: any) {
         console.error('Error creating player:', error);

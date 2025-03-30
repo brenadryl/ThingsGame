@@ -35,7 +35,7 @@ export interface Prompt {
     active: boolean;
     color?: string;
     createdAt: number;
-    icon?: number;
+    icon: number;
     turn: number;
     game: Game;
     gags: Gag[];
@@ -134,4 +134,22 @@ export interface Prompt {
   export type Emotion = 'neutral' | 'happy' | 'suspicious' | 'nervous' | 'sad';
 
 
-  export type Page = 'guessing' | 'waiting' | 'writing' | 'submitted' | 'score' | 'play';
+  export type Room = 'guessing' | 'waiting' | 'writing' | 'submitted' | 'score' | 'play';
+
+
+  export const SUPERLATIVE_DESCRIPTIONS = {
+    sniper: { title: "sniper" , description: "most accurate guesser", emotion: "suspicious"  },
+    conspiracyTheorist: { title: "conspiracy theorist" , description: "most clueless", emotion: "sad" },
+    mostSus: { title: "most sus" , description: "fooled everyone", emotion: "suspicious"  },
+    easyOut: { title: "captain obvious" , description: "easiest to guess", emotion: "sad"  },
+    quickest: { title: "keyboard cheetah" , description: "quickest typer", emotion: "happy"  }, //one word wonder
+    slowest: { title: "still buffering" , description: "slowest typer", emotion: "sad" },
+    mostLiked: { title: "mr popular" , description: "most liked", emotion: "happy" },
+    liker: { title: "hype man" , description: "liked everyone", emotion: "neutral"  },
+    selfLike: { title: "self five" , description: "liked themself most", emotion: "happy"  },
+    probablyBot: { title: "probs a bot" , description: "blandest answers", emotion: "sad"  }, // least liked
+    tldr: { title: "rambler" , description: "most verbose", emotion: "neutral"  }, //rambler
+    minimalist: { title: "one word wonder" , description: "master of brevity", emotion: "neutral"  }, //one word wonder
+}
+
+export type SuperlativeKey = keyof typeof SUPERLATIVE_DESCRIPTIONS;
