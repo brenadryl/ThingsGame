@@ -1,14 +1,14 @@
 import { useSubscription } from '@apollo/client';
 import { Gag } from '../types';
 import { GAG_UPDATE_SUBSCRIPTION } from '../graphql/subscriptions/gagSubscriptions';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import { sortGags } from '../utils/gameUtils';
 
 export const useGagSubscription = (
   setErrorMessage: (msg: string) => void
 ) => {
-    const setGagList = useGameStore((state) => state.setGagList);
-    const currentRound = useGameStore((state) => state.currentRound);
+    const setGagList = useGameStore((state: GameState) => state.setGagList);
+    const currentRound = useGameStore((state: GameState) => state.currentRound);
 
 
     const roundId = currentRound?._id;

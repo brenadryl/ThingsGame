@@ -6,7 +6,7 @@ import GuessAnnouncementModal from '../GuessAnnouncementModal';
 import ConfirmGuessModal from '../ConfirmGuessModal';
 import PlayerDrawer from '../PlayerDrawer';
 import PlayerTurnCarousel from '../PlayerTurnCarousel';
-import { useGameStore } from '../../stores/useGameStore';
+import { GameState, useGameStore } from '../../stores/useGameStore';
 import { useParams } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { NEW_LIKE } from '../../graphql/mutations/likeMutation';
@@ -27,17 +27,17 @@ const GuessingRoom: React.FC = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const game = useGameStore((state) => state.game);
-  const playerList = useGameStore((state) => state.playerList);
-  const currentRound = useGameStore((state) => state.currentRound);
-  const isMyTurn = useGameStore((state) => state.myTurn)
-  const setMyTurn = useGameStore((state) => state.setMyTurn)
-  const currentTurnPlayer = useGameStore((state) => state.currentTurnPlayer);
-  const setCurrentTurnPlayer = useGameStore((state) => state.setCurrentTurnPlayer);
-  const guessList = useGameStore((state) => state.guessList);
-  const gagList = useGameStore((state) => state.gagList);
-  const newGuess = useGameStore((state) => state.newGuess);
-  const setNewGuess = useGameStore((state) => state.setNewGuess);
+  const game = useGameStore((state: GameState) => state.game);
+  const playerList = useGameStore((state: GameState) => state.playerList);
+  const currentRound = useGameStore((state: GameState) => state.currentRound);
+  const isMyTurn = useGameStore((state: GameState) => state.myTurn)
+  const setMyTurn = useGameStore((state: GameState) => state.setMyTurn)
+  const currentTurnPlayer = useGameStore((state: GameState) => state.currentTurnPlayer);
+  const setCurrentTurnPlayer = useGameStore((state: GameState) => state.setCurrentTurnPlayer);
+  const guessList = useGameStore((state: GameState) => state.guessList);
+  const gagList = useGameStore((state: GameState) => state.gagList);
+  const newGuess = useGameStore((state: GameState) => state.newGuess);
+  const setNewGuess = useGameStore((state: GameState) => state.setNewGuess);
   console.log("currentRound", currentRound)
   console.log("currentTurnPlayer", currentTurnPlayer)
   console.log("isMyTurn", isMyTurn)

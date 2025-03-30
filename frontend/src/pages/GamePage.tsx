@@ -2,7 +2,7 @@ import { Alert, Box, Button, CircularProgress} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useGameQuery } from '../Hooks/useGameQuery';
 import { useParams } from 'react-router-dom';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import LoadingLogo from '../Components/LoadingLogo';
 import WaitingRoom from '../Components/Rooms/WaitingRoom';
 import GuessingRoom from '../Components/Rooms/GuessingRoom';
@@ -31,12 +31,12 @@ const GamePage: React.FC = () => {
   const { gameId, playerId } = useParams();
   useGameQuery(gameId, playerId)
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const game = useGameStore((state) => state.game)
-  const gagList = useGameStore((state) => state.gagList)
-  const room = useGameStore((state) => state.room)
-  const currentRound = useGameStore((state) => state.currentRound)
-  const playerList = useGameStore((state) => state.playerList)
-  const setRoom = useGameStore((state) => state.setRoom)
+  const game = useGameStore((state: GameState) => state.game)
+  const gagList = useGameStore((state: GameState) => state.gagList)
+  const room = useGameStore((state: GameState) => state.room)
+  const currentRound = useGameStore((state: GameState) => state.currentRound)
+  const playerList = useGameStore((state: GameState) => state.playerList)
+  const setRoom = useGameStore((state: GameState) => state.setRoom)
   usePlayerSubscription(gameId, setErrorMessage);
   useAvatarSubscription(gameId, setErrorMessage);
   useGameSubscription(gameId, setErrorMessage);

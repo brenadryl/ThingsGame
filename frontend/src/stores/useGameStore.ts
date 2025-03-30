@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Gag, Game, Guess, Like, Player, Room, Round } from '../types';
 
-interface GameState {
+export interface GameState {
     game: Game | null;
     gagList: Gag[];
     likes: Like[];

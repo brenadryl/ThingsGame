@@ -3,7 +3,7 @@ import { Box, Button } from "@mui/material";
 import { Gag, Player } from "../types";
 import PlayerCard from "./PlayerCards";
 import { shallowEqual } from "../utils/gameUtils";
-import { useGameStore } from "../stores/useGameStore";
+import { GameState, useGameStore } from "../stores/useGameStore";
 
 interface PlayerTurnCarouselProps {
   players: Player[];
@@ -11,8 +11,8 @@ interface PlayerTurnCarouselProps {
 }
 
 const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players}) => {
-    const gagList = useGameStore((state) => state.gagList)
-    const currentPlayerTurn = useGameStore((state) => state.currentTurnPlayer)
+    const gagList = useGameStore((state: GameState) => state.gagList)
+    const currentPlayerTurn = useGameStore((state: GameState) => state.currentTurnPlayer)
 
     const containerRef = useRef<HTMLDivElement | null>(null);
     const selectedRef = useRef<HTMLDivElement | null>(null);

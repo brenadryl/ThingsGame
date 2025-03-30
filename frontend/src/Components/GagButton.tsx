@@ -1,6 +1,6 @@
 import { Button, Typography } from "@mui/material"
 import { Box } from "@mui/system"
-import { useGameStore } from "../stores/useGameStore";
+import { GameState, useGameStore } from "../stores/useGameStore";
 import { Gag, Guess } from "../types";
 import { useEffect, useState } from "react";
 import { AVATAR_LIST } from "../themes/constants";
@@ -14,10 +14,10 @@ interface GagButtonProps {
 }
 
 const GagButton: React.FC<GagButtonProps> = ({ selectGag, currGag, isStandardMode, selectedGag}) => {
-    const myTurn = useGameStore((state) => state.myTurn)
-    const guessList = useGameStore((state) => state.guessList)
+    const myTurn = useGameStore((state: GameState) => state.myTurn)
+    const guessList = useGameStore((state: GameState) => state.guessList)
     const [gagGuesses, setGagGuesses] = useState<Guess[]>([]);
-    const playerList = useGameStore((state) => state.playerList)
+    const playerList = useGameStore((state: GameState) => state.playerList)
     const player = playerList.find(p => p._id === currGag.player._id)
 
     useEffect(() => {

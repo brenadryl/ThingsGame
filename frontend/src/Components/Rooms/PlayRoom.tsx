@@ -3,13 +3,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PlayerCard from '../PlayerCards';
 import PromptSelection from '../PromptSelection';
-import { useGameStore } from '../../stores/useGameStore';
+import { GameState, useGameStore } from '../../stores/useGameStore';
 
 const PlayRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const game = useGameStore((state) => state.game);
-  const playerList = useGameStore((state) => state.playerList);
+  const game = useGameStore((state: GameState) => state.game);
+  const playerList = useGameStore((state: GameState) => state.playerList);
 
   const currentTurn = playerList.length > 0 ? ((game?.rounds?.length ?? 0) % playerList.length) : 0;
   const currentTurnPlayer = useMemo(() => playerList[currentTurn], [playerList, currentTurn]);

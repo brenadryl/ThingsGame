@@ -3,7 +3,7 @@ import { Gag } from '../types';
 import { IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import GagButton from './GagButton';
 
 interface GagSelectionProps {
@@ -14,9 +14,9 @@ interface GagSelectionProps {
 }
 
 const GagSelection: React.FC<GagSelectionProps> = ({ onClick, playerId, setFavorite, isStandardMode}) => {
-  const gags = useGameStore((state) => state.gagList)
-  const likes = useGameStore((state) => state.likes)
-  const myTurn = useGameStore((state) => state.myTurn)
+  const gags = useGameStore((state: GameState) => state.gagList)
+  const likes = useGameStore((state: GameState) => state.likes)
+  const myTurn = useGameStore((state: GameState) => state.myTurn)
 
   const [selectedGag, setSelectedGag] = useState('');
   const [favoriteGag, setFavoriteGag] = useState("");
