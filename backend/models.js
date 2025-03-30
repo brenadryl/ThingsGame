@@ -96,6 +96,11 @@ const guessSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gag'
     },
+    round: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Round'
+    },
 });
 
 export const Prompt = mongoose.model('Prompt', promptSchema);

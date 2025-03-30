@@ -1,35 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Guess } from '../types';
 import { Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PlayerCard from './PlayerCards';
 import { AVATAR_LIST } from '../themes/constants';
+import { Guess } from '../types';
 
 interface GuessAnnouncementModalProps {
-  hasNewGuess: boolean;
   newGuess: Guess | null;
+  playerId: string;
   handleClose: () => void;
 }
 
-const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ hasNewGuess, newGuess, handleClose }) => {
-    const guesser = newGuess?.guesser || null;
-    const guessed = newGuess?.guessed || null;
-    const selfGuess = guesser?._id === guessed?._id;
-    const [delayedAnnouncement, setDelayedAnnouncement] = useState("...")
-    const delay = selfGuess ? 0 : 3000;
-    useEffect(() => {
-        if (hasNewGuess) {
-            setDelayedAnnouncement("...")
-            const timer = setTimeout(() => {
-                setDelayedAnnouncement(newGuess?.isCorrect ? "CORRECT!" : "WRONG")
-            }, delay)
-            return () => clearTimeout(timer);
-        }
-    }, [hasNewGuess, newGuess, delay])
-    if (newGuess === null) return null
+const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ newGuess, playerId, handleClose }) => {
+  const guesser = newGuess?.guesser || null;
+  const guessed = newGuess?.guessed || null;
+  const selfGuess = guesser?._id === guessed?._id;
+  const [delayedAnnouncement, setDelayedAnnouncement] = useState("...")
+  const delay = selfGuess ? 0 : 2500;
+  useEffect(() => {
+    setDelayedAnnouncement("...")
+    const timer = setTimeout(() => {
+        setDelayedAnnouncement(newGuess?.isCorrect ? "CORRECT!" : "WRONG")
+    }, delay)
+    return () => clearTimeout(timer);
+  }, [delay, newGuess])
+
+  const closeModal = () => {
+    handleClose();
+  }
 
   return (
-    <Dialog open={hasNewGuess} onClose={() => handleClose}>
+    <Dialog open={newGuess !== null}>
       <DialogContent>
         <Box display="flex" flexDirection="column" alignItems="center">
           <Box display="flex" flexDirection="row" alignItems="center">
@@ -97,7 +98,7 @@ const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ hasNewG
         </Box>
       </DialogContent>
       <DialogActions>
-            <Button onClick={handleClose} color="secondary" disabled={delayedAnnouncement === "..."}>CLOSE</Button>
+            <Button onClick={closeModal} color="secondary" disabled={delayedAnnouncement === "..."}>CLOSE</Button>
       </DialogActions>
     </Dialog>
   );

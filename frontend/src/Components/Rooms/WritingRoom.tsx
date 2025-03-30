@@ -1,33 +1,28 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { Alert, Box, Button, CircularProgress, TextField, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { GET_CURRENT_ROUND, GetCurrentRoundData } from '../graphql/queries/roundQueries';
-import { Round } from '../types';
-import { NEW_GAG } from '../graphql/mutations/gagMutations';
-import LoadingLogo from '../Components/LoadingLogo';
-import useDirector from '../Hooks/useDirector';
+import { NEW_GAG } from '../../graphql/mutations/gagMutations';
+import { useGameStore } from '../../stores/useGameStore';
+import { useParams } from 'react-router-dom';
+import { GET_CURRENT_ROUND, GetCurrentRoundData } from '../../graphql/queries/roundQueries';
+import LoadingLogo from '../LoadingLogo';
 
 const WritingRoom: React.FC = () => {
     const { gameId, playerId } = useParams();
-    useDirector(gameId, playerId, "writing")
-    const navigate = useNavigate();
     const [gag, setGag] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [round, setRound] = useState<Round | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const round = useGameStore(state => state.currentRound)
+    const setRound = useGameStore(state => state.setCurrentRound)
+    const setGagList = useGameStore(state => state.setGagList)
+    const setGuessList = useGameStore(state => state.setGuessList)
+    const [submitGag, { error: gagError}] = useMutation(NEW_GAG);
+    const setRoom = useGameStore((state) => state.setRoom)
     const { loading: loadingRound, error: errorRound, data: roundData } = useQuery<GetCurrentRoundData>(GET_CURRENT_ROUND, {
         variables: { gameId},
         skip: !gameId,
         fetchPolicy: "network-only",
     });
-    const [submitGag, { error: gagError}] = useMutation(NEW_GAG);
-
-    useEffect (() => {
-        if (gagError) {
-          setErrorMessage(gagError.message)
-        }
-      }, [gagError])
 
     useEffect(() => {
         if (!gameId || !playerId) {
@@ -37,12 +32,19 @@ const WritingRoom: React.FC = () => {
         }
         if(roundData?.getCurrentRound) {
             setRound(roundData.getCurrentRound)
+            setGagList(roundData.getCurrentRound.gags)
+            setGuessList(roundData.getCurrentRound.guesses)
           if (roundData.getCurrentRound.stage === 1 && roundData.getCurrentRound.gags && roundData.getCurrentRound.gags.find(g => g.player._id === playerId)) {
-            console.log("Player has already submitted a response to this round")
-            navigate(`/submitted-room/${gameId}/${playerId}`)
+            setRoom("submitted")
           }
         }
-    }, [roundData, gameId, playerId, navigate, errorRound])
+    }, [roundData, gameId, playerId, errorRound, setRoom, setRound, setGagList, setGuessList])
+
+    useEffect (() => {
+        if (gagError) {
+          setErrorMessage(gagError.message)
+        }
+      }, [gagError])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const inputGag = event.target.value;
@@ -60,7 +62,7 @@ const WritingRoom: React.FC = () => {
         try {
             const {data: gagData} = await submitGag({variables: { roundId: round?._id, playerId: playerId, text: gag }})
             if (gagData?.createGag) {
-                navigate(`/submitted-room/${gameId}/${playerId}`)
+                setRoom("submitted");
             }
         } catch (error: any) {
             console.error("Error submitting gag:", error)
@@ -71,6 +73,11 @@ const WritingRoom: React.FC = () => {
         }
     };
 
+    if (errorMessage) {
+        return <Alert severity="error">{errorMessage}</Alert>
+    }
+
+
     if (loadingRound) {
         return <LoadingLogo/>
     }
@@ -78,7 +85,6 @@ const WritingRoom: React.FC = () => {
   return (
     <form onSubmit={handleSubmit}>
         <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-          {errorMessage && <Alert severity="error" sx={{ mb: 2}}> {errorMessage}</Alert>}
           <Box marginBottom="24px">
                 <Typography variant="h4"> {round?.promptText}</Typography>
             </Box>

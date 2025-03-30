@@ -2,9 +2,10 @@ const typeDefs = `
   type Query {
     prompts: [Prompt]
     getRandomPrompts: [Prompt]
-    getPlayers(gameId: ID!): [Player]
+    getPlayers(gameId: ID!, roundId: ID): [Player]
+    getGags(roundId: ID!): [Gag]
     getPlayer(id: ID!): Player
-    getGame(id: ID!): Game
+    getGame(id: ID!, roundId: ID): Game
     getCurrentRound(gameId: ID!): Round
   }
 
@@ -19,6 +20,7 @@ const typeDefs = `
     player: Player
     round: Round
     gag: Gag
+    createdAt: Float!
   }
 
   type Gag {
@@ -81,6 +83,7 @@ const typeDefs = `
     guesser: Player
     guessed: Player
     gag: Gag
+    round: Round
   }
 
   type DeleteResponse {

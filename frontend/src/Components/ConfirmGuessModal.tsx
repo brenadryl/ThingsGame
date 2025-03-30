@@ -42,7 +42,9 @@ const ConfirmGuessModal: React.FC<ConfirmGuessModalProps> = ({ isModalOpen, sele
   );
 };
 
-export default ConfirmGuessModal;
+export default React.memo(ConfirmGuessModal, (prev, next) => {
+  return prev.isModalOpen === next.isModalOpen;
+});
 
 
 
