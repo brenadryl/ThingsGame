@@ -1,12 +1,12 @@
 import { useSubscription } from '@apollo/client';
 import { NEW_LIKE_SUBSCRIPTION } from '../graphql/subscriptions/likeSubscriptions';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 
 export const useLikeSubscription = (
   setErrorMessage: (msg: string) => void
 ) => {
-  const setLikes = useGameStore((state) => state.setLikes);
-  const currentRound = useGameStore((state) => state.currentRound)
+  const setLikes = useGameStore((state: GameState) => state.setLikes);
+  const currentRound = useGameStore((state: GameState) => state.currentRound)
 
   const roundId = currentRound?._id;
 

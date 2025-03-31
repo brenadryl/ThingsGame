@@ -2,10 +2,13 @@ import { ApolloClient, HttpLink, InMemoryCache, split } from "@apollo/client";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
-const httpLink = new HttpLink({ uri: "http://localhost:5500/graphql" });
+const GRAPHQL_HTTP_URL = process.env.REACT_APP_GRAPHQL_ENDPOINT || 'http://localhost:5500/graphql';
+const GRAPHQL_WS_URL = GRAPHQL_HTTP_URL.replace(/^http/, 'ws'); // Converts http to ws automatically
+
+const httpLink = new HttpLink({ uri: GRAPHQL_HTTP_URL});
 
 const wsLink = new WebSocketLink({
-  uri: "ws://localhost:5500/graphql",
+  uri: GRAPHQL_WS_URL,
   options: {
     reconnect: true,
     lazy: true,

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Alert, Box, Button, CircularProgress, TextField, Typography} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { NEW_GAG } from '../../graphql/mutations/gagMutations';
-import { useGameStore } from '../../stores/useGameStore';
+import { GameState, useGameStore } from '../../stores/useGameStore';
 import { useParams } from 'react-router-dom';
 import { GET_CURRENT_ROUND, GetCurrentRoundData } from '../../graphql/queries/roundQueries';
 import LoadingLogo from '../LoadingLogo';
@@ -17,7 +17,7 @@ const WritingRoom: React.FC = () => {
     const setGagList = useGameStore(state => state.setGagList)
     const setGuessList = useGameStore(state => state.setGuessList)
     const [submitGag, { error: gagError}] = useMutation(NEW_GAG);
-    const setRoom = useGameStore((state) => state.setRoom)
+    const setRoom = useGameStore((state: GameState) => state.setRoom)
     const { loading: loadingRound, error: errorRound, data: roundData } = useQuery<GetCurrentRoundData>(GET_CURRENT_ROUND, {
         variables: { gameId},
         skip: !gameId,

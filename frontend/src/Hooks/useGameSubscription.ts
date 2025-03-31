@@ -1,14 +1,14 @@
 import { useSubscription } from '@apollo/client';
 import { GAME_STAGE_SUBSCRIPTION } from '../graphql/subscriptions/gameSubscriptions';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import { Game } from '../types';
 
 export const useGameSubscription = (
   gameId: string | undefined,
   setErrorMessage: (msg: string) => void
 ) => {
-    const setGame = useGameStore((state) => state.setGame);
-    const game = useGameStore((state) => state.game);
+    const setGame = useGameStore((state: GameState) => state.setGame);
+    const game = useGameStore((state: GameState) => state.game);
 
     useSubscription(GAME_STAGE_SUBSCRIPTION, {
         variables: { gameId },

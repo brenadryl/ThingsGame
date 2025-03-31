@@ -1,12 +1,12 @@
 import { useSubscription } from '@apollo/client';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import { NEW_PLAYER_SUBSCRIPTION } from '../graphql/subscriptions/playerSubscriptions';
 
 export const useAvatarSubscription = (
   gameId: string | undefined,
   setErrorMessage: (msg: string) => void
 ) => {
-    const setPlayerList = useGameStore((state) => state.setPlayerList);
+    const setPlayerList = useGameStore((state: GameState) => state.setPlayerList);
     useSubscription(NEW_PLAYER_SUBSCRIPTION, {
         variables: { gameId },
         skip: !gameId,

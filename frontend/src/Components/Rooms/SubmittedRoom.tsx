@@ -2,7 +2,7 @@ import { Alert, Box, Typography} from '@mui/material';
 import React, { useState } from 'react';
 import PlayerSelection from '../PlayerSelection';
 import { useGagSubscription } from '../../Hooks/useGagSubscription';
-import { useGameStore } from '../../stores/useGameStore';
+import { GameState, useGameStore } from '../../stores/useGameStore';
 import { useQuery } from '@apollo/client';
 import { GET_GAGS, GetGagsData } from '../../graphql/queries/gagQueries';
 import LoadingLogo from '../LoadingLogo';
@@ -11,10 +11,10 @@ import { sortGags } from '../../utils/gameUtils';
  
 const SubmittedRoom: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const playerList = useGameStore((state) => state.playerList)
-  const currentRound = useGameStore((state) => state.currentRound)
-  const gagList = useGameStore((state) => state.gagList)
-  const setGagList = useGameStore((state) => state.setGagList)
+  const playerList = useGameStore((state: GameState) => state.playerList)
+  const currentRound = useGameStore((state: GameState) => state.currentRound)
+  const gagList = useGameStore((state: GameState) => state.gagList)
+  const setGagList = useGameStore((state: GameState) => state.setGagList)
   const { loading: loadingGags, error: errorGags } = useQuery<GetGagsData>(GET_GAGS, {
     variables: { roundId: currentRound?._id },
     skip: !currentRound?._id,

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import { Guess } from '../types';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import { getCurrentTurn, shallowEqual, sortGags } from '../utils/gameUtils';
 
 export const useGameQuery = (
@@ -12,21 +12,21 @@ export const useGameQuery = (
   currentRoundId?: string,
 ) => {
     const navigate = useNavigate();
-    const setGame = useGameStore((state) => state.setGame);
-    const setGagList = useGameStore((state) => state.setGagList);
-    const setLikes = useGameStore((state) => state.setLikes);
-    const setGuessList = useGameStore((state) => state.setGuessList);
-    const setCurrentTurnPlayer = useGameStore((state) => state.setCurrentTurnPlayer);
-    const setMyTurn = useGameStore((state) => state.setMyTurn);
-    const setPlayerList = useGameStore((state) => state.setPlayerList);
-    const setCurrentRound = useGameStore((state) => state.setCurrentRound);
+    const setGame = useGameStore((state: GameState) => state.setGame);
+    const setGagList = useGameStore((state: GameState) => state.setGagList);
+    const setLikes = useGameStore((state: GameState) => state.setLikes);
+    const setGuessList = useGameStore((state: GameState) => state.setGuessList);
+    const setCurrentTurnPlayer = useGameStore((state: GameState) => state.setCurrentTurnPlayer);
+    const setMyTurn = useGameStore((state: GameState) => state.setMyTurn);
+    const setPlayerList = useGameStore((state: GameState) => state.setPlayerList);
+    const setCurrentRound = useGameStore((state: GameState) => state.setCurrentRound);
 
-    const gagList = useGameStore((state) => state.gagList);
-    const playerList = useGameStore((state) => state.playerList);
-    const likeList = useGameStore((state) => state.likes);
-    const guessList = useGameStore((state) => state.guessList);
-    const currentTurnPlayer = useGameStore((state) => state.currentTurnPlayer);
-    const myTurn = useGameStore((state) => state.myTurn);
+    const gagList = useGameStore((state: GameState) => state.gagList);
+    const playerList = useGameStore((state: GameState) => state.playerList);
+    const likeList = useGameStore((state: GameState) => state.likes);
+    const guessList = useGameStore((state: GameState) => state.guessList);
+    const currentTurnPlayer = useGameStore((state: GameState) => state.currentTurnPlayer);
+    const myTurn = useGameStore((state: GameState) => state.myTurn);
 
     const { loading: loadingGame, error: errorGame } = useQuery<GetGameData>(GET_GAME, {
         variables: { id: gameId, roundId: currentRoundId },

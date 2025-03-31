@@ -3,7 +3,7 @@ import { Player } from '../types';
 import { Drawer, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import PlayerSelection from './PlayerSelection';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import { shallowEqual } from '../utils/gameUtils';
 
 interface PlayerDrawerProps {
@@ -14,7 +14,7 @@ interface PlayerDrawerProps {
 }
 
 const PlayerDrawer: React.FC<PlayerDrawerProps> = ({ isDrawerOpen, handleCloseDrawer, handlePlayerClick, players }) => {
-  const gagList = useGameStore((state) => state.gagList)
+  const gagList = useGameStore((state: GameState) => state.gagList)
 
   return (
     <Drawer

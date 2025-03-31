@@ -2,15 +2,15 @@ import { useSubscription } from '@apollo/client';
 import { Guess } from '../types';
 import { getCurrentTurn } from '../utils/gameUtils';
 import { NEW_GUESS_SUBSCRIPTION } from '../graphql/subscriptions/guessSubscription';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 
 export const useGuessSubscription = (
   playerId: string | undefined,
   setErrorMessage: (msg: string) => void
 ) => {
-  const setGuessList  = useGameStore((state) => state.setGuessList);
-  const setNewGuess = useGameStore((state) => state.setNewGuess);
-  const currentRound = useGameStore((state) => state.currentRound);
+  const setGuessList  = useGameStore((state: GameState) => state.setGuessList);
+  const setNewGuess = useGameStore((state: GameState) => state.setNewGuess);
+  const currentRound = useGameStore((state: GameState) => state.currentRound);
 
   const roundId = currentRound?._id;
 

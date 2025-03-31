@@ -6,7 +6,7 @@ import { Emotion, Player, SUPERLATIVE_DESCRIPTIONS, SuperlativeKey } from '../..
 import { CHANGE_GAME_MUTATION } from '../../graphql/mutations/gameMutations';
 import PlayerCard from '../PlayerCards';
 import SuperlativeCard from '../Superlatives';
-import { useGameStore } from '../../stores/useGameStore';
+import { GameState, useGameStore } from '../../stores/useGameStore';
 import { calculatePoints, getFavoriteGags, getSuperlatives } from '../../utils/gameUtils';
 import LoadingLogo from '../LoadingLogo';
 import { GET_PLAYERS, GetPlayersData } from '../../graphql/queries/playerQueries';
@@ -17,8 +17,8 @@ const ScoreRoom: React.FC = () => {
   const { gameId, playerId } = useParams();
   const [playerList, setPlayerList] = useState<Player[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const game = useGameStore((state) => state.game)
-  const currentRound = useGameStore((state) => state.currentRound)
+  const game = useGameStore((state: GameState) => state.game)
+  const currentRound = useGameStore((state: GameState) => state.currentRound)
   const [updateGame, {loading: updateGameLoading, error: updateGameError}] = useMutation(CHANGE_GAME_MUTATION);
   const {totalLikeCounts, favoriteGags} = getFavoriteGags(game)
   useGameQuery(gameId, playerId, currentRound?._id)

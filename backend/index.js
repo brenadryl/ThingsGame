@@ -20,8 +20,8 @@ async function startServer() {
 
   const app = express();
 
-  // app.use(cors({ credentials: true, origin: '*' }));
-  app.use(cors({ credentials: true, origin: allowedOrigins }));
+  app.use(cors({ credentials: true, origin: '*' }));
+  // app.use(cors({ credentials: true, origin: allowedOrigins }));
 
   const httpServer = createServer(app);
   const { wsServerInstance, serverCleanup } = initializeWebSocket(httpServer);

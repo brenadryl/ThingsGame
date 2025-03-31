@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { CHANGE_GAME_MUTATION } from '../../graphql/mutations/gameMutations';
 import PlayerList from '../PlayerList';
 import AvatarSelection from '../AvatarSelection';
-import { useGameStore } from '../../stores/useGameStore';
+import { GameState, useGameStore } from '../../stores/useGameStore';
 import { FaRegCopy } from 'react-icons/fa';
 
 
@@ -14,8 +14,8 @@ const WaitingRoom: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copyOpen, setCopyOpen] = useState(false);
   const [mode, setMode] = useState("easy");
-  const playerList = useGameStore((state) => state.playerList)
-  const game = useGameStore((state) => state.game)
+  const playerList = useGameStore((state: GameState) => state.playerList)
+  const game = useGameStore((state: GameState) => state.game)
   const [startGame, {loading: startLoading, error: startError}] = useMutation(CHANGE_GAME_MUTATION);
 
   const handleStartGame = async () => {

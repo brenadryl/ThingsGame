@@ -1,19 +1,19 @@
 import { useSubscription } from '@apollo/client';
-import { useGameStore } from '../stores/useGameStore';
+import { GameState, useGameStore } from '../stores/useGameStore';
 import { NEW_ROUND_SUBSCRIPTION } from '../graphql/subscriptions/roundSubscriptions';
 
 export const useRoundSubscription = (
   setErrorMessage: (msg: string) => void,
   playerId: string
 ) => {
-    const game = useGameStore((state) => state.game)
-    const players = useGameStore((state) => state.playerList)
-    const setRoom = useGameStore((state) => state.setRoom)
-    const setGuessList = useGameStore((state) => state.setGuessList)
-    const setGagList = useGameStore((state) => state.setGagList)
-    const setCurrentRound = useGameStore((state) => state.setCurrentRound)
-    const setCurrentTurnPlayer = useGameStore((state) => state.setCurrentTurnPlayer)
-    const setMyTurn = useGameStore((state) => state.setMyTurn)
+    const game = useGameStore((state: GameState) => state.game)
+    const players = useGameStore((state: GameState) => state.playerList)
+    const setRoom = useGameStore((state: GameState) => state.setRoom)
+    const setGuessList = useGameStore((state: GameState) => state.setGuessList)
+    const setGagList = useGameStore((state: GameState) => state.setGagList)
+    const setCurrentRound = useGameStore((state: GameState) => state.setCurrentRound)
+    const setCurrentTurnPlayer = useGameStore((state: GameState) => state.setCurrentTurnPlayer)
+    const setMyTurn = useGameStore((state: GameState) => state.setMyTurn)
     const gameId = game?._id;
 
     useSubscription(NEW_ROUND_SUBSCRIPTION, {
