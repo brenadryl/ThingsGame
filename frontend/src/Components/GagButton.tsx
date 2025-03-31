@@ -21,7 +21,6 @@ const GagButton: React.FC<GagButtonProps> = ({ selectGag, currGag, isStandardMod
     const player = playerList.find(p => p._id === currGag.player._id)
 
     useEffect(() => {
-        console.log("GUESS LIST USE EFFECT:", guessList)
         const individualGuesses = guessList?.filter((guess) => guess.gag._id === currGag._id && !guess.isCorrect).reduce((acc: Guess[], curr: Guess) => {
             if (!acc.find(g => g.guessed._id === curr.guessed._id)) {
                 acc.push(curr);
@@ -31,14 +30,12 @@ const GagButton: React.FC<GagButtonProps> = ({ selectGag, currGag, isStandardMod
         setGagGuesses(individualGuesses);
     }, [guessList, currGag])
 
-    console.log("gagGuesses", gagGuesses);
-
     return (
         <Box>
           <Box position="relative" paddingTop="4px" paddingBottom={gagGuesses.length > 0 ? "0px" : "4px"} marginBottom={gagGuesses.length > 0 ? "-4px" : "0px"}>
             <Button 
-                variant={selectedGag === currGag._id ? "contained" :"outlined"}
-                color="secondary"
+                variant={myTurn ? "contained" :"outlined"}
+                color={selectedGag === currGag._id ? "info" : "secondary"}
                 key={currGag._id}
                 disabled={currGag.guessed || !myTurn}
                 sx={{
@@ -47,7 +44,6 @@ const GagButton: React.FC<GagButtonProps> = ({ selectGag, currGag, isStandardMod
                     width: '270px', 
                     marginBottom: '8px',
                     borderRadius: .5,
-                    border: '2px solid',
                     textDecoration: currGag.guessed ? "line-through" : undefined,
                     textDecorationThickness: '3px',
                 }}

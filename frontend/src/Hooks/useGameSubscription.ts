@@ -23,6 +23,7 @@ export const useGameSubscription = (
                   ...game,
                   stage: stageChange.stage,
                   active: stageChange.active,
+                  mode: stageChange.mode
                 };
                 console.log("updatedGame", updatedGame)
                 setGame(updatedGame);

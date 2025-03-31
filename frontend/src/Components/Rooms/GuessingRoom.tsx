@@ -143,14 +143,14 @@ const GuessingRoom: React.FC = () => {
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer players={playerList || []} isDrawerOpen={isDrawerOpen} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
       <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-        <Box textAlign="center" alignItems="center"  marginBottom="32px" marginTop="8px">
-          <Typography color="info" variant="h3">{currentRound?.promptText}</Typography>
+        <Box textAlign="center" alignItems="center"  marginBottom="8px" marginTop="8px">
+          <Typography color="info" variant="h5">{currentRound?.promptText}</Typography>
         </Box>
 
         <PlayerTurnCarousel players={playerList || []} playerId={playerId || ''}/>
 
         <Box bgcolor="background.default" padding="8px" zIndex={1}>
-          <Typography color={isMyTurn ? "warning.main" : "secondary.light"}>{isMyTurn ? "YOUR TURN" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>
+          <Typography variant={isMyTurn ? "h3" : "h5"} color={isMyTurn ? "warning.main" : "secondary.light"}>{isMyTurn ? "YOUR TURN" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>
         </Box>
         <GagSelection onClick={handleGagClick} playerId={playerId || ''} setFavorite={handleFavorite} isStandardMode={game?.mode === "standard"}/>
       </Box>

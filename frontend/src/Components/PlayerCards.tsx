@@ -11,10 +11,14 @@ interface PlayerCardProps {
   happy?: Boolean;
   emotion?: Emotion;
   mini?: Boolean
+  isStandard?: Boolean;
 }
 
-const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emotion = "neutral", mini }) => {
-  const size = mini ? 50 : 70;
+const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emotion = "neutral", mini, isStandard = true }) => {
+  const start = mini ? 50 : 70;
+  const sub = isStandard ? 0 : 24;
+  const size = start - sub;
+
   return (
     <Box
       sx={{
@@ -42,7 +46,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emot
         
       </Box>
       <Box borderRadius="10px">
-        <Typography variant="h5" color={color} sx={{textDecoration: color === "grey" ? "line-through" : undefined, textDecorationThickness: '2px',}}>{name}</Typography>
+        <Typography variant="body1" color={color} sx={{textDecoration: color === "grey" ? "line-through" : undefined, textDecorationThickness: '2px',}}>{name}</Typography>
         <Typography variant="h3" color={color}>{points}</Typography>
       </Box>
     </Box>
