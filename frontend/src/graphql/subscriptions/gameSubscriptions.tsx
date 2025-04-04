@@ -6,6 +6,7 @@ export const GAME_STAGE_SUBSCRIPTION = gql`
       _id
       stage
       active
+      mode
     }
   }
 `;

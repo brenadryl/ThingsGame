@@ -11,6 +11,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/" element={<HomePage />} />
       <Route path="/host" element={<HostPage />} />
       <Route path="/join" element={<JoinPage />} />
+      <Route path="/spectator-join" element={<JoinPage isSpectator={true} />} />
       <Route path="/game/:gameId/:playerId" element={<GamePage />} />
     </Routes>
   );

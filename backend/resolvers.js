@@ -449,14 +449,21 @@ const resolvers = {
       createPlayer: async (_, { name, gameCode }) => {
         try {
           const existingGame = await Game.findOne({ gameCode: gameCode });
-          if (existingGame && existingGame.active && existingGame.stage === 1) {
+          if (existingGame && existingGame.active) {
+            if (name === "SPECTATORRRRRRRRRRRRR") {
+              return {_id: "spectator", name: "spectator", active: false, game: existingGame};
+            }
+            if (existingGame.stage !== 1) {
+              return {_id: "spectator", name: "started", active: false, game: existingGame};
+            }
             const existingPlayer = await Player.findOne({ game: existingGame._id, name: name });
             if (existingPlayer) {
               throw new UserInputError("A player with this name already exists in this game.");
             }
             const players = await Player.find({game: existingGame._id})
             if (players.length > 19) {
-              throw new UserInputError("This game is full.");
+              return {_id: "spectator", name: "full", active: false, game: existingGame};
+              // throw new UserInputError("This game is full.");
             }
             const TOTAL_ICONS = 57
             const assignedIcons = players.map(player => player.icon);

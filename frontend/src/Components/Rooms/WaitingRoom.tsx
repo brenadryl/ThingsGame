@@ -13,9 +13,9 @@ const WaitingRoom: React.FC = () => {
   const { gameId, playerId } = useParams();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copyOpen, setCopyOpen] = useState(false);
-  const [mode, setMode] = useState("easy");
   const playerList = useGameStore((state: GameState) => state.playerList)
   const game = useGameStore((state: GameState) => state.game)
+  const mode = useGameStore((state: GameState) => state.mode)
   const [startGame, {loading: startLoading, error: startError}] = useMutation(CHANGE_GAME_MUTATION);
 
   const handleStartGame = async () => {
@@ -26,12 +26,6 @@ const WaitingRoom: React.FC = () => {
     } catch (error) {
       console.error("Error starting game:", error)
       setErrorMessage("Failed to start game.");
-    }
-  }
-
-  const handleToggle = (_event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
-    if(newMode !== null) {
-      setMode(newMode)
     }
   }
 
@@ -49,19 +43,18 @@ const WaitingRoom: React.FC = () => {
   }
 
   return (
-    <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
+    <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
       <Box display="flex" alignItems="center" justifyContent="center" gap={1} marginBottom={2}>
-        <Typography color="text.secondary">Game Code:</Typography>
         <Box display="flex" alignItems="flex-start">
           <Typography 
-            color="info" 
-            variant="h3" 
+            color="secondary" 
+            variant="h2" 
             sx={{ cursor: 'pointer' }} 
             onClick={handleCopy}
           >
             {game?.gameCode}
           </Typography>
-          <IconButton size="small" color="info" sx={{ paddingTop: 0}} onClick={handleCopy}>
+          <IconButton size="small" color="secondary" sx={{ paddingTop: 0, paddingRight: 0}} onClick={handleCopy}>
             <FaRegCopy fontSize="small" />
           </IconButton>
         </Box>
@@ -71,38 +64,6 @@ const WaitingRoom: React.FC = () => {
           <Button onClick={handleStartGame} variant='contained' disabled={startLoading} sx={{marginBottom: '16px'}}>
             {startLoading ? <CircularProgress size={24}/> : <Typography variant="h2" color="primary.contrastText">START GAME</Typography>}
           </Button>
-
-          <Box marginBottom="16px" display="flex" flexDirection="column" alignItems="center">
-            <ToggleButtonGroup
-              value={mode}
-              exclusive
-              onChange={handleToggle}
-              sx={{
-                borderRadius: "50px",
-                overflow: "hidden",
-                backgroundColor: "info.main",
-                "& .MuiToggleButton-root": {
-                  border: "none",
-                  padding: "8px 20px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  textTransform: "none",
-                  transition: "0.3s",
-                  "&.Mui-selected": {
-                    backgroundColor: "info.main",
-                    color: "white",
-                  },
-                  "&:not(.Mui-selected)": {
-                    backgroundColor: "grey",
-                    color: "white",
-                  },
-                },
-              }}
-            >
-              <ToggleButton value="easy" sx={{ width: "100px"}}>EASY</ToggleButton>
-              <ToggleButton value="standard" sx={{ width: "100px"}}>STANDARD</ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
         </>
       )}
       {startError && <Alert severity="error">Error starting game: {startError.message}</Alert>}

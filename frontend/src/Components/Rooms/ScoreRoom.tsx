@@ -54,48 +54,55 @@ const ScoreRoom: React.FC = () => {
     }
   }
 
-  const renderPlayerCards = () => (
-    pointArray.map((scoreEntry, index) => {
-      const currPlayer = game?.players.find(p => p._id === scoreEntry.playerId);
-      const points = scoreEntry.points;
-      const n = pointArray.length
-      let emotion = "nervous"
-      if (index === 0) {
-        emotion = "happy";
-      } else if (index === n - 1) {
-        emotion = "sad";
-      } else if (index <= Math.floor((n - 1) / 2)) {
-        emotion = "neutral";
-      }
-      return (
-        <Box sx={{ position: 'relative', display: 'inline-block' }}>
-          <PlayerCard 
-            key={currPlayer?._id} 
-            name={currPlayer?.name || ''}
-            color={currPlayer?.color || ''}
-            points={points}
-            icon={currPlayer?.icon}
-            emotion={emotion as Emotion}
-          />
-          { index === 0 && (
-            <Box 
-              sx={{ 
-                position: 'absolute', 
-                top: '-20px', 
-                right: '0px', 
-                transform: 'rotate(20deg)' 
-              }}
-            >
-              <GiQueenCrown color="gold" size={40} />
-            </Box>
-          )}
-        </Box>
-      );
-    })
-  );
+  const renderPlayerCards = () => {
+    let tieScore = -1;
+    return (
+      pointArray.map((scoreEntry, index) => {
+        const currPlayer = game?.players.find(p => p._id === scoreEntry.playerId);
+        const points = scoreEntry.points;
+        const n = pointArray.length
+        if (index === 0 && n > 1 && pointArray[1].points === scoreEntry.points) tieScore = scoreEntry.points;
+        let emotion = "neutral"
+        if (scoreEntry.points !== tieScore) {
+          if (index === 0) {
+            emotion = "happy";
+          } else if (index === n - 1) {
+            emotion = "sad";
+          } else if (index > Math.floor((n - 1) / 2)) {
+            emotion = "nervous";
+          }
+        }
+
+        return (
+          <Box sx={{ position: 'relative', display: 'inline-block' }}>
+            <PlayerCard 
+              key={currPlayer?._id} 
+              name={currPlayer?.name || ''}
+              color={currPlayer?.color || ''}
+              points={points}
+              icon={currPlayer?.icon}
+              emotion={emotion as Emotion}
+            />
+            { index === 0 && tieScore === -1 && (
+              <Box 
+                sx={{ 
+                  position: 'absolute', 
+                  top: '-20px', 
+                  right: '0px', 
+                  transform: 'rotate(20deg)' 
+                }}
+              >
+                <GiQueenCrown color="gold" size={42}/>
+              </Box>
+            )}
+          </Box>
+        );
+      })
+    );
+  }
 
   return (
-    <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
+    <Box textAlign="center" alignItems="center"  marginTop="8px" display="flex" flexDirection="column">
       <Box textAlign="center" alignItems="center"  marginBottom="32px" display="flex" flexDirection="row">
         <Typography color="text.secondary" variant="h3">SCOREBOARD</Typography>
       </Box>

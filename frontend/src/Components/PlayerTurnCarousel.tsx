@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Box, Button } from "@mui/material";
-import { Gag, Player } from "../types";
+import { Player } from "../types";
 import PlayerCard from "./PlayerCards";
 import { shallowEqual } from "../utils/gameUtils";
 import { GameState, useGameStore } from "../stores/useGameStore";
@@ -13,6 +13,7 @@ interface PlayerTurnCarouselProps {
 const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players}) => {
     const gagList = useGameStore((state: GameState) => state.gagList)
     const currentPlayerTurn = useGameStore((state: GameState) => state.currentTurnPlayer)
+    const myTurn = useGameStore((state: GameState) => state.myTurn)
 
     const containerRef = useRef<HTMLDivElement | null>(null);
     const selectedRef = useRef<HTMLDivElement | null>(null);
@@ -38,12 +39,13 @@ const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players}) => {
                 alignItems: "center",
                 position: "relative",
                 overflowX: "auto",
-                gap: "24px",
-                padding: "8px",
+                gap: myTurn ? "2px" : "24px",
+                paddingY: "8px",
+                marginY: "8px",
                 paddingX:"16px",
                 whitespace: "nowrap",
                 scrollBehavior: "smooth",
-                height: "200px",
+                height: myTurn ? "115px" : "150px",
                 width: "100vw",
                 maxWidth: "100%",
             }}
@@ -73,7 +75,7 @@ const PlayerTurnCarousel: React.FC<PlayerTurnCarouselProps> = ({ players}) => {
                                 width: '130px',
                             }}
                         >
-                            <PlayerCard name={player?.name || ''} color={!gag || gag.guessed ? "grey" : player?.color || ''} icon={player?.icon} emotion={!gag || gag.guessed ? "sad" : (currentTurn ? "happy" : "neutral")} mini={!currentTurn}/>
+                            <PlayerCard name={player?.name || ''} color={!gag || gag.guessed ? "grey" : player?.color || ''} icon={player?.icon} emotion={!gag || gag.guessed ? "sad" : (currentTurn ? "happy" : "neutral")} mini={!currentTurn} isStandard={!myTurn} />
                         </Button>
                     </Box>
                 )

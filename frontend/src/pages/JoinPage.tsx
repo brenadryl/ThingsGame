@@ -3,10 +3,13 @@ import { Alert, Box, Button, CircularProgress, TextField} from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ADD_PLAYER } from '../graphql/mutations/playerMutations';
+interface JoinPageProps {
+  isSpectator?: Boolean;
+}
 
-const JoinPage: React.FC = () => {
+const JoinPage: React.FC<JoinPageProps> = ({isSpectator = false}) => {
     const [createPlayer, {loading: creatingPlayer}] = useMutation(ADD_PLAYER);
-    const [name, setName] = useState('');
+    const [name, setName] = useState(isSpectator ? 'SPECTATORRRRRRRRRRRRR' : '');
     const [gameCode, setGameCode] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -63,14 +66,15 @@ const JoinPage: React.FC = () => {
         <form onSubmit={handleSubmit}>
             <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
               {errorMessage && <Alert severity="error" sx={{ mb: 2}}> {errorMessage}</Alert>}
-                <TextField 
-                  id="name" 
-                  label="Name" 
-                  required
-                  autoFocus
-                  value={name} 
-                  onChange={handleNameChange} 
-                />
+                { !isSpectator && (<TextField 
+                    id="name" 
+                    label="Name" 
+                    required
+                    autoFocus
+                    value={name} 
+                    onChange={handleNameChange} 
+                  />)
+                }
                 <Box marginY="24px">
                     <TextField 
                       id="game-code" 

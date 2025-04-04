@@ -12,6 +12,7 @@ export interface GameState {
     myTurn: boolean;
     room: Room | null;
     currentRound: Round | null;
+    mode: String;
 
     setGame: (game: Game | null) => void;
     setPlayerList: (players: Player[]) => void;
@@ -23,6 +24,7 @@ export interface GameState {
     setMyTurn: (val: boolean) => void;
     setRoom: (val: Room | null) => void;
     setCurrentRound: (val: Round | null) => void;
+    setMode: (val: String) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -37,6 +39,7 @@ export const useGameStore = create<GameState>((set) => ({
     myTurn: false,
     room: null,
     currentRound: null,
+    mode: "easy",
 
     setGame: (game) => set({ game }),
     setPlayerList: (playerList) => set({ playerList }),
@@ -48,4 +51,5 @@ export const useGameStore = create<GameState>((set) => ({
     setMyTurn: (myTurn) => set({ myTurn }),
     setRoom: (room) => set({room}),
     setCurrentRound: (currentRound) => set({currentRound}),
+    setMode: (mode) => set({mode})
 }));

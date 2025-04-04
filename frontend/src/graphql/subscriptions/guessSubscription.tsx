@@ -5,6 +5,7 @@ export const NEW_GUESS_SUBSCRIPTION = gql`
     newGuess(roundId: $roundId) {
         _id
         isCorrect
+        createdAt
         gag {
             _id
             text
