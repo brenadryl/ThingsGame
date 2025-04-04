@@ -1,6 +1,4 @@
 import { useSubscription } from '@apollo/client';
-import { Guess } from '../types';
-import { getCurrentTurn } from '../utils/gameUtils';
 import { NEW_GUESS_SUBSCRIPTION } from '../graphql/subscriptions/guessSubscription';
 import { GameState, useGameStore } from '../stores/useGameStore';
 
@@ -20,9 +18,9 @@ export const useGuessSubscription = (
     onSubscriptionData: ({ subscriptionData }) => {
       try {
         const updatedGuesses = subscriptionData.data?.newGuess;
+        setNewGuess(updatedGuesses[0] || null);
         if (updatedGuesses) {
           setGuessList(updatedGuesses);
-          setNewGuess(updatedGuesses[0]);
         }
       } catch (e: any) {
         console.error(e);

@@ -142,8 +142,8 @@ const GuessingRoom: React.FC = () => {
     <GuessAnnouncementModal playerId={playerId || ''} newGuess={newGuess} handleClose={handleAnnouncementClose} />
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer players={playerList || []} isDrawerOpen={isDrawerOpen} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
-      <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-        <Box textAlign="center" alignItems="center"  marginBottom="8px" marginTop="8px">
+      <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
+        <Box textAlign="center" alignItems="center"  marginBottom="8px" marginTop="8px" paddingX="8px">
           <Typography color="info" variant="h5">{currentRound?.promptText}</Typography>
         </Box>
 

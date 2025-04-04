@@ -44,7 +44,7 @@ const GagSelection: React.FC<GagSelectionProps> = ({ onClick, playerId, setFavor
       <Box 
         display="flex" 
         justifyContent="center" 
-        flexDirection="column" 
+        flexDirection="column"
         paddingX="16px"
         paddingTop="32px"
         paddingBottom="16px"
@@ -63,12 +63,16 @@ const GagSelection: React.FC<GagSelectionProps> = ({ onClick, playerId, setFavor
             return (
                 <Box width="100%" key={`${currGag._id}-container`} display="flex" alignItems="center" position="relative">
                   <Box display="flex" flexDirection="column" key={`${currGag._id}-like-container`} >
-                    <IconButton sx={{ paddingTop: "0px"}} key={`${currGag._id}-icon-button`} size="large" color={favId === currGag._id  ? "error" : undefined} onClick={() => selectFavorite(currGag)}>
-                        {favId === currGag._id ? <FaHeart key={`${currGag._id}-heart`}  size={25}/> : <FaRegHeart key={`${currGag._id}-outline`} size={25}/>}
-                    </IconButton>
-                    {gagLikes !== 0 && <Typography variant='body2' color="grey" key={`${currGag._id}-like-cound`} marginTop="-14px"> {gagLikes}</Typography>}
+                    {playerId !== "spectator" && 
+                    (<>
+                      <IconButton sx={{ paddingTop: "0px"}} key={`${currGag._id}-icon-button`} size="large" color={favId === currGag._id  ? "error" : undefined} onClick={() => selectFavorite(currGag)}>
+                          {favId === currGag._id ? <FaHeart key={`${currGag._id}-heart`}  size={25}/> : <FaRegHeart key={`${currGag._id}-outline`} size={25}/>}
+                      </IconButton>
+                      {gagLikes !== 0 && <Typography variant='body2' color="grey" key={`${currGag._id}-like-cound`} marginTop="-14px"> {gagLikes}</Typography>}
+                    </>)
+                    }
                   </Box>
-                  <GagButton selectGag={selectGag} currGag={currGag} isStandardMode={isStandardMode} selectedGag={selectedGag} />
+                  <GagButton selectGag={selectGag} currGag={currGag} isStandardMode={isStandardMode} selectedGag={selectedGag} isSpectator={playerId === "spectator"} />
                 </Box>
         )})}
     </Box>

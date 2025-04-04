@@ -16,7 +16,7 @@ interface PlayerCardProps {
 
 const PlayerCard: React.FC<PlayerCardProps> = ({ name, icon, points, color, emotion = "neutral", mini, isStandard = true }) => {
   const start = mini ? 50 : 70;
-  const sub = isStandard ? 0 : 24;
+  const sub = isStandard ? 0 : mini ? 10 : 24;
   const size = start - sub;
 
   return (

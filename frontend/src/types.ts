@@ -134,7 +134,7 @@ export interface Prompt {
   export type Emotion = 'neutral' | 'happy' | 'suspicious' | 'nervous' | 'sad';
 
 
-  export type Room = 'guessing' | 'waiting' | 'writing' | 'submitted' | 'score' | 'play';
+  export type Room = 'submitted-transition' |'guessing' | 'waiting' | 'writing' | 'submitted' | 'score' | 'play';
 
 
   export const SUPERLATIVE_DESCRIPTIONS = {

@@ -27,6 +27,11 @@ const HomePage: React.FC = () => {
         <Box marginTop="24px">
             <Button variant="contained" color="info" onClick={()=> navigate('/host')}> HOST GAME</Button>
         </Box>
+        <Box marginY="12px">
+            <Button variant="text" color="info" onClick={()=> navigate('/spectator-join')}> 
+              <Typography variant="body2" color='info'>WATCH GAME</Typography>
+            </Button>
+        </Box>
     </Box>
   )
 }

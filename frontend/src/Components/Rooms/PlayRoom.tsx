@@ -13,7 +13,6 @@ const PlayRoom: React.FC = () => {
 
   const currentTurn = playerList.length > 0 ? ((game?.rounds?.length ?? 0) % playerList.length) : 0;
   const currentTurnPlayer = useMemo(() => playerList[currentTurn], [playerList, currentTurn]);
-  const currentRound = ((game?.rounds?.length ?? 0) + 1);
 
   useEffect(() => {
     if (!gameId || !playerId) {
@@ -31,8 +30,7 @@ const PlayRoom: React.FC = () => {
   }
 
   return (
-    <Box textAlign="center" alignItems="center"  marginTop="32px" display="flex" flexDirection="column">
-      <Typography color="info" variant="h3">{`Round ${currentRound}`}</Typography>
+    <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
       <Box textAlign="center" alignItems="center"  marginY="16px" >
         <Typography color="text.secondary">
           {currentTurnPlayer ? `${currentTurnPlayer.name} is choosing a prompt` : "Waiting for player..."}

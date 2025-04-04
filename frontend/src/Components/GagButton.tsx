@@ -11,47 +11,63 @@ interface GagButtonProps {
   currGag: Gag;
   isStandardMode?: Boolean;
   selectedGag: string;
+  isSpectator?: Boolean;
 }
 
-const GagButton: React.FC<GagButtonProps> = ({ selectGag, currGag, isStandardMode, selectedGag}) => {
+const GagButton: React.FC<GagButtonProps> = ({ selectGag, currGag, isStandardMode, selectedGag, isSpectator}) => {
     const myTurn = useGameStore((state: GameState) => state.myTurn)
+    const newGuess = useGameStore((state: GameState) => state.newGuess)
     const guessList = useGameStore((state: GameState) => state.guessList)
     const [gagGuesses, setGagGuesses] = useState<Guess[]>([]);
+    const [isCorrectGuessVisible, setIsCorrectGuessVisible] = useState(false);
     const playerList = useGameStore((state: GameState) => state.playerList)
     const player = playerList.find(p => p._id === currGag.player._id)
 
     useEffect(() => {
-        const individualGuesses = guessList?.filter((guess) => guess.gag._id === currGag._id && !guess.isCorrect).reduce((acc: Guess[], curr: Guess) => {
-            if (!acc.find(g => g.guessed._id === curr.guessed._id)) {
-                acc.push(curr);
-            }
-            return acc;
-        }, []) || [];
-        setGagGuesses(individualGuesses);
-    }, [guessList, currGag])
+        if (newGuess === null) {
+            const individualGuesses = guessList?.filter((guess) => guess.gag._id === currGag._id && !guess.isCorrect).reduce((acc: Guess[], curr: Guess) => {
+                if (!acc.find(g => g.guessed._id === curr.guessed._id)) {
+                    acc.push(curr);
+                }
+                return acc;
+            }, []) || [];
+            setGagGuesses(individualGuesses);
+        }
+        const currGagGuess = guessList.find((guess) => (guess.gag._id === currGag._id) && guess.isCorrect)
+        setIsCorrectGuessVisible(
+          currGag.guessed &&
+          (newGuess?.gag._id || '') !== currGag._id &&
+          !!currGagGuess &&
+          (Date.now() - ((currGagGuess?.createdAt || 1) * 1000) > 2000)
+        );
+    }, [guessList, currGag, newGuess])
+
 
     return (
         <Box>
           <Box position="relative" paddingTop="4px" paddingBottom={gagGuesses.length > 0 ? "0px" : "4px"} marginBottom={gagGuesses.length > 0 ? "-4px" : "0px"}>
             <Button 
-                variant={myTurn ? "contained" :"outlined"}
+                variant={myTurn || isSpectator ? "contained" :"outlined"}
                 color={selectedGag === currGag._id ? "info" : "secondary"}
                 key={currGag._id}
-                disabled={currGag.guessed || !myTurn}
+                disabled={isCorrectGuessVisible || (!myTurn && !isSpectator)}
                 sx={{
                     pointerEvents: myTurn ? "auto" : "none",
                     opacity: myTurn ? 1 : 1,
                     width: '270px', 
                     marginBottom: '8px',
                     borderRadius: .5,
-                    textDecoration: currGag.guessed ? "line-through" : undefined,
+                    textDecoration: isCorrectGuessVisible ? "line-through" : undefined,
                     textDecorationThickness: '3px',
                 }}
-                onClick={()=>{selectGag(currGag)}}
+                onClick={()=>{
+                    if (isSpectator) return null;
+                    selectGag(currGag)
+                }}
             >
                 {currGag?.text || ''}
             </Button>
-            {currGag.guessed && player?.icon !== undefined && (
+            {isCorrectGuessVisible && player?.icon !== undefined && (
               <img 
                 src={AVATAR_LIST[player?.icon]?.sad ?? "image"} 
                 key={`${player._id}-img`} 

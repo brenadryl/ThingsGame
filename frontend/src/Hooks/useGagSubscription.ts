@@ -1,5 +1,4 @@
 import { useSubscription } from '@apollo/client';
-import { Gag } from '../types';
 import { GAG_UPDATE_SUBSCRIPTION } from '../graphql/subscriptions/gagSubscriptions';
 import { GameState, useGameStore } from '../stores/useGameStore';
 import { sortGags } from '../utils/gameUtils';

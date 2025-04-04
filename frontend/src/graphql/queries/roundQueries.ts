@@ -10,6 +10,7 @@ export const GET_CURRENT_ROUND = gql`
         turn
         guesses {
           _id
+          createdAt
           isCorrect
           guesser {
             _id
@@ -22,6 +23,7 @@ export const GET_CURRENT_ROUND = gql`
           }
         }
         gags {
+            _id
             text
             player {
                 _id
