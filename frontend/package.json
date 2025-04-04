@@ -18,7 +18,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@types/react-icons": "^2.2.7",
-    "framer-motion": "^12.4.7",
+    "framer-motion": "^12.6.3",
     "graphql-ws": "^6.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

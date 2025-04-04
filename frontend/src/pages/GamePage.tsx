@@ -61,25 +61,26 @@ const GamePage: React.FC = () => {
       const allPlayersIn = (players.length === gagList.length);
       const currentRoundGuesses = currentRound?.guesses || [];
 
-      if (game.stage === 2 && currentRound?.stage === 1 && !gagSubmitted && playerId) {
-        console.log("set to writing room");
-        setRoom("writing")
-      } else if (currentRound?.stage === 1 && gagSubmitted && !allPlayersIn) {
-        console.log("set to submitted room");
-        setRoom("submitted")
-      // } else if (game.stage === 2 && currentRound?.stage === 1 && gagSubmitted && allPlayersIn && currentRoundGuesses.length === 0 && room !== "guessing" &&) {
-      //   console.log("set to submitted transition");
-      //   setRoom("submitted-transition")
-      } else if (game.stage === 2 && currentRound?.stage === 1 && gagSubmitted && allPlayersIn) {
-        console.log("set to guessing room");
-        setRoom("guessing")
-      } else if (game.stage === 3) {
-        console.log("set to score room");
-        setRoom("score")
-      } else if (game.stage === 2 && currentRound?.stage === 2) {
-        console.log("set to play room2");
-        setRoom("play")
-      }
+      setRoom("submitted-transition")
+      // if (game.stage === 2 && currentRound?.stage === 1 && !gagSubmitted && playerId) {
+      //   console.log("set to writing room");
+      //   setRoom("writing")
+      // } else if (currentRound?.stage === 1 && gagSubmitted && !allPlayersIn) {
+      //   console.log("set to submitted room");
+      //   setRoom("submitted")
+      // // } else if (game.stage === 2 && currentRound?.stage === 1 && gagSubmitted && allPlayersIn && currentRoundGuesses.length === 0 && room !== "guessing" &&) {
+      // //   console.log("set to submitted transition");
+      // //   setRoom("submitted-transition")
+      // } else if (game.stage === 2 && currentRound?.stage === 1 && gagSubmitted && allPlayersIn) {
+      //   console.log("set to guessing room");
+      //   setRoom("guessing")
+      // } else if (game.stage === 3) {
+      //   console.log("set to score room");
+      //   setRoom("score")
+      // } else if (game.stage === 2 && currentRound?.stage === 2) {
+      //   console.log("set to play room2");
+      //   setRoom("play")
+      // }
     }
   }, [game, room, gagList, setRoom, playerId, currentRound, playerList]);
 
