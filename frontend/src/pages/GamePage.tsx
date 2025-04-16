@@ -18,6 +18,10 @@ import { useRoundSubscription } from '../Hooks/useRoundSubscription';
 import GameMenu from '../Components/GameMenu';
 import GameSettings from '../Components/GameSettings';
 import SubmittedTransition from '../Components/Transitions/SubmittedTransition';
+import RoundTransition from '../Components/Transitions/RoundTransition';
+import BeginTransition from '../Components/Transitions/BeginTransition';
+import WritingTransition from '../Components/Transitions/WritingTransition';
+import AwardRoom from '../Components/Rooms/AwardsRoom';
 
 const ROOM_MAP: Record<Room, JSX.Element> ={
     "waiting": <WaitingRoom />,
@@ -26,7 +30,11 @@ const ROOM_MAP: Record<Room, JSX.Element> ={
     "play": <PlayRoom />,
     "submitted": <SubmittedRoom />,
     "score": <ScoreRoom />,
+    "award": <AwardRoom/>,
     "submitted-transition": <SubmittedTransition/>,
+    "round-transition": <RoundTransition/>,
+    "begin-transition": <BeginTransition/>,
+    "writing-transition": <WritingTransition/>,
 }
 
 const GamePage: React.FC = () => {
@@ -43,6 +51,7 @@ const GamePage: React.FC = () => {
   useAvatarSubscription(gameId, setErrorMessage);
   useGameSubscription(gameId, setErrorMessage);
   useRoundSubscription(setErrorMessage, playerId || '');
+  console.log("game", game)
 
   useEffect(() => {
     if (!game){
@@ -51,6 +60,9 @@ const GamePage: React.FC = () => {
       if (game.stage === 1) {
         console.log("set to waiting room");
         setRoom("waiting")
+      } else if (game.stage === 2 && room !== "play") {
+        console.log("set to beginning transition");
+        setRoom("begin-transition")
       } else if (game.stage === 2) {
         console.log("set to play room1");
         setRoom("play")
@@ -61,21 +73,33 @@ const GamePage: React.FC = () => {
       const allPlayersIn = (players.length === gagList.length);
       const currentRoundGuesses = currentRound?.guesses || [];
 
-      if (game.stage === 2 && currentRound?.stage === 1 && !gagSubmitted && playerId) {
-        console.log("set to writing room");
-        setRoom("writing")
-      } else if (currentRound?.stage === 1 && gagSubmitted && !allPlayersIn) {
+      if (currentRound?.stage === 1 && gagSubmitted && !allPlayersIn) {
         console.log("set to submitted room");
         setRoom("submitted")
-      // } else if (game.stage === 2 && currentRound?.stage === 1 && gagSubmitted && allPlayersIn && currentRoundGuesses.length === 0 && room !== "guessing" &&) {
-      //   console.log("set to submitted transition");
-      //   setRoom("submitted-transition")
+      } else if (game.stage === 2 && currentRound?.stage === 1 && !gagSubmitted && playerId && room !== "writing" && !currentRound.gags) {
+        console.log("set to writing room");
+        setRoom("writing-transition")
+      } else if (game.stage === 2 && currentRound?.stage === 1 && !gagSubmitted && playerId) {
+        console.log("set to writing room");
+        setRoom("writing")
+      } else if (game.stage === 2 && currentRound?.stage === 1 && gagSubmitted && allPlayersIn && currentRoundGuesses.length === 0 && room !== "guessing") {
+        console.log("set to submitted transition");
+        setRoom("submitted-transition")
       } else if (game.stage === 2 && currentRound?.stage === 1 && gagSubmitted && allPlayersIn) {
         console.log("set to guessing room");
         setRoom("guessing")
-      } else if (game.stage === 3) {
+      } else if (game.stage === 3 && game.active && room !== "score") {
+        console.log("set to round transition");
+        setRoom("round-transition")
+      } else if (game.stage === 3 && game.active) {
         console.log("set to score room");
         setRoom("score")
+      } else if (game.stage === 3 && !game.active) {
+        console.log("set to award room");
+        setRoom("award")
+      } else if (game.stage === 2 && currentRound?.stage === 2 && room !== "play") {
+        console.log("set to beginning transition2");
+        setRoom("begin-transition")
       } else if (game.stage === 2 && currentRound?.stage === 2) {
         console.log("set to play room2");
         setRoom("play")
@@ -97,7 +121,7 @@ const GamePage: React.FC = () => {
         
         { playerId !== game.players[0]._id ? 
           (<Box display="flex" flexDirection="column"> 
-            <Typography variant={game.stage === 1 ? "h3" : "h2"} color="info.main">{game.stage === 1 ? "CODE" : !game.active ? "FINAL" :`ROUND ${roundCount}`}</Typography>
+            <Typography variant={game.stage === 1 ? "h3" : "h2"} color="info.main">{game.stage === 1 ? "CODE" : !game.active ? "GAME OVER" :`ROUND ${roundCount}`}</Typography>
             {playerId === "spectator" && <Typography variant="body2">SPECTATOR VIEW</Typography>}
           </Box>)
           : (<Box position="relative" width="100%" display="flex" alignItems="center">
@@ -106,7 +130,7 @@ const GamePage: React.FC = () => {
               color="info.main"
               sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
             >
-              {game.stage === 1 ? "CODE" : !game.active ? "FINAL" :`ROUND ${roundCount}`}
+              {game.stage === 1 ? "CODE" : !game.active ? "GAME OVER" :`ROUND ${roundCount}`}
             </Typography>
             <Box sx={{ marginLeft: 'auto' }}>
               {game.stage === 1 ? <GameSettings /> : <GameMenu />}

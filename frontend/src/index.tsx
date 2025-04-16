@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 import App from './App';
 import client from './ApolloProvider';
+import './index.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

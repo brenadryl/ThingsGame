@@ -17,6 +17,22 @@ export const HOME_LOGO = process.env.PUBLIC_URL + '/data/JOAKS.png';
 
 export const LOADING_GIF = process.env.PUBLIC_URL + '/data/JOAKS.GIF';
 
+export const SUPERLATIVES = {
+    detective: process.env.PUBLIC_URL + '/data/superlatives/detective.GIF',
+    agent: process.env.PUBLIC_URL + '/data/superlatives/secretAgent.GIF',
+    king: process.env.PUBLIC_URL + '/data/superlatives/king.GIF',
+    kingStill: process.env.PUBLIC_URL + '/data/superlatives/king-still.png',
+    robot: process.env.PUBLIC_URL + '/data/superlatives/robot.GIF',
+    mirror: process.env.PUBLIC_URL + '/data/superlatives/mirror.GIF',
+    cheerleader: process.env.PUBLIC_URL + '/data/superlatives/cheerleader.GIF',
+    speed: process.env.PUBLIC_URL + '/data/superlatives/speed.GIF',
+    celebrity: process.env.PUBLIC_URL + '/data/superlatives/celebrity.GIF',
+    brevity: process.env.PUBLIC_URL + '/data/superlatives/brevity.GIF',
+    novelist: process.env.PUBLIC_URL + '/data/superlatives/novelist.GIF',
+    clueless: process.env.PUBLIC_URL + '/data/superlatives/clueless.GIF',
+    target: process.env.PUBLIC_URL + '/data/superlatives/target.GIF',
+};
+
 export const AVATAR_LIST = [
     {
         name: 'pear',
@@ -29,7 +45,7 @@ export const AVATAR_LIST = [
         happy_phrase: 'Pear-fect!',
     },
     {
-        name: 'gummy-bear',
+        name: 'cinnamonbear',
         neutral: process.env.PUBLIC_URL + '/data/avatars/gummy-bear/IMG_2621.PNG',
         happy: process.env.PUBLIC_URL + '/data/avatars/gummy-bear/IMG_2620.PNG',
         suspicious: process.env.PUBLIC_URL + '/data/avatars/gummy-bear/IMG_2625.PNG',
@@ -59,7 +75,7 @@ export const AVATAR_LIST = [
         happy_phrase: 'Boo yah!',
     },
     {
-        name: 'bell-pepper',
+        name: 'bellpepper',
         neutral: process.env.PUBLIC_URL + '/data/avatars/bell-pepper/IMG_2371.PNG',
         happy: process.env.PUBLIC_URL + '/data/avatars/bell-pepper/IMG_2375.PNG',
         suspicious: process.env.PUBLIC_URL + '/data/avatars/bell-pepper/IMG_2376.PNG',
@@ -370,11 +386,11 @@ export const AVATAR_LIST = [
     },
     {
         name: 'donut',
-        neutral: process.env.PUBLIC_URL + '/data/avatars/donut/IMG_1785.PNG',
-        happy: process.env.PUBLIC_URL + '/data/avatars/donut/055aa2ae-8774-4130-8171-8a467c2a06f9.png.PNG',
-        suspicious: process.env.PUBLIC_URL + '/data/avatars/donut/27429fc7-533d-4a11-81d4-1c402bed8bb3.png.PNG',
-        nervous: process.env.PUBLIC_URL + '/data/avatars/donut/27429fc7-533d-4a11-81d4-1c402bed8bb3.png.PNG',
-        sad: process.env.PUBLIC_URL + '/data/avatars/donut/4f93c576-adee-47d0-80ce-ba9b28267f7c.png.PNG',
+        neutral: process.env.PUBLIC_URL + '/data/avatars/donut/neutral-donut.png',
+        happy: process.env.PUBLIC_URL + '/data/avatars/donut/happy-donut.png',
+        suspicious: process.env.PUBLIC_URL + '/data/avatars/donut/suspicious-donut.png',
+        nervous: process.env.PUBLIC_URL + '/data/avatars/donut/nervous-donut.png',
+        sad: process.env.PUBLIC_URL + '/data/avatars/donut/sad-donut.png',
         sad_phrase: 'I just donut understand.',
         happy_phrase: 'You made my hole day.',
     },
@@ -579,7 +595,7 @@ export const AVATAR_LIST = [
         happy_phrase: 'I made out like a bandit.',
     },
     {
-        name: 'rain',
+        name: 'raindrop',
         neutral: process.env.PUBLIC_URL + '/data/avatars/rain/IMG_2022.PNG',
         happy: process.env.PUBLIC_URL + '/data/avatars/rain/IMG_2024.PNG',
         suspicious: process.env.PUBLIC_URL + '/data/avatars/rain/IMG_2023.PNG',

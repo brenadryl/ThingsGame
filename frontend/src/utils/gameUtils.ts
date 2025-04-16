@@ -75,18 +75,18 @@ function getEarliestAndLatestGagCreators(players: Player[]) {
 
 export const getSuperlatives = (players: Player[]) => {
     let superlatives = {
-        mostLiked: "",
-        liker: "",
-        mostSus: "",
-        easyOut:"",
-        probablyBot: "", // least liked
-        sniper: "",
-        selfLike: "",
-        tldr: "", //rambler
-        minimalist: "", //one word wonder
-        conspiracyTheorist: "",
-        quickest: "",
-        slowest: "",
+      detective: "",
+      celebrity: "",
+      cheerleader: "",
+      agent: "",
+      target:"",
+      robot: "", // least liked
+      mirror: "",
+      novelist: "", //rambler
+      brevity: "", //one word wonder
+      clueless: "",
+      speed: "",
+      buffering: "",
     }
 
     console.log("players", players)
@@ -159,18 +159,18 @@ export const getSuperlatives = (players: Player[]) => {
             const { earliest, latest } = getEarliestAndLatestGagCreators(players);
 
         superlatives = {
-            mostLiked: mostLiked?._id || "",
-            liker: liker?._id || "",
-            mostSus: mostSus?._id || "",
-            easyOut: easyOut?._id || "",
-            probablyBot: leastLiked?._id || "", // least liked
-            sniper: sniper?._id || "",
-            selfLike: selfLike?._id || "",
-            tldr: rambler?._id || "", //rambler
-            minimalist: minimalist?._id || "", //one word wonder\
-            conspiracyTheorist: conspiracyTheorist?._id || "",
-            quickest: earliest?._id || "",
-            slowest: latest?._id || "",
+            detective: sniper?._id || "",
+            celebrity: mostLiked?._id || "",
+            cheerleader: liker?._id || "",
+            agent: mostSus?._id || "",
+            target: easyOut?._id || "",
+            robot: leastLiked?._id || "", // least liked
+            mirror: selfLike?._id || "",
+            novelist: rambler?._id || "", //rambler
+            brevity: minimalist?._id || "", //one word wonder\
+            clueless: conspiracyTheorist?._id || "",
+            speed: earliest?._id || "",
+            buffering: latest?._id || "",
         }
 
     }
