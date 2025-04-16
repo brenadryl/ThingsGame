@@ -5,8 +5,10 @@ import { FaRegCopy } from 'react-icons/fa';
 import { GameState, useGameStore } from '../stores/useGameStore';
 import { useMutation } from '@apollo/client';
 import { CHANGE_GAME_MUTATION } from '../graphql/mutations/gameMutations';
+import { useNavigate } from 'react-router-dom';
 
 const GameMenu = () => {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [copyOpen, setCopyOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -76,11 +78,19 @@ const GameMenu = () => {
                         <FaRegCopy fontSize="small" />
                     </IconButton>
                 </Box>
-                <Box textAlign="center">
-                    <Button onClick={handleEndGame} color="error" variant='contained' disabled={updateGameLoading} sx={{marginTop: '24px'}}>
-                    {updateGameLoading ? <CircularProgress size={24}/> : "END GAME"}
-                    </Button>
-                </Box>
+                {game?.active ? (
+                    <Box textAlign="center">
+                        <Button onClick={handleEndGame} color="error" variant='contained' disabled={updateGameLoading} sx={{marginTop: '24px'}}>
+                        {updateGameLoading ? <CircularProgress size={24}/> : "END GAME"}
+                        </Button>
+                    </Box>
+                    ):
+                    <Box textAlign="center">
+                        <Button onClick={() => navigate('/')} color="info" variant='contained' sx={{marginTop: '24px'}}>
+                            NEW GAME
+                        </Button>
+                    </Box>
+                }
             </Box>
         </Drawer>
         <Snackbar

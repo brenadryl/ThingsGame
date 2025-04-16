@@ -1,3 +1,5 @@
+import { MissingFieldError } from "@apollo/client";
+
 export interface Prompt {
     _id: string;
     promptId?: number;
@@ -134,22 +136,23 @@ export interface Prompt {
   export type Emotion = 'neutral' | 'happy' | 'suspicious' | 'nervous' | 'sad';
 
 
-  export type Room = 'submitted-transition' |'guessing' | 'waiting' | 'writing' | 'submitted' | 'score' | 'play';
+  export type Room = 'award' | 'writing-transition' | 'begin-transition' | 'round-transition' | 'submitted-transition' |'guessing' | 'waiting' | 'writing' | 'submitted' | 'score' | 'play';
 
 
   export const SUPERLATIVE_DESCRIPTIONS = {
-    sniper: { title: "sniper" , description: "most accurate guesser", emotion: "suspicious"  },
-    conspiracyTheorist: { title: "conspiracy theorist" , description: "most clueless", emotion: "sad" },
-    mostSus: { title: "most sus" , description: "fooled everyone", emotion: "suspicious"  },
-    easyOut: { title: "captain obvious" , description: "easiest to guess", emotion: "sad"  },
-    quickest: { title: "keyboard cheetah" , description: "quickest typer", emotion: "happy"  }, //one word wonder
-    slowest: { title: "still buffering" , description: "slowest typer", emotion: "sad" },
-    mostLiked: { title: "mr popular" , description: "most liked", emotion: "happy" },
-    liker: { title: "hype man" , description: "liked everyone", emotion: "neutral"  },
-    selfLike: { title: "self five" , description: "liked themself most", emotion: "happy"  },
-    probablyBot: { title: "probs a bot" , description: "blandest answers", emotion: "sad"  }, // least liked
-    tldr: { title: "rambler" , description: "most verbose", emotion: "neutral"  }, //rambler
-    minimalist: { title: "one word wonder" , description: "master of brevity", emotion: "neutral"  }, //one word wonder
+    detective: { title: "sniper" , description: "most accurate guesser", emotion: "suspicious"  },
+    clueless: { title: "conspiracy theorist" , description: "most clueless", emotion: "sad" },
+    agent: { title: "most sus" , description: "fooled everyone", emotion: "suspicious"  },
+    target: { title: "captain obvious" , description: "easiest to guess", emotion: "sad"  },
+    speed: { title: "keyboard cheetah" , description: "quickest typer", emotion: "happy"  }, //one word wonder
+    buffering: { title: "still buffering" , description: "slowest typer", emotion: "sad" },
+    celebrity: { title: "mr popular" , description: "most liked", emotion: "happy" },
+    cheerleader: { title: "hype man" , description: "liked everyone", emotion: "neutral"  },
+    mirror: { title: "self five" , description: "liked themself most", emotion: "happy"  },
+    robot: { title: "probs a bot" , description: "blandest answers", emotion: "sad"  }, // least liked
+    novelist: { title: "rambler" , description: "most verbose", emotion: "neutral"  }, //rambler
+    brevity: { title: "one word wonder" , description: "master of brevity", emotion: "neutral"  }, //one word wonder
+    king: { title: "king" , description: "the winner", emotion: "happy"  },
 }
 
 export type SuperlativeKey = keyof typeof SUPERLATIVE_DESCRIPTIONS;

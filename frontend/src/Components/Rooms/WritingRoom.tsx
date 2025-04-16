@@ -6,6 +6,7 @@ import { GameState, useGameStore } from '../../stores/useGameStore';
 import { useParams } from 'react-router-dom';
 import { GET_CURRENT_ROUND, GetCurrentRoundData } from '../../graphql/queries/roundQueries';
 import LoadingLogo from '../LoadingLogo';
+import { sortGags } from '../../utils/gameUtils';
 
 const WritingRoom: React.FC = () => {
     const { gameId, playerId } = useParams();
@@ -14,6 +15,8 @@ const WritingRoom: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const round = useGameStore(state => state.currentRound)
     const setRound = useGameStore(state => state.setCurrentRound)
+    const newGuess = useGameStore(state => state.newGuess)
+    const setNewGuess = useGameStore(state => state.setNewGuess)
     const setGagList = useGameStore(state => state.setGagList)
     const setGuessList = useGameStore(state => state.setGuessList)
     const [submitGag, { error: gagError}] = useMutation(NEW_GAG);
@@ -24,6 +27,10 @@ const WritingRoom: React.FC = () => {
         fetchPolicy: "network-only",
     });
 
+    if (newGuess?.gag.round._id !== round?._id) {
+        setNewGuess(null)
+    }
+
     useEffect(() => {
         if (!gameId || !playerId) {
           setErrorMessage("Invalid Game ID or Player ID")
@@ -32,7 +39,7 @@ const WritingRoom: React.FC = () => {
         }
         if(roundData?.getCurrentRound) {
             setRound(roundData.getCurrentRound)
-            setGagList(roundData.getCurrentRound.gags)
+            setGagList(sortGags(roundData.getCurrentRound.gags))
             setGuessList(roundData.getCurrentRound.guesses)
           if (roundData.getCurrentRound.stage === 1 && roundData.getCurrentRound.gags && roundData.getCurrentRound.gags.find(g => g.player._id === playerId)) {
             setRoom("submitted")

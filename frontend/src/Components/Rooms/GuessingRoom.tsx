@@ -1,4 +1,4 @@
-import { Alert, Box, Typography} from '@mui/material';
+import { Alert, Box, Typography, useTheme} from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Gag, Guess, Player } from '../../types';
 import GagSelection from '../GagSelection';
@@ -26,6 +26,7 @@ const GuessingRoom: React.FC = () => {
   const [selectedGag, setSelectedGag] = useState<Gag | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const theme = useTheme();
 
   const game = useGameStore((state: GameState) => state.game);
   const playerList = useGameStore((state: GameState) => state.playerList);
@@ -65,22 +66,38 @@ const GuessingRoom: React.FC = () => {
     console.log("isOpen1", closingAnnouncement)
     if (newGuess === null) {
       setClosingAnnouncement(false)
-    }
-    if (newGuess !== null && !closingAnnouncement) {
+    } if (newGuess !== null && !closingAnnouncement) {
       const timer = setTimeout(() => {
         setClosingAnnouncement(true)
       }, 6000)
       return () => clearTimeout(timer);
-    }
-    if (newGuess !== null && closingAnnouncement) {
+    } else if (newGuess !== null && closingAnnouncement) {
       const lastWrongGuess = guessList.filter((guess: Guess) => !guess.isCorrect)[0];
       const turnPlayer = getCurrentTurn(playerList, lastWrongGuess, currentRound?.turn || 0, gagList);
       if (currentTurnPlayer?._id !== turnPlayer?._id) setCurrentTurnPlayer(turnPlayer);
       const myTurnStatus = turnPlayer?._id === playerId;
       if (myTurnStatus !== isMyTurn) setMyTurn(turnPlayer?._id === playerId);
       setNewGuess(null)
+    } 
+    const currentPlayerGag = gagList.find((gag) => gag.player._id === currentTurnPlayer?._id);
+    if (newGuess === null && isMyTurn && gagList.filter((gag) => !gag.guessed).length === 1 && !!currentPlayerGag && !currentPlayerGag.guessed) {
+      const timer = setTimeout(() => {
+        try {
+          createGuess({
+            variables: {
+              gagId: currentPlayerGag._id,
+              guesserId: playerId,
+              guessedId: playerId,
+            }
+          })
+        } catch (error: any) {
+          setErrorMessage(error?.message || "Final guess wasn't submitted.");
+        }
+      }, 500)
+      return () => clearTimeout(timer);
+
     }
-  }, [newGuess, closingAnnouncement, currentRound, isMyTurn, playerId, gagList, guessList, playerList, setMyTurn, setCurrentTurnPlayer, setNewGuess, currentTurnPlayer])
+  }, [newGuess, createGuess, closingAnnouncement, currentRound, isMyTurn, playerId, gagList, guessList, playerList, setMyTurn, setCurrentTurnPlayer, setNewGuess, currentTurnPlayer])
 
   const handleAnnouncementClose = useCallback(() => {
     setClosingAnnouncement(true);
@@ -149,8 +166,23 @@ const GuessingRoom: React.FC = () => {
 
         <PlayerTurnCarousel players={playerList || []} playerId={playerId || ''}/>
 
-        <Box bgcolor="background.default" padding="8px" zIndex={1}>
-          <Typography variant={isMyTurn ? "h3" : "h5"} color={isMyTurn ? "warning.main" : "secondary.light"}>{isMyTurn ? "YOUR TURN" : `${currentTurnPlayer?.name} IS GUESSING`}</Typography>
+        <Box
+          sx={{
+            padding: '8px',
+            zIndex: 1,
+            background: isMyTurn ? `linear-gradient(to bottom, ${theme.palette.background.default} 55%, ${theme.palette.warning.light} 45%)` : theme.palette.background.default,
+          }}
+        >
+          <Typography 
+            variant={isMyTurn ? "h3" : "h5"} 
+            color={isMyTurn ? "text.secondary" : "secondary.light"}
+            // sx={{
+            //   WebkitTextStroke: isMyTurn ? `2px ${theme.palette.text.secondary}` : undefined,
+            //   fontWeight: 900,
+            // }}
+          >
+            {isMyTurn ? "YOUR TURN" : `${currentTurnPlayer?.name} IS GUESSING`}
+          </Typography>
         </Box>
         <GagSelection onClick={handleGagClick} playerId={playerId || ''} setFavorite={handleFavorite} isStandardMode={game?.mode === "standard"}/>
       </Box>

@@ -1,5 +1,21 @@
 import { createTheme } from '@mui/material/styles';
 
+declare module '@mui/material/styles' {
+  interface TypographyVariants {
+    outlinedHeader: React.CSSProperties;
+  }
+
+  interface TypographyVariantsOptions {
+    outlinedHeader?: React.CSSProperties;
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    outlinedHeader: true;
+  }
+}
+
 // Module augmentation to add custom background keys to MUI's Palette
 declare module '@mui/material/styles' {
   interface Palette {
@@ -23,12 +39,12 @@ export const lightTheme = createTheme({
         primary: { main: '#FFD700', contrastText: '#FFFFFF' }, // Electric Yellow (Primary Accent)
         secondary: { main: '#FF6B35', contrastText: '#FFFFFF', light: '#A9A9A9'}, // Bright Orange (Interactive Elements)
         error: { main: '#FF3F34' }, // Sunset Red (Error & Alerts)
-        warning: { main: '#A7D129', contrastText: "#FFFFFF"  }, // Lime Green (Success & Highlights)
+        warning: { main: '#A7D129', contrastText: "#005F73", light: '#A7D129' }, // Lime Green (Success & Highlights)
         info: { main: '#00C9A7', contrastText: '#FFFFFF'}, // Aqua Blue (Secondary UI)
         success: { main: '#38B6FF', light:'#54938AFF' }, // Sky Blue (Active & Hover States)
         background: { 
-          default: '#F8F8F8', // Off-White (Main Background)
-          paper: '#FFFFFF', // Cards and UI Components
+          default: '#EEECECFF', // Off-White (Main Background)
+          paper: '#F8F8F8', // Cards and UI Components
         },
         text: { 
           primary: '#333333', // Dark Gray (Text Readability)
@@ -45,6 +61,13 @@ export const lightTheme = createTheme({
         body1: { fontSize: '1rem', fontWeight: 800, color: '#333333' },
         body2: { fontSize: '0.75rem', fontWeight: 800, color: '#333333' },
         button: { textTransform: 'none', fontWeight: 800 },
+        outlinedHeader: {
+          fontFamily: "'Chewy', cursive",
+          WebkitTextStroke: '1px #005F73',
+          color: "#FFD700",
+          fontWeight: 700,
+          fontSize: '3rem'
+        },
       },
       components: {
         MuiButton: {
@@ -72,7 +95,7 @@ export const darkTheme = createTheme({
       primary: { main: '#FFD700', contrastText: '#2A2A2A' }, // Electric Yellow (Primary Accent)
       secondary: { main: '#FF6B35', contrastText: '#2A2A2A', light: '#A9A9A9' }, // Bright Orange (Interactive Elements)
       error: { main: '#FF3F34' }, // Sunset Red (Error & Alerts)
-      warning: { main: '#A7D129', contrastText: "#FFFFFF" }, // Lime Green (Success & Highlights)
+      warning: { main: '#A7D129', contrastText: "#FFFFFF", light: '#6F8684FF' }, // Lime Green (Success & Highlights)
       info: { main: '#00C9A7', contrastText: '#2A2A2A' }, // Aqua Blue (Secondary UI)
       success: { main: '#38B6FF', light:'#6F8684FF' }, // Sky Blue (Active & Hover States)
       background: { 
@@ -94,6 +117,13 @@ export const darkTheme = createTheme({
       body1: { fontSize: '1rem', fontWeight: 800, color: '#FFFFFF' },
       body2: { fontSize: '0.75rem', fontWeight: 800, color: '#FFFFFF' },
       button: { textTransform: 'none', fontWeight: 800 },
+      outlinedHeader: {
+        fontFamily: "'Chewy', cursive",
+        WebkitTextStroke: '.8px #005F73',
+        color: "#FFD700",
+        fontWeight: 700,
+        fontSize: '3rem'
+      },
     },
     components: {
       MuiButton: {

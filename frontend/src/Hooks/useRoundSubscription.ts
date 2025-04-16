@@ -29,7 +29,7 @@ export const useRoundSubscription = (
                     setCurrentTurnPlayer(currTurnPlayer)
                     setMyTurn(currTurnPlayer?._id === playerId)
                     console.log("Round started! Navigating to Writing Room...")
-                    setRoom("writing")
+                    setRoom("writing-transition")
                 }
             } catch (e: any) {
                 console.error(e);

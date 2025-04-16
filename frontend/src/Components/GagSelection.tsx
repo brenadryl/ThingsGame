@@ -52,10 +52,11 @@ const GagSelection: React.FC<GagSelectionProps> = ({ onClick, playerId, setFavor
         sx={{
           borderRadius: "16px",
           border: '2px solid',
-          borderColor: myTurn ? "warning.main" : "secondary.light"
+          borderColor: myTurn ? "text.secondary" : "secondary.light",
+          bgcolor: myTurn ? 'warning.light' : undefined,
         }}
       >
-        {myTurn && <Typography variant="body1" color="warning.main" sx={{paddingBottom: "16px", marginTop: "-16px", zIndex: 1}}>SELECT A RESPONSE TO GUESS</Typography>}
+        {myTurn && <Typography variant="body1" color="text.secondary" sx={{paddingBottom: "16px", marginTop: "-16px", zIndex: 1}}>SELECT A RESPONSE TO GUESS</Typography>}
         {gags.map((currGag) => {
           const gagLikes = likes.filter((l) => l.gag._id === currGag._id).length || 0;
           const favId = favoriteGag;

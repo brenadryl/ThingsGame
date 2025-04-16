@@ -32,7 +32,7 @@ const GuessAnnouncementModal: React.FC<GuessAnnouncementModalProps> = ({ newGues
   return (
     <Dialog open={newGuess !== null}>
       <DialogContent>
-        <Box display="flex" flexDirection="column" alignItems="center">
+        <Box display="flex" flexDirection="column" alignItems="center" minHeight="400px" >
           <Box display="flex" flexDirection="row" alignItems="center">
               { selfGuess ?
                 <Box maxWidth="220px" marginY="12px">
