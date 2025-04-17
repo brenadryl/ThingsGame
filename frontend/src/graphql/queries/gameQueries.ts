@@ -8,6 +8,7 @@ export const GET_GAME = gql`
       stage
       gameCode
       mode
+      minutes
       active
       players {
         _id
@@ -73,6 +74,7 @@ export const GET_GAME = gql`
         _id
         stage
         promptText
+        createdAt
         turn
         likes {
           _id
@@ -117,6 +119,7 @@ export const GET_GAME = gql`
         _id
         stage
         promptText
+        createdAt
         turn
         likes {
           _id

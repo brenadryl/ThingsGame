@@ -47,11 +47,17 @@ const GamePage: React.FC = () => {
   const currentRound = useGameStore((state: GameState) => state.currentRound)
   const playerList = useGameStore((state: GameState) => state.playerList)
   const setRoom = useGameStore((state: GameState) => state.setRoom)
+  const setGagList = useGameStore((state: GameState) => state.setGagList)
+
   usePlayerSubscription(gameId, setErrorMessage);
   useAvatarSubscription(gameId, setErrorMessage);
   useGameSubscription(gameId, setErrorMessage);
   useRoundSubscription(setErrorMessage, playerId || '');
+
   console.log("game", game)
+  if (!!game?.currentRound?.gags && game.currentRound._id === currentRound?._id && game?.currentRound?.gags?.length > gagList.length) {
+    setGagList(game?.currentRound?.gags)
+  }
 
   useEffect(() => {
     if (!game){
@@ -73,7 +79,10 @@ const GamePage: React.FC = () => {
       const allPlayersIn = (players.length === gagList.length);
       const currentRoundGuesses = currentRound?.guesses || [];
 
-      if (currentRound?.stage === 1 && gagSubmitted && !allPlayersIn) {
+      if (game.stage === 3 && !game.active) {
+        console.log("set to award room");
+        setRoom("award")
+      } else if (currentRound?.stage === 1 && gagSubmitted && !allPlayersIn) {
         console.log("set to submitted room");
         setRoom("submitted")
       } else if (game.stage === 2 && currentRound?.stage === 1 && !gagSubmitted && playerId && room !== "writing" && !currentRound.gags) {
@@ -94,9 +103,6 @@ const GamePage: React.FC = () => {
       } else if (game.stage === 3 && game.active) {
         console.log("set to score room");
         setRoom("score")
-      } else if (game.stage === 3 && !game.active) {
-        console.log("set to award room");
-        setRoom("award")
       } else if (game.stage === 2 && currentRound?.stage === 2 && room !== "play") {
         console.log("set to beginning transition2");
         setRoom("begin-transition")
@@ -113,30 +119,9 @@ const GamePage: React.FC = () => {
     return <Alert severity="error">{errorMessage}</Alert>
   }
 
-  const roundCount = ((game?.rounds?.length ?? 0) + 1);
-
   return (
     <Box>
       <Box textAlign="center" alignItems="center" display="flex" flexDirection="column" paddingY="8px">
-        
-        { playerId !== game.players[0]._id ? 
-          (<Box display="flex" flexDirection="column"> 
-            <Typography variant={game.stage === 1 ? "h3" : "h2"} color="info.main">{game.stage === 1 ? "CODE" : !game.active ? "GAME OVER" :`ROUND ${roundCount}`}</Typography>
-            {playerId === "spectator" && <Typography variant="body2">SPECTATOR VIEW</Typography>}
-          </Box>)
-          : (<Box position="relative" width="100%" display="flex" alignItems="center">
-            <Typography
-              variant={game.stage === 1 ? "h3" : "h2"}
-              color="info.main"
-              sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
-            >
-              {game.stage === 1 ? "CODE" : !game.active ? "GAME OVER" :`ROUND ${roundCount}`}
-            </Typography>
-            <Box sx={{ marginLeft: 'auto' }}>
-              {game.stage === 1 ? <GameSettings /> : <GameMenu />}
-            </Box>
-          </Box>)
-        }
         {ROOM_MAP[room]}
       </Box>
     </Box>

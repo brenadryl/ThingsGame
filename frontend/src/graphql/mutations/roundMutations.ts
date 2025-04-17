@@ -6,6 +6,7 @@ export const NEW_ROUND = gql`
       _id
       promptText
       stage
+      createdAt
       game {
         _id
       }

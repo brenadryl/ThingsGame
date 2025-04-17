@@ -13,6 +13,7 @@ import { SUPERLATIVES } from '../../themes/constants';
 import AwardDisplay from '../AwardDisplay';
 import AwardCard from '../AwardCard';
 import KingCard from '../SuperlativeCards/KingCard';
+import GameMenu from '../GameMenu';
 
 const AwardRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
@@ -116,7 +117,20 @@ const AwardRoom: React.FC = () => {
   }
 
   return (
-    <Box textAlign="center" alignItems="center"  marginTop="8px" display="flex" flexDirection="column">
+    <Box textAlign="center" alignItems="center" marginBottom="52px" display="flex" flexDirection="column">
+        <Box position="relative" width="100%" display="flex" alignItems="center" paddingBottom="12px">
+            <Typography
+              variant="h2"
+              color="info.main"
+              sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', width: "200px" }}
+            >
+              GAME OVER
+            </Typography>
+            <Box sx={{ marginLeft: 'auto' }}>
+              <GameMenu />
+            </Box>
+        </Box>
+
         <Box display="flex" justifyContent="center" flexWrap="wrap">
             {renderPlayerCards()}
         </Box>

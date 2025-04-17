@@ -581,13 +581,15 @@ const resolvers = {
         }
       },
   
-      updateGameStage: async (_, { id, active, stage, mode }) => {
+      updateGameStage: async (_, { id, active, stage, mode, minutes }) => {
+        console.log("minutes", minutes)
         try {
           const game = await Game.findByIdAndUpdate(
             id,
-            { active, stage, mode },
+            { active, stage, mode, minutes },
             { new: true }
           );
+          console.log("GAMERMEMEME", game)
           if (!game) {
             throw new Error("Game not found.")
           }
@@ -630,8 +632,9 @@ const resolvers = {
 
       createRound: async (_, { gameId, promptText, turn }) => {
         try {
-          const game = Game.findById(gameId)
-          if (game?.currentRound && !game?.currentRound.stage != 2) {
+          const game = await Game.findById(gameId).populate("currentRound")
+          if (game?.currentRound && game?.currentRound.stage !== 2) {
+            console.log("GAMEISSSS", game)
             throw new Error("Current round not yet over");
           }
           const createdAt = Math.floor(Date.now() / 1000);
@@ -642,6 +645,36 @@ const resolvers = {
             { currentRound: round._id },
             { new: true }
           );
+          //brennah
+          const duration = ((game?.minutes || 5) * 60 * 1000) + 2000;
+          console.log("duration", duration)
+          console.log("GAMEIS: ", game)
+          setTimeout(async () => {
+            try {
+              const players = await Player.find({ game: gameId });
+              const submittedGags = await Gag.find({ round: round._id });
+              const submittedPlayerIds = new Set(submittedGags.map(g => g.player.toString()));
+          
+              const missingPlayers = players.filter(p => !submittedPlayerIds.has(p._id.toString()));
+          
+              for (const player of missingPlayers) {
+                const fallbackGag = new Gag({
+                  round: round._id,
+                  player: player._id,
+                  text: "{*PLAYER DID NOT FINISH IN TIME*}",
+                  createdAt: Math.floor(Date.now() / 1000)
+                });
+                await fallbackGag.save();
+                const populatedGag = await Gag.findById(fallbackGag._id).populate("player");
+
+                console.log("SUBMITTING GAGS FROM TIME ELAPSED gagUpdate: ", { ...populatedGag.toObject(), roundId: round._id.toString() })
+                pubsub.publish("gagUpdate", { gagUpdate: { ...populatedGag.toObject(), roundId: round._id.toString() } });
+              }
+            } catch (error) {
+              console.error("Error auto-submitting fallback gags:", error);
+            }
+          }, duration);
+          //brennah
           pubsub.publish("newRound", { newRound: { ...round.toObject(), gameId: gameId } });
           return round;
         } catch (error) {

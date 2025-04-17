@@ -18,7 +18,7 @@ const BeginTransition: React.FC = () => {
   return (
     <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
         <SlapDown delay={0.3}>
-            <Typography color="info" variant="h2" marginBottom="160px"> STARTING </Typography>
+            <Typography color="info" variant="h2" marginBottom="160px"> STARTING NEXT ROUND </Typography>
         </SlapDown>
         <SlapDown>
             <Typography color="text.secondary" variant="h3"> LET THE GAMES BEGIN! </Typography>

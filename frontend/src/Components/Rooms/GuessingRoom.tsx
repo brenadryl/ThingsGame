@@ -16,6 +16,7 @@ import { useGameSubscription } from '../../Hooks/useGameSubscription';
 import { useGuessSubscription } from '../../Hooks/useGuessSubscription';
 import { useLikeSubscription } from '../../Hooks/useLikeSubscription';
 import { getCurrentTurn } from '../../utils/gameUtils';
+import GameMenu from '../GameMenu';
 
  
 const GuessingRoom: React.FC = () => {  
@@ -153,6 +154,7 @@ const GuessingRoom: React.FC = () => {
   if (errorMessage) {
     return <Alert severity="error">{errorMessage}</Alert>
   }
+  const roundCount = currentRound ? (currentRound?.turn + 1) :  (game?.rounds?.length ?? 0);
 
   return (
     <>
@@ -160,6 +162,28 @@ const GuessingRoom: React.FC = () => {
     <ConfirmGuessModal isModalOpen={isModalOpen} selectedGag={selectedGag} selectedPlayer={selectedPlayer} handleCloseModal={handleCloseModal} handleConfirmGuess={handleConfirmGuess}/>
     <PlayerDrawer players={playerList || []} isDrawerOpen={isDrawerOpen} handleCloseDrawer={handleCloseDrawer} handlePlayerClick={handlePlayerClick} />
       <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
+      { playerId !== "spectator" ? <Box position="relative" width="100%" display="flex" alignItems="center">
+        <Typography
+          variant="h3"
+          color="info.main"
+          sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
+        >
+          {`ROUND ${roundCount}`}
+        </Typography>
+        <Box sx={{ marginLeft: 'auto' }}>
+          <GameMenu />
+        </Box>
+      </Box> :
+      <Box>
+        <Typography
+          variant="h3"
+          color="info.main"
+        >
+          {`ROUND ${roundCount}`}
+        </Typography>
+        <Typography variant="body1" > SPECTATOR VIEW </Typography>
+      </Box>
+      }
         <Box textAlign="center" alignItems="center"  marginBottom="8px" marginTop="8px" paddingX="8px">
           <Typography color="info" variant="h5">{currentRound?.promptText}</Typography>
         </Box>

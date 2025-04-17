@@ -52,6 +52,7 @@ export interface Prompt {
     stage: number;
     gameCode: string;
     active: boolean;
+    minutes: number;
     createdAt: number;
     mode: string;
     currentRound: Round;

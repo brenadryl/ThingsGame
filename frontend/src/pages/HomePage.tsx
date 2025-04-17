@@ -3,10 +3,26 @@ import React from 'react';
 import GradientButton from '../Components/GradientButton';
 import { useNavigate } from 'react-router-dom';
 import { HOME_LOGO } from '../themes/constants';
+import { GameState, useGameStore } from '../stores/useGameStore';
 
 const HomePage: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const setGame = useGameStore((state: GameState) => state.setGame)
+    const setGagList = useGameStore((state: GameState) => state.setGagList)
+    const setRoom = useGameStore((state: GameState) => state.setRoom)
+    const setCurrentRound = useGameStore((state: GameState) => state.setCurrentRound)
+    const setPlayerList = useGameStore((state: GameState) => state.setPlayerList)
+    const setMode = useGameStore((state: GameState) => state.setMode)
+    const setMinutes = useGameStore((state: GameState) => state.setMinutes)
+
+    setGame(null);
+    setGagList([])
+    setRoom(null)
+    setCurrentRound(null)
+    setPlayerList([])
+    setMode("easy")
+    setMinutes(2)
 
   return (
     <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">

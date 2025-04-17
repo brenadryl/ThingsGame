@@ -36,7 +36,7 @@ const RoundTransition: React.FC = () => {
   return (
     <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
         <SlapDown delay={0.2}>
-            <Typography color="info" variant="h2" marginBottom="24px"> OVER </Typography>
+            <Typography color="info" variant="h2" marginBottom="24px"> ROUND OVER </Typography>
         </SlapDown>
         <SlapDown delay={0.8}>
             <Typography color="text.secondary" variant="h3"> LONE SURVIVOR: </Typography>

@@ -8,6 +8,7 @@ export const GET_CURRENT_ROUND = gql`
         promptText
         stage
         turn
+        createdAt
         guesses {
           _id
           createdAt

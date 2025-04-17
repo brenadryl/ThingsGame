@@ -31,6 +31,7 @@ export const useGameQuery = (
     const { loading: loadingGame, error: errorGame } = useQuery<GetGameData>(GET_GAME, {
         variables: { id: gameId, roundId: currentRoundId },
         skip: !gameId,
+        fetchPolicy: 'network-only',
         onCompleted(data) {
             console.log("gettingGame. data : ", data);
             if (!!data?.getGame) {

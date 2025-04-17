@@ -7,6 +7,7 @@ import PlayerList from '../PlayerList';
 import AvatarSelection from '../AvatarSelection';
 import { GameState, useGameStore } from '../../stores/useGameStore';
 import { FaRegCopy } from 'react-icons/fa';
+import GameSettings from '../GameSettings';
 
 
 const WaitingRoom: React.FC = () => {  
@@ -16,12 +17,13 @@ const WaitingRoom: React.FC = () => {
   const playerList = useGameStore((state: GameState) => state.playerList)
   const game = useGameStore((state: GameState) => state.game)
   const mode = useGameStore((state: GameState) => state.mode)
+  const minutes = useGameStore((state: GameState) => state.minutes)
   const [startGame, {loading: startLoading, error: startError}] = useMutation(CHANGE_GAME_MUTATION);
 
   const handleStartGame = async () => {
     if (!gameId) return;
     try {
-      await startGame({variables: { id: gameId, active: true, stage: 2, mode }})
+      await startGame({variables: { id: gameId, active: true, stage: 2, mode, minutes }})
       console.log("Game started!")
     } catch (error) {
       console.error("Error starting game:", error)
@@ -44,6 +46,29 @@ const WaitingRoom: React.FC = () => {
 
   return (
     <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
+      {playerId === game?.players[0]._id ? 
+        (<Box position="relative" width="100%" display="flex" alignItems="center">
+          <Typography
+            variant="h2"
+            color="info.main"
+            sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
+          >
+            CODE
+          </Typography>
+          <Box sx={{ marginLeft: 'auto' }}>
+            <GameSettings />
+          </Box>
+        </Box>) :
+        (<Box>
+          {playerId === "spectator" && <Typography variant="body1" > SPECTATOR VIEW </Typography>}
+          <Typography
+            variant="h2"
+            color="info.main"
+          >
+            CODE
+          </Typography>
+        </Box>)
+      }
       <Box display="flex" alignItems="center" justifyContent="center" gap={1} marginBottom={2}>
         <Box display="flex" alignItems="flex-start">
           <Typography 

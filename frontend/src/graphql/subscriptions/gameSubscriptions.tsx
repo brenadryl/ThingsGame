@@ -7,6 +7,7 @@ export const GAME_STAGE_SUBSCRIPTION = gql`
       stage
       active
       mode
+      minutes
     }
   }
 `;

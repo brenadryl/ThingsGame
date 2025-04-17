@@ -11,6 +11,7 @@ import LoadingLogo from '../LoadingLogo';
 import { GET_PLAYERS, GetPlayersData } from '../../graphql/queries/playerQueries';
 import { useGameQuery } from '../../Hooks/useGameQuery';
 import { SUPERLATIVES } from '../../themes/constants';
+import GameMenu from '../GameMenu';
 
 const ScoreRoom: React.FC = () => {  
   const { gameId, playerId } = useParams();
@@ -99,11 +100,30 @@ const ScoreRoom: React.FC = () => {
   }
 
   return (
-    <Box textAlign="center" alignItems="center"  marginTop="8px" display="flex" flexDirection="column">
-      <Box textAlign="center" alignItems="center"  marginBottom="32px" display="flex" flexDirection="row">
-        <Typography color="text.secondary" variant="h3">SCOREBOARD</Typography>
+    <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
+      { playerId !== "spectator" ? <Box position="relative" width="100%" display="flex" alignItems="center">
+        <Typography
+          variant="h3"
+          color="info.main"
+          sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
+        >
+          SCOREBOARD
+        </Typography>
+        <Box sx={{ marginLeft: 'auto' }}>
+          <GameMenu />
+        </Box>
+      </Box> :
+      <Box>
+        <Typography
+          variant="h3"
+          color="info.main"
+        >
+          SCOREBOARD
+        </Typography>
+        <Typography variant="body1" > SPECTATOR VIEW </Typography>
       </Box>
-      <Box display="flex" justifyContent="center" flexWrap="wrap">
+      }
+      <Box display="flex" justifyContent="center" flexWrap="wrap" marginTop="8px">
         {renderPlayerCards()}
       </Box>
         {(favoriteGags?.length || 0) > 0 && (

@@ -68,6 +68,7 @@ const typeDefs = `
     _id: ID!
     stage: Int!
     gameCode: String!
+    minutes: Int
     active: Boolean!
     createdAt: Float!
     mode: String
@@ -99,7 +100,7 @@ const typeDefs = `
     updatePlayer(id: ID!, name: String, points: Int): Player!
     updatePlayerIcon(gameId: ID!, playerId: ID!, icon: Int, color: String): Player!
     createGame: Game!
-    updateGameStage(id: ID!, active: Boolean, stage: Int, mode: String): Game!
+    updateGameStage(id: ID!, active: Boolean, stage: Int, mode: String, minutes: Int): Game!
     deleteOld: DeleteResponse
     createRound(gameId: ID!, promptText: String!, turn: Int!): Round!
     updateRound(id: ID!, turn: Int, stage: Int): Round!

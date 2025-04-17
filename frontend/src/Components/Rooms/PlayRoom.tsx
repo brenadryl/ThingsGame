@@ -4,8 +4,9 @@ import { useParams } from 'react-router-dom';
 import PlayerCard from '../PlayerCards';
 import PromptSelection from '../PromptSelection';
 import { GameState, useGameStore } from '../../stores/useGameStore';
+import GameMenu from '../GameMenu';
 
-const PlayRoom: React.FC = () => {  
+const PlayRoom: React.FC = () => {
   const { gameId, playerId } = useParams();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const game = useGameStore((state: GameState) => state.game);
@@ -29,8 +30,33 @@ const PlayRoom: React.FC = () => {
     return <PromptSelection gameId={gameId || ''} turn={currentTurn}/>
   }
 
+  const roundCount = ((game?.rounds?.length ?? 0) + 1);
+
+
   return (
     <Box textAlign="center" alignItems="center" display="flex" flexDirection="column">
+      { playerId !== "spectator" ? <Box position="relative" width="100%" display="flex" alignItems="center">
+        <Typography
+          variant="h3"
+          color="info.main"
+          sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
+        >
+          {`ROUND ${roundCount}`}
+        </Typography>
+        <Box sx={{ marginLeft: 'auto' }}>
+          <GameMenu />
+        </Box>
+      </Box> :
+      <Box>
+        <Typography
+          variant="h3"
+          color="info.main"
+        >
+          {`ROUND ${roundCount}`}
+        </Typography>
+        <Typography variant="body1" > SPECTATOR VIEW </Typography>
+      </Box>
+      }
       <Box textAlign="center" alignItems="center"  marginY="16px" >
         <Typography color="text.secondary">
           {currentTurnPlayer ? `${currentTurnPlayer.name} is choosing a prompt` : "Waiting for player..."}
