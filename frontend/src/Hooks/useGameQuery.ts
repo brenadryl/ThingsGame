@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GET_GAME, GetGameData } from '../graphql/queries/gameQueries';
 import { Guess } from '../types';
@@ -11,7 +11,7 @@ export const useGameQuery = (
   playerId: string | undefined,
   currentRoundId?: string,
 ) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const setGame = useGameStore((state: GameState) => state.setGame);
     const setGagList = useGameStore((state: GameState) => state.setGagList);
     const setLikes = useGameStore((state: GameState) => state.setLikes);
@@ -74,11 +74,15 @@ export const useGameQuery = (
         },
     });
 
-    useEffect(() => {
-        console.log("loadingGame: ", loadingGame);
+    if (errorGame) {
         console.log("errorGame: ", errorGame);
-        if (!loadingGame && errorGame) {
-            setTimeout(() => navigate('/'), 3000);
-        }
-    }, [ errorGame, loadingGame, navigate ]);
+    }
+
+    // useEffect(() => {
+    //     console.log("loadingGame: ", loadingGame);
+    //     console.log("errorGame: ", errorGame);
+    //     if (!loadingGame && errorGame) {
+    //         setTimeout(() => navigate('/'), 3000);
+    //     }
+    // }, [ errorGame, loadingGame, navigate ]);
 };
